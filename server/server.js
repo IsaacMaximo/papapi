@@ -12,14 +12,14 @@ app.use(cors());
 
 app.use(express.json());
 
-app.get("/teste", (req, res) => {
+app.get("/papapi/teste", (req, res) => {
   res.json({
     mensagem: "Requisição GET funcionando!",
     timestamp: new Date().toISOString(),
   });
 });
 
-app.post("/teste", (req, res) => {
+app.post("/papapi/teste", (req, res) => {
   const dados = req.body;
   res.json({
     mensagem: "Requisição POST recebida!",
@@ -40,7 +40,7 @@ const {
 const { connectToDatabase } = require("./conndb.js");
 
 
-app.get("/run-scraper-testebrowserless", async (req, res) => {
+app.get("/papapi/run-scraper-testebrowserless", async (req, res) => {
   try {
     const output = await testebrowserless("https://www.pingodoce.pt/");
     res.json({
@@ -55,7 +55,7 @@ app.get("/run-scraper-testebrowserless", async (req, res) => {
 });
 
 // Rota para o Pingo Doce
-app.get("/run-scraper-pingodoce", async (req, res) => {
+app.get("/papapi/run-scraper-pingodoce", async (req, res) => {
   try {
     const termoBusca = req.query.produto;
 
@@ -83,7 +83,7 @@ app.get("/run-scraper-pingodoce", async (req, res) => {
 });
 
 // Rota para o Continente
-app.get("/run-scraper-continente", async (req, res) => {
+app.get("/papapi/run-scraper-continente", async (req, res) => {
   try {
     const termoBusca = req.query.produto;
 
@@ -113,7 +113,7 @@ app.get("/run-scraper-continente", async (req, res) => {
 
 
 
-app.get("/run-scraper-Auchan", async (req, res) => {
+app.get("/papapi/run-scraper-Auchan", async (req, res) => {
   try {
     const termoBusca = req.query.produto;
 
@@ -141,7 +141,7 @@ app.get("/run-scraper-Auchan", async (req, res) => {
 });
 
 
-app.get("/run-scraper-Intermarche", async (req, res) => {
+app.get("/papapi/run-scraper-Intermarche", async (req, res) => {
   try {
     const termoBusca = req.query.produto;
 
@@ -168,7 +168,7 @@ app.get("/run-scraper-Intermarche", async (req, res) => {
   }
 });
 
-app.get("/run-scraper-lidl", async (req, res) => {
+app.get("/papapi/run-scraper-lidl", async (req, res) => {
   try {
     const termoBusca = req.query.produto;
 
@@ -198,7 +198,7 @@ app.get("/run-scraper-lidl", async (req, res) => {
 
 
 
-app.get("/", (req, res) => {
+app.get("/papapi/", (req, res) => {
   res.send("Servidor Node.js funcionando! 🚀");
 });
 
