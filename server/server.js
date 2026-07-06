@@ -34,10 +34,25 @@ const {
   scraper_Auchan,
   scraper_Intermarche,
   scraper_lidl,
+  testebrowserless,
 } = require("./scraper.js");
 
 const { connectToDatabase } = require("./conndb.js");
 
+
+app.get("/run-scraper-testebrowserless", async (req, res) => {
+  try {
+    const output = await testebrowserless("https://www.pingodoce.pt/");
+    res.json({
+      message: "Teste do Browserless executado com sucesso!",
+      output: output,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Erro ao executar teste do Browserless", error: error.message });
+  }
+});
 
 // Rota para o Pingo Doce
 app.get("/run-scraper-pingodoce", async (req, res) => {
@@ -187,15 +202,17 @@ app.get("/", (req, res) => {
   res.send("Servidor Node.js funcionando! 🚀");
 });
 
-
-const connectDB = async () => {
+async function startServer() {
   try {
-    await connectToDatabase();
-    console.log("✅ Banco conectado com sucesso");
+    await connectToDatabase().catch(console.dir);
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando em http://localhost:${PORT}`);
+      console.log(`Endpoint de teste: http://localhost:${PORT}/teste`);
+    });
   } catch (error) {
-    console.error("❌ Erro ao conectar ao banco:", error);
+    console.error("Falha na inicialização do servidor:", error);
+    process.exit(1);
   }
-};
+}
 
-// Exporta para o Vercel (NÃO use app.listen!)
-module.exports = app;
+startServer();
