@@ -12,7 +12,7 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
+      "src": "/papapi/(.*)",
       "dest": "server/server.js"
     },
     {
