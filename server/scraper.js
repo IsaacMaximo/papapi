@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer-core");
+const puppeteer = require("puppeteer");
 
 const BROWSERLESS_URL = "wss://production-sfo.browserless.io?token=2Uq0NqfU2OfmBd14ff28ddd83e274f38cb653424eae972cc1";
 
