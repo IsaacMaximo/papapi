@@ -2,13 +2,11 @@ const express = require("express");
 const app = express();
 const PORT = 1919;
 
-
 const axios = require("axios");
 const cheerio = require("cheerio");
 
 const cors = require("cors");
 app.use(cors());
-
 
 app.use(express.json());
 
@@ -39,7 +37,6 @@ const {
 
 const { connectToDatabase } = require("./conndb.js");
 
-
 app.get("/papapi/run-scraper-testebrowserless", async (req, res) => {
   try {
     const output = await testebrowserless("https://www.pingodoce.pt/");
@@ -48,9 +45,10 @@ app.get("/papapi/run-scraper-testebrowserless", async (req, res) => {
       output: output,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erro ao executar teste do Browserless", error: error.message });
+    res.status(500).json({
+      message: "Erro ao executar teste do Browserless",
+      error: error.message,
+    });
   }
 });
 
@@ -110,9 +108,6 @@ app.get("/papapi/run-scraper-continente", async (req, res) => {
   }
 });
 
-
-
-
 app.get("/papapi/run-scraper-Auchan", async (req, res) => {
   try {
     const termoBusca = req.query.produto;
@@ -139,7 +134,6 @@ app.get("/papapi/run-scraper-Auchan", async (req, res) => {
       .json({ message: "Erro ao executar scraper", error: error.message });
   }
 });
-
 
 app.get("/papapi/run-scraper-Intermarche", async (req, res) => {
   try {
@@ -195,24 +189,18 @@ app.get("/papapi/run-scraper-lidl", async (req, res) => {
   }
 });
 
-
-
-
 app.get("/papapi/", (req, res) => {
   res.send("Servidor Node.js funcionando! 🚀");
 });
 
-async function startServer() {
+const connectDB = async () => {
   try {
-    await connectToDatabase().catch(console.dir);
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando em http://localhost:${PORT}`);
-      console.log(`Endpoint de teste: http://localhost:${PORT}/teste`);
-    });
+    await connectToDatabase();
+    console.log("✅ Banco conectado com sucesso");
   } catch (error) {
-    console.error("Falha na inicialização do servidor:", error);
-    process.exit(1);
+    console.error("❌ Erro ao conectar ao banco:", error);
   }
-}
+};
 
-startServer();
+// Exporta para o Vercel (NÃO use app.listen!)
+module.exports = app;
