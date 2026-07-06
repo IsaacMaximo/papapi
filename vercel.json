@@ -5,7 +5,7 @@
       "src": "server/server.js",
       "use": "@vercel/node",
       "config": {
-        "installCommand": "npm install puppeteer-core --platform=linux --arch=x64"
+        "installCommand": "npm install puppeteer --platform=linux --arch=x64"
       }
     },
     {
