@@ -1,4 +1,4 @@
-const BROWSERLESS_URL =
+const B= await connectBrowserless()ROWSERLESS_URL =
   "wss://production-sfo.browserless.io?token=" + process.env.BROWSERLESS_TOKEN;
 
 async function getPuppeteer() {
@@ -138,7 +138,7 @@ async function scraper_PingoDoce(pagina, pesquisa) {
 }
 
 async function scraper_Continente(pagina, pesquisa) {
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await connectBrowserless();
   const page = await browser.newPage();
 
   const startTime = Date.now();
@@ -234,7 +234,7 @@ async function scraper_Continente(pagina, pesquisa) {
 }
 
 async function scraper_Auchan(pagina, pesquisa) {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await connectBrowserless();
   const page = await browser.newPage();
 
   const startTime = Date.now();
@@ -331,7 +331,7 @@ async function scraper_Auchan(pagina, pesquisa) {
 }
 
 async function scraper_lidl(pagina, pesquisa) {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await connectBrowserless();
   const page = await browser.newPage();
   const startTime = Date.now();
 
@@ -425,8 +425,7 @@ async function scraper_lidl(pagina, pesquisa) {
 }
 
 async function scraper_Intermarche(pagina, pesquisa) {
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
+  const browser = await connectBrowserless();
   const startTime = Date.now();
 
   await page.goto(pagina);
