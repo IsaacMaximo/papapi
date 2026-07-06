@@ -1,5 +1,5 @@
 const BROWSERLESS_URL =
-  "wss://production-sfo.browserless.io?token=2Uq0NqfU2OfmBd14ff28ddd83e274f38cb653424eae972cc1";
+  "wss://production-sfo.browserless.io?token=" + process.env.BROWSERLESS_TOKEN;
 
 async function getPuppeteer() {
   const puppeteerModule = await import("puppeteer");
@@ -18,7 +18,7 @@ async function connectBrowserless() {
 
 async function testebrowserless(pagina) {
   const response = await fetch(
-    "https://production-sfo.browserless.io/scrape?token=2Uq0NqfU2OfmBd14ff28ddd83e274f38cb653424eae972cc1",
+    `https://production-sfo.browserless.io/scrape?token=${process.env.BROWSERLESS_TOKEN}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
