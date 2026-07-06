@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="visual/css/css.css" />
+    <title>PAP</title>
+  </head>
+  <body>
+    <div class="container">
+      <main>
+        <h1>Web Scraper</h1>
+        <form action="">
+          <input type="text" id="produto" placeholder="Enter product name" />
+          <button type="button" enabled onclick="runScraper('continente')">
+            Continente
+          </button>
+          <button type="button" enabled onclick="runScraper('pingodoce')">
+            Pingo Doce
+          </button>
+          <button type="button" enabled onclick="runScraper('auchan')">
+            Auchan
+          </button>
+          <button type="button" enabled onclick="runScraper('lidl')">
+            Lidl
+          </button>
+
+          <button type="button" enabled onclick="runScraperTodos()">
+            TODOS
+          </button>
+        </form>
+        <div id="results"></div>
+      </main>
+    </div>
+  </body>
+</html>
+<script>
+  function enableButtons() {
+    document
+      .querySelectorAll("button")
+      .forEach((button) => (button.disabled = false));
+  }
+  const lojas = ["continente", "pingodoce", "auchan", "lidl"];
+  const search = document.getElementById("produto");
+
+  function displayResults(loja, data) {
+    const resultsDiv = document.getElementById("results");
+    let html = `<div class="store-section">
+            <div class="store-header">${loja.toUpperCase()}</div>`;
+
+    console.log("data:", data);
+    console.log("data.output.products:", data.output.products);
+
+    // Corrigido: data.products ao invés de data.output.products
+    if (data.output && data.output.products && data.output.products.length > 0) {
+      html += `<div class="store-info">Encontrados ${data.output.products.length} produtos</div>
+                  <div class="products-grid">`;
+
+      data.output.products.forEach((product) => {
+        html += `<div class="product-card">
+                        <img src="${product.image || "placeholder.jpg"}" alt="${product.name}" class="product-image">
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-price">${product.price}</div>
+                            <a href="${product.urldoproduto}" target="_blank" class="product-link">Ver Produto</a>
+                        </div>
+                    </div>`;
+      });
+      html += `</div>`;
+    } else {
+      html += `<div class="error-message">Nenhum produto encontrado</div>`;
+    }
+    html += `</div>`;
+    resultsDiv.innerHTML += html;
+  }
+
+  function runScraper(LOJA) {
+    document
+      .querySelectorAll("button")
+      .forEach((button) => (button.disabled = true));
+    console.log("iniciando fetch");
+    document.body.style.cursor = "wait";
+    document.getElementById("results").innerHTML = "";
+    fetch(
+      "http://localhost:1919/run-scraper-" + LOJA + "?produto=" + search.value,
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        displayResults(LOJA, data);
+        document.body.style.cursor = "default";
+        enableButtons();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        document.getElementById("results").innerHTML =
+          '<div class="error-message">Erro ao buscar dados</div>';
+        document.body.style.cursor = "default";
+        enableButtons();
+      });
+  }
+
+  async function runScraperTodos() {
+    document
+      .querySelectorAll("button")
+      .forEach((button) => (button.disabled = true));
+    document.body.style.cursor = "wait";
+    document.getElementById("results").innerHTML = "";
+
+    try {
+      for (const loja of lojas) {
+        const response = await fetch(
+          `http://localhost:1919/run-scraper-${loja}?produto=${search.value}`,
+        );
+        const data = await response.json();
+        console.log(`${loja}:`, data);
+        displayResults(loja, data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      document.getElementById("results").innerHTML +=
+        '<div class="error-message">Erro ao buscar dados</div>';
+    } finally {
+      document
+        .querySelectorAll("button")
+        .forEach((button) => (button.disabled = false));
+      document.body.style.cursor = "default";
+    }
+  }
+</script>

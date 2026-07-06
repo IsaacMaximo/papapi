@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAP</title>
+</head>
+<body>
+    <div class="container">
+        <main>
+            <h1>Scraper Continente</h1>
+            <form action="">
+                <input type="text" id="produto" placeholder="Enter product name">
+                <button type="button" enabled onclick="runScraper('continente')">Continente</button>
+                <button type="button" enabled onclick="runScraper('pingodoce')">Pingo Doce</button>
+                <button type="button" enabled onclick="runScraper('auchan')">Auchan</button>
+                <button type="button" enabled onclick="runScraper('lidl')">Lidl</button>
+                <button type="button" enabled onclick="runScraper('intermarche')">Intermarché</button>
+
+                <button type="button" disabled="false" onclick="runScraperTodos()">TODOS</button>
+            </form>
+        </main>
+
+    </div>
+</body>
+</html>
+<style>
+    h1 {
+        text-align: center;
+        color: #333;
+        position: relative;
+        display: inline-block;
+    }
+    h1:hover {
+        color: #007BFF;
+    }
+    
+    h1:hover:before {
+        border: #00ffea solid 2px;
+    }
+    h1:active {
+        color: #FF5733;
+    }
+    h1:focus {
+        color: #28A745;
+    }
+    h1:before {
+        content: "";
+        position: absolute;
+        left: auto;
+        bottom: 0px;
+        width: 100%;
+        height: 0px;
+        border: #007BFF solid 1px;
+        
+    }
+    h1:after {
+        content: "";
+    }
+    html {
+    font-size: 62.5%;
+    }
+    body {
+        font-size: 1.6rem;
+        max-width: 120rem;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: Arial, sans-serif;
+    }
+    *{
+        box-sizing: border-box;
+        transition: all 0.3s ease .1s;
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+<script>
+    function enableButtons() {
+        document.querySelectorAll('button').forEach(button => button.disabled = false);
+    }
+    const lojas = ['continente', 'pingodoce', 'auchan', 'lidl'];
+    const search = document.getElementById('produto');
+    function runScraper(LOJA) {
+        document.querySelectorAll('button').forEach(button => button.disabled = true);
+        console.log('iniciando fetch');
+        document.body.style.cursor = 'wait';
+        fetch('http://localhost:1919/run-scraper-' + LOJA + '?produto=' + search.value)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                console.log('iniciando data');
+                document.body.style.cursor = 'default';
+                enableButtons();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.body.style.cursor = 'default';
+                enableButtons();
+            });
+    }
+
+async function runScraperTodos() {
+    document.querySelectorAll('button').forEach(button => button.disabled = true);
+    document.body.style.cursor = 'wait';
+    
+    try {
+        for (const loja of lojas) {
+            const response = await fetch(`http://localhost:1919/run-scraper-${loja}?produto=${search.value}`);
+            const data = await response.json();
+            console.log(`${loja}:`, data);
+        }
+    } finally {
+        document.querySelectorAll('button').forEach(button => button.disabled = false);
+        document.body.style.cursor = 'default';
+    }
+}
+</script>

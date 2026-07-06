@@ -1,0 +1,14 @@
+services:
+  # Serviço do seu aplicativo Node.js
+  app:
+    build: . # Constrói a imagem a partir do Dockerfile na pasta atual
+    container_name: meu-backend
+    ports:
+      - "1920:1920" # Mapeia a porta do container para a sua máquina
+    environment:
+      # ⚠️ IMPORTANTE: Use variáveis de ambiente para a conexão
+      - MONGODB_URI=mongodb+srv://Isaac:PassDeTestePAP@cluster0.mg2g147.mongodb.net/?appName=Cluster0
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
