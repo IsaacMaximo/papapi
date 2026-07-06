@@ -89,7 +89,7 @@
         document.querySelectorAll('button').forEach(button => button.disabled = true);
         console.log('iniciando fetch');
         document.body.style.cursor = 'wait';
-        fetch('http://localhost:1919/run-scraper-' + LOJA + '?produto=' + search.value)
+        fetch('https://api-pap.vercel.app/run-scraper-' + LOJA + '?produto=' + search.value)
             .then(response => {
                 return response.json();
             })
@@ -112,7 +112,7 @@ async function runScraperTodos() {
     
     try {
         for (const loja of lojas) {
-            const response = await fetch(`http://localhost:1919/run-scraper-${loja}?produto=${search.value}`);
+            const response = await fetch(`https://api-pap.vercel.app/run-scraper-${loja}?produto=${search.value}`);
             const data = await response.json();
             console.log(`${loja}:`, data);
         }
