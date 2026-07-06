@@ -1,13 +1,19 @@
-const puppeteer = require("puppeteer");
+const BROWSERLESS_URL =
+  "wss://production-sfo.browserless.io?token=2Uq0NqfU2OfmBd14ff28ddd83e274f38cb653424eae972cc1";
 
-const BROWSERLESS_URL = "wss://production-sfo.browserless.io?token=2Uq0NqfU2OfmBd14ff28ddd83e274f38cb653424eae972cc1";
-
+async function getPuppeteer() {
+  const puppeteerModule = await import("puppeteer");
+  return puppeteerModule.default;
+}
 
 async function connectBrowserless() {
-    return await puppeteer.connect({
-        browserWSEndpoint: BROWSERLESS_URL,
-        defaultViewport: null,
-    });
+  const puppeteer = await getPuppeteer();
+  return await puppeteer.connect({
+    browserWSEndpoint: BROWSERLESS_URL,
+    defaultViewport: null,
+    // Adicione timeout para evitar problemas
+    timeout: 30000,
+  });
 }
 
 async function testebrowserless(pagina) {
@@ -27,9 +33,8 @@ async function testebrowserless(pagina) {
   return data;
 }
 
-
 async function scraper_PingoDoce(pagina, pesquisa) {
-  const browser = await connectBeowserless()
+  const browser = await connectBrowserless();
   const page = await browser.newPage();
 
   const startTime = Date.now();
@@ -519,5 +524,5 @@ module.exports = {
   scraper_Auchan,
   scraper_lidl,
   scraper_Intermarche,
-  testebrowserless
+  testebrowserless,
 };
