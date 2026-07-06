@@ -187,17 +187,15 @@ app.get("/", (req, res) => {
   res.send("Servidor Node.js funcionando! 🚀");
 });
 
-async function startServer() {
-  try {
-    await connectToDatabase().catch(console.dir);
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando em http://localhost:${PORT}`);
-      console.log(`Endpoint de teste: http://localhost:${PORT}/teste`);
-    });
-  } catch (error) {
-    console.error("Falha na inicialização do servidor:", error);
-    process.exit(1);
-  }
-}
 
-startServer();
+const connectDB = async () => {
+  try {
+    await connectToDatabase();
+    console.log("✅ Banco conectado com sucesso");
+  } catch (error) {
+    console.error("❌ Erro ao conectar ao banco:", error);
+  }
+};
+
+// Exporta para o Vercel (NÃO use app.listen!)
+module.exports = app;

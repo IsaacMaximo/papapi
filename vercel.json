@@ -1,15 +1,26 @@
 {
-    "version": 2,
-    "builds": [
-        {
-            "src": "server/server.js",
-            "use": "@vercel/node"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "server/server.js"
-        }
-    ]
+  "version": 2,
+  "builds": [
+    {
+      "src": "server/server.js",
+      "use": "@vercel/node",
+      "config": {
+        "maxDuration": 60,
+        "memory": 1024,
+        "installCommand": "npm install puppeteer --platform=linux --arch=x64"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "server/server.js"
+    }
+  ],
+  "functions": {
+    "server/server.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  }
 }
