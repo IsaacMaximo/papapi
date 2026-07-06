@@ -190,7 +190,7 @@ app.get("/papapi/run-scraper-lidl", async (req, res) => {
 });
 
 app.get("/papapi/", (req, res) => {
-  res.send("Servidor Node.js funcionando! 🚀");
+  res.send("Servidor Node.js funcionando!");
 });
 
 const connectDB = async () => {

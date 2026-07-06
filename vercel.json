@@ -21,6 +21,10 @@
     {
       "src": "/(.*)",
       "dest": "public/index.html"
+    },
+    {
+      "src": "/visual/(.*)",
+      "dest": "public/visual/$1"
     }
   ]
 }
