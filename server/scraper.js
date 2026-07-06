@@ -1,489 +1,369 @@
 // scraper.js
-const puppeteer = require("puppeteer");
+const axios = require("axios");
+const cheerio = require("cheerio");
 
+// Configuração do Browserless
+const BROWSERLESS_API_KEY = process.env.BROWSERLESS_API_KEY;
+const BROWSERLESS_URL = `https://chrome.browserless.io/content?token=${BROWSERLESS_API_KEY}`;
+
+// Função auxiliar para fazer scraping via Browserless
+async function fetchHTML(url) {
+  try {
+    const response = await axios.post(BROWSERLESS_URL, {
+      url: url,
+      options: {
+        waitForSelector:
+          ".product-tile-pd, .product, .product-grid, #search-results, .productList__grid__item",
+        waitForTimeout: 10000,
+        scrollPage: true,
+        scrollDelay: 1000,
+        scrollTimes: 3,
+        userAgent:
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar HTML via Browserless:", error.message);
+    throw error;
+  }
+}
+
+// ============ PINGO DOCE ============
 async function scraper_PingoDoce(pagina, pesquisa) {
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
-
   const startTime = Date.now();
 
-  await page.goto(pagina);
+  try {
+    const url = `${pagina}?s=${encodeURIComponent(pesquisa)}`;
+    console.log(`Buscando: ${url}`);
 
-  const title = await page.title();
-  console.log("Título da página:", title);
+    const html = await fetchHTML(url);
+    const $ = cheerio.load(html);
 
-  const searchSelector = "input[name='q']";
-  await page.waitForSelector(searchSelector);
-  console.log("Campo de pesquisa encontrado. Realizando busca...");
-  await page.type(searchSelector, pesquisa);
-  console.log(`Texto digitado no campo de pesquisa: ${pesquisa}`);
-  await page.keyboard.press("Enter");
-  console.log(`Realizando pesquisa por: ${pesquisa}`);
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
-  console.log("Pesquisa concluída. Página de resultados carregada.");
+    // Verifica se encontrou produtos
+    const resultText = $(".search-results-container-count").text();
+    const resultCount = parseInt(resultText, 10) || 0;
 
-  const resultText = await page.$eval(
-    ".search-results-container-count",
-    (el) => el.innerText,
-  );
-  const resultCount = parseInt(resultText, 10);
+    if (resultCount === 0) {
+      return {
+        success: false,
+        message: "Nenhum produto encontrado para a pesquisa.",
+        timestamp: new Date().toISOString(),
+        execution_time_ms: Date.now() - startTime,
+      };
+    }
 
-  if (resultCount === 0) {
-    console.log("Nenhum produto encontrado para a pesquisa.");
-    await browser.close();
-    const executionTime = Date.now() - startTime;
-    return {
-      success: false,
-      message: "Nenhum produto encontrado para a pesquisa.",
-      timestamp: new Date().toISOString(),
-      execution_time_ms: executionTime,
-    };
-  }
-
-  const showMoreButton = await page.$(".show-more button");
-  if (showMoreButton) {
-    await showMoreButton.click();
-    console.log("Clicando no botão 'Mostrar mais'");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-  }
-
-  await page.waitForSelector(".product-tile-pd", { timeout: 10000 });
-  console.log("Produtos carregados. Extraindo informações...");
-
-  await autoScroll(page);
-
-  const products = await page.evaluate(() => {
-    const items = document.querySelectorAll(".product-tile-pd");
-    return Array.from(items).map((item) => {
+    const products = [];
+    $(".product-tile-pd").each((index, element) => {
       const name =
-        item.querySelector(".product-name-link a")?.innerText.trim() || "ERROR";
+        $(element).find(".product-name-link a").text().trim() || "ERROR";
 
       let price = "N/A";
-      const priceBruto = item.querySelector(".value")?.getAttribute("content");
-
+      const priceBruto = $(element).find(".value").attr("content");
       if (priceBruto) {
-        // Corrigido: replace de ponto por vírgula
         price = priceBruto.replace(/\./g, ",") + "€";
       }
 
       const image =
-        item.querySelector(".product-tile-image-link img")?.src || "ERROR";
-
+        $(element).find(".product-tile-image-link img").attr("src") || "ERROR";
       const urldoproduto =
-        item.querySelector(".product-name-link a")?.href || "ERROR";
+        $(element).find(".product-name-link a").attr("href") || "ERROR";
 
-      return { name, price, image, urldoproduto };
+      products.push({ name, price, image, urldoproduto });
     });
-  });
 
-  console.log(`Produtos encontrados: ${products.length}`);
+    console.log(`Pingo Doce: ${products.length} produtos encontrados`);
 
-  await browser.close();
-
-  const executionTime = Date.now() - startTime;
-  if (products.length === 0) {
-    console.log("Nenhum produto encontrado para a pesquisa.");
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      search: {
+        term: pesquisa,
+        url: pagina,
+      },
+      summary: {
+        total_products: products.length,
+        execution_time_ms: Date.now() - startTime,
+      },
+      products: products,
+    };
+  } catch (error) {
+    console.error("Erro no scraper_PingoDoce:", error.message);
     return {
       success: false,
-      message: "Nenhum produto encontrado para a pesquisa.",
+      message: "Erro ao executar scraper",
+      error: error.message,
       timestamp: new Date().toISOString(),
-      execution_time_ms: executionTime,
+      execution_time_ms: Date.now() - startTime,
     };
   }
-  return {
-    success: true,
-    timestamp: new Date().toISOString(),
-    search: {
-      term: pesquisa,
-      url: pagina,
-    },
-    summary: {
-      total_products: products.length,
-      execution_time_ms: executionTime,
-    },
-    products: products,
-  };
 }
 
+// ============ CONTINENTE ============
 async function scraper_Continente(pagina, pesquisa) {
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
-
   const startTime = Date.now();
 
-  await page.goto(pagina);
+  try {
+    const url = `${pagina}?q=${encodeURIComponent(pesquisa)}`;
+    console.log(`Buscando: ${url}`);
 
-  const title = await page.title();
-  console.log("Título da página:", title);
+    const html = await fetchHTML(url);
+    const $ = cheerio.load(html);
 
-  const searchSelector = "input[name='q']";
-  await page.waitForSelector(searchSelector);
+    // Verifica se encontrou produtos
+    if ($(".search-noresults-wrapper").length > 0) {
+      return {
+        success: false,
+        message: "Nenhum produto encontrado para a pesquisa.",
+        timestamp: new Date().toISOString(),
+        execution_time_ms: Date.now() - startTime,
+      };
+    }
 
-  console.log("Campo de pesquisa encontrado. Realizando busca...");
-  await page.type(searchSelector, pesquisa);
-  console.log(`Texto digitado no campo de pesquisa: ${pesquisa}`);
-  await page.keyboard.press("Enter");
-  console.log(`Realizando pesquisa por: ${pesquisa}`);
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
-  console.log("Pesquisa concluída. Página de resultados carregada.");
-
-  if (await page.$(".search-noresults-wrapper")) {
-    console.log("Nenhum produto encontrado para a pesquisa.");
-    await browser.close();
-    const executionTime = Date.now() - startTime;
-    return {
-      success: false,
-      message: "Nenhum produto encontrado para a pesquisa.",
-      timestamp: new Date().toISOString(),
-      execution_time_ms: executionTime,
-    };
-  }
-
-  await page.waitForSelector("div[class ='product']", { timeout: 10000 });
-  console.log("Produtos carregados. Extraindo informações...");
-
-  await autoScroll(page);
-
-  const products = await page.evaluate(() => {
-    const items = document.querySelectorAll("div[class ='product']");
-    return Array.from(items).map((item) => {
+    const products = [];
+    $("div[class='product']").each((index, element) => {
       const name =
-        item.querySelector(".pwc-tile--description")?.innerText.trim() ||
-        "ERROR";
-      const image = item.querySelector(".ct-tile-image")?.src || "ERROR";
+        $(element).find(".pwc-tile--description").text().trim() || "ERROR";
+      const image = $(element).find(".ct-tile-image").attr("src") || "ERROR";
 
-      const priceSpan = item.querySelector(".pwc-tile--price-primary");
       let price = "N/A";
-
-      if (priceSpan) {
-        const integerPart = priceSpan.childNodes[0]?.textContent.trim();
-        const decimalPart = priceSpan.querySelector(".decimalPrice")?.innerText;
-
+      const priceSpan = $(element).find(".pwc-tile--price-primary");
+      if (priceSpan.length > 0) {
+        const integerPart = priceSpan.contents().first().text().trim();
+        const decimalPart = priceSpan.find(".decimalPrice").text();
         if (integerPart && decimalPart) {
           price = integerPart + decimalPart;
         }
       }
 
       const urldoproduto =
-        item.querySelector(".ct-pdp-link a")?.href || "ERROR";
+        $(element).find(".ct-pdp-link a").attr("href") || "ERROR";
 
-      return { name, price, image, urldoproduto };
+      products.push({ name, price, image, urldoproduto });
     });
-  });
 
-  console.log(`Produtos encontrados: ${products.length}`);
-  await browser.close();
+    console.log(`Continente: ${products.length} produtos encontrados`);
 
-  const executionTime = Date.now() - startTime;
-  if (products.length === 0) {
-    console.log("Nenhum produto encontrado para a pesquisa.");
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      search: {
+        term: pesquisa,
+        url: pagina,
+      },
+      summary: {
+        total_products: products.length,
+        execution_time_ms: Date.now() - startTime,
+      },
+      products: products,
+    };
+  } catch (error) {
+    console.error("Erro no scraper_Continente:", error.message);
     return {
       success: false,
-      message: "Nenhum produto encontrado para a pesquisa.",
+      message: "Erro ao executar scraper",
+      error: error.message,
       timestamp: new Date().toISOString(),
-      execution_time_ms: executionTime,
+      execution_time_ms: Date.now() - startTime,
     };
   }
-
-  console.log("Produtos encontrados. Retornando resultados...");
-  return {
-    success: true,
-    timestamp: new Date().toISOString(),
-    search: {
-      term: pesquisa,
-      url: pagina,
-    },
-    summary: {
-      total_products: products.length,
-      execution_time_ms: executionTime,
-    },
-    products: products,
-  };
 }
 
+// ============ AUCHAN ============
 async function scraper_Auchan(pagina, pesquisa) {
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
-
   const startTime = Date.now();
 
-  await page.goto(pagina);
+  try {
+    const url = `${pagina}?q=${encodeURIComponent(pesquisa)}`;
+    console.log(`Buscando: ${url}`);
 
-  const title = await page.title();
-  console.log("Título da página:", title);
+    const html = await fetchHTML(url);
+    const $ = cheerio.load(html);
 
-  const searchSelector = "input[name='q']";
-  await page.waitForSelector(searchSelector);
+    // Verifica se encontrou produtos
+    if ($(".auc-noresults__error--message").length > 0) {
+      return {
+        success: false,
+        message: "Nenhum produto encontrado para a pesquisa.",
+        timestamp: new Date().toISOString(),
+        execution_time_ms: Date.now() - startTime,
+      };
+    }
 
-  console.log("Campo de pesquisa encontrado. Realizando busca...");
-  await page.type(searchSelector, pesquisa);
-  console.log(`Texto digitado no campo de pesquisa: ${pesquisa}`);
+    const products = [];
+    $(".product").each((index, element) => {
+      const image = $(element).find(".tile-image").attr("src") || "ERROR";
 
-  await page.keyboard.press("Enter");
-  console.log(`Realizando pesquisa por: ${pesquisa}`);
+      // Filtra produtos inválidos
+      if (image.includes("pesquisa?search-button=&q")) return;
 
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
-  console.log("Pesquisa concluída. Página de resultados carregada.");
+      const name = $(element).find(".link").text().trim() || "ERROR";
 
-  if (await page.$(".auc-noresults__error--message")) {
-    console.log("Nenhum produto encontrado para a pesquisa.");
-    await browser.close();
-    const executionTime = Date.now() - startTime;
+      let price = "N/A";
+      const priceBruto = $(element).find(".sales span.value").attr("content");
+      if (priceBruto) {
+        price = priceBruto.replace(/\./g, ",") + "€";
+      }
+
+      const urldoproduto = $(element).find(".link").attr("href") || "ERROR";
+
+      products.push({ name, price, image, urldoproduto });
+    });
+
+    console.log(`Auchan: ${products.length} produtos encontrados`);
+
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      search: {
+        term: pesquisa,
+        url: pagina,
+      },
+      summary: {
+        total_products: products.length,
+        execution_time_ms: Date.now() - startTime,
+      },
+      products: products,
+    };
+  } catch (error) {
+    console.error("Erro no scraper_Auchan:", error.message);
     return {
       success: false,
-      message: "Nenhum produto encontrado para a pesquisa.",
+      message: "Erro ao executar scraper",
+      error: error.message,
       timestamp: new Date().toISOString(),
-      execution_time_ms: executionTime,
+      execution_time_ms: Date.now() - startTime,
     };
   }
-
-  await page.waitForSelector(".product-grid", { timeout: 1000 });
-  console.log("Produtos carregados. Extraindo informações...");
-
-  await autoScroll(page);
-
-  const products = await page.evaluate(() => {
-    const items = document.querySelectorAll(".product");
-
-    return Array.from(items)
-      .filter((item) => {
-        const image = item.querySelector(".tile-image")?.src || "ERROR";
-        return !image.includes("pesquisa?search-button=&q");
-      })
-      .map((item) => {
-        const name = item.querySelector(".link")?.innerText.trim() || "ERROR";
-
-        let price = "N/A";
-        const priceBruto =
-          item.querySelector(".sales span.value")?.getAttribute("content") ||
-          "ERROR";
-
-        if (priceBruto) {
-          price = priceBruto.replace(/\./g, ",") + "€";
-        }
-
-        const image = item.querySelector(".tile-image")?.src || "ERROR";
-        const urldoproduto = item.querySelector(".link")?.href || "ERROR";
-
-        return { name, price, image, urldoproduto };
-      });
-  });
-  console.log(`Produtos encontrados: ${products.length}`);
-  await browser.close();
-
-  const executionTime = Date.now() - startTime;
-  if (products.length === 0) {
-    console.log("Nenhum produto encontrado para a pesquisa.");
-    return {
-      success: false,
-      message: "Nenhum produto encontrado para a pesquisa.",
-      timestamp: new Date().toISOString(),
-      execution_time_ms: executionTime,
-    };
-  }
-
-  console.log("Produtos encontrados. Retornando resultados...");
-  return {
-    success: true,
-    timestamp: new Date().toISOString(),
-    search: {
-      term: pesquisa,
-      url: pagina,
-    },
-    summary: {
-      total_products: products.length,
-      execution_time_ms: executionTime,
-    },
-    products: products,
-  };
 }
 
+// ============ LIDL ============
 async function scraper_lidl(pagina, pesquisa) {
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
   const startTime = Date.now();
 
-  await page.goto(pagina);
-  const title = await page.title();
-  console.log("Título da página:", title);
-  const searchSelector = "input[name='q']";
+  try {
+    const url = `${pagina}?q=${encodeURIComponent(pesquisa)}`;
+    console.log(`Buscando: ${url}`);
 
-  await page.waitForSelector(searchSelector);
-  console.log("Campo de pesquisa encontrado. Realizando busca...");
+    const html = await fetchHTML(url);
+    const $ = cheerio.load(html);
 
-  await page.type(searchSelector, pesquisa);
-  console.log(`Texto digitado no campo de pesquisa: ${pesquisa}`);
+    // Verifica se encontrou produtos
+    if ($(".s-products-not-found-message-wrapper").length > 0) {
+      return {
+        success: false,
+        message: "Nenhum produto encontrado para a pesquisa.",
+        timestamp: new Date().toISOString(),
+        execution_time_ms: Date.now() - startTime,
+      };
+    }
 
-  await page.keyboard.press("Enter");
-  console.log(`Realizando pesquisa por: ${pesquisa}`);
-
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
-  console.log("Pesquisa concluída. Página de resultados carregada.");
-
-  if (await page.$(".s-products-not-found-message-wrapper")) {
-    console.log("Nenhum produto encontrado para a pesquisa.");
-    await browser.close();
-    const executionTime = Date.now() - startTime;
-    return {
-      success: false,
-      message: "Nenhum produto encontrado para a pesquisa.",
-      timestamp: new Date().toISOString(),
-      execution_time_ms: executionTime,
-    };
-  }
-
-  console.log("Produtos encontrados. Continuando com a extração...");
-
-  await page.waitForSelector("#search-results", { timeout: 10000 });
-  console.log("Produtos carregados. Extraindo informações...");
-
-  await autoScroll(page);
-
-  const products = await page.evaluate(() => {
-    const items = document.querySelectorAll(".product-grid-box");
-    return Array.from(items).map((item) => {
+    const products = [];
+    $(".product-grid-box").each((index, element) => {
       const brand =
-        item.querySelector(".product-grid-box__brand")?.innerText.trim() || "";
+        $(element).find(".product-grid-box__brand").text().trim() || "";
       const title =
-        item.querySelector(".product-grid-box__title")?.innerText.trim() || "";
+        $(element).find(".product-grid-box__title").text().trim() || "";
       const name = brand + (brand && title ? " " : "") + title || "ERROR";
 
       let price = "N/A";
-      const priceBruto =
-        item.querySelector(".ods-price__value")?.innerHTML.trim() || "ERROR";
+      const priceBruto = $(element).find(".ods-price__value").html();
       if (priceBruto) {
         price = priceBruto.replace(/\./g, ",") + "€";
       }
+
       const image =
-        item.querySelector(".odsc-image-gallery__image")?.src || "ERROR";
+        $(element).find(".odsc-image-gallery__image").attr("src") || "ERROR";
       const urldoproduto =
-        item.querySelector(".odsc-tile__link")?.href || "ERROR";
-      return { name, price, image, urldoproduto };
+        $(element).find(".odsc-tile__link").attr("href") || "ERROR";
+
+      products.push({ name, price, image, urldoproduto });
     });
-  });
 
-  console.log(`Produtos encontrados: ${products.length}`);
-  await browser.close();
+    console.log(`Lidl: ${products.length} produtos encontrados`);
 
-  const executionTime = Date.now() - startTime;
-  if (products.length === 0) {
-    console.log("Nenhum produto encontrado para a pesquisa.");
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      search: {
+        term: pesquisa,
+        url: pagina,
+      },
+      summary: {
+        total_products: products.length,
+        execution_time_ms: Date.now() - startTime,
+      },
+      products: products,
+    };
+  } catch (error) {
+    console.error("Erro no scraper_lidl:", error.message);
     return {
       success: false,
-      message: "Nenhum produto encontrado para a pesquisa.",
+      message: "Erro ao executar scraper",
+      error: error.message,
       timestamp: new Date().toISOString(),
-      execution_time_ms: executionTime,
+      execution_time_ms: Date.now() - startTime,
     };
   }
-
-  console.log("Produtos encontrados. Retornando resultados...");
-  return {
-    success: true,
-    timestamp: new Date().toISOString(),
-    search: {
-      term: pesquisa,
-      url: pagina,
-    },
-    summary: {
-      total_products: products.length,
-      execution_time_ms: executionTime,
-    },
-    products: products,
-  };
 }
 
+// ============ INTERMARCHÉ ============
 async function scraper_Intermarche(pagina, pesquisa) {
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
   const startTime = Date.now();
 
-  await page.goto(pagina);
-  const title = await page.title();
-  console.log("Título da página:", title);
+  try {
+    // URL do Intermarché é um pouco diferente
+    const url = `${pagina}?q=${encodeURIComponent(pesquisa)}`;
+    console.log(`Buscando: ${url}`);
 
-  const searchSelector = "input[id='header-search-text']";
-  await page.waitForSelector(searchSelector);
-  console.log("Campo de pesquisa encontrado. Realizando busca...");
+    const html = await fetchHTML(url);
+    const $ = cheerio.load(html);
 
-  await page.type(searchSelector, pesquisa);
-  console.log(`Texto digitado no campo de pesquisa: ${pesquisa}`);
-
-  await page.keyboard.press("Enter");
-  console.log(`Realizando pesquisa por: ${pesquisa}`);
-
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
-  console.log("Pesquisa concluída. Página de resultados carregada.");
-
-  await page.waitForSelector(".productList__grid__item", { timeout: 10000 });
-  console.log("Produtos carregados. Extraindo informações...");
-
-  const products = await page.evaluate(() => {
-    const items = document.querySelectorAll(".productList__grid__item");
-    return Array.from(items).map((item) => {
+    const products = [];
+    $(".productList__grid__item").each((index, element) => {
       const name =
-        item.querySelector(".product__brand")?.innerText.trim() ||
-        "ERROR" + item.querySelector(".product-name-link")?.innerText.trim() ||
+        $(element).find(".product__brand").text().trim() ||
+        $(element).find(".product-name-link").text().trim() ||
         "ERROR";
 
       let price = "N/A";
-      const priceBruto = item
-        .querySelector(".productList__grid__item")
-        ?.getAttribute("data-price");
+      const priceBruto = $(element).attr("data-price");
       if (priceBruto) {
         price = priceBruto.replace(/\./g, ",") + "€";
       }
+
       const image =
-        item.querySelector(".image product__image no-flag")?.src || "ERROR";
-      return { name, price, image };
-    });
-  });
+        $(element).find(".image.product__image.no-flag").attr("src") || "ERROR";
 
-  console.log(`Produtos encontrados: ${products.length}`);
-
-  await browser.close();
-
-  const executionTime = Date.now() - startTime;
-
-  return {
-    success: true,
-    timestamp: new Date().toISOString(),
-    search: {
-      term: pesquisa,
-      url: pagina,
-    },
-    summary: {
-      total_products: products.length,
-      execution_time_ms: executionTime,
-    },
-    products: products,
-  };
-}
-
-async function autoScroll(page) {
-  await page.evaluate(async () => {
-    const targetHeight = document.body.scrollHeight * 2; // Ajuste para scroll mais profundo
-    const duration = 2000;
-    const startTime = Date.now();
-    const startPosition = window.scrollY;
-
-    await new Promise((resolve) => {
-      const scrollInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const currentPosition =
-          startPosition + (targetHeight - startPosition) * progress;
-        window.scrollTo(0, currentPosition);
-
-        if (progress >= 1) {
-          clearInterval(scrollInterval);
-          resolve();
-        }
-      }, 16);
+      products.push({ name, price, image });
     });
 
-    // Espera 2 segundos adicionais após o scroll completar
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-  });
+    console.log(`Intermarché: ${products.length} produtos encontrados`);
+
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      search: {
+        term: pesquisa,
+        url: pagina,
+      },
+      summary: {
+        total_products: products.length,
+        execution_time_ms: Date.now() - startTime,
+      },
+      products: products,
+    };
+  } catch (error) {
+    console.error("Erro no scraper_Intermarche:", error.message);
+    return {
+      success: false,
+      message: "Erro ao executar scraper",
+      error: error.message,
+      timestamp: new Date().toISOString(),
+      execution_time_ms: Date.now() - startTime,
+    };
+  }
 }
 
 module.exports = {
