@@ -11,8 +11,8 @@ async function connectBrowserless() {
   return await puppeteer.connect({
     browserWSEndpoint: BROWSERLESS_URL,
     defaultViewport: null,
-    // Adicione timeout para evitar problemas
-    timeout: 30000,
+
+    timeout: 5000,
   });
 }
 
@@ -338,7 +338,7 @@ async function scraper_lidl(pagina, pesquisa) {
   await page.goto(pagina);
   const title = await page.title();
   console.log("Título da página:", title);
-  const searchSelector = "input[name='q']";
+  const searchSelector = "input[data-id='search-input-field']";
 
   await page.waitForSelector(searchSelector);
   console.log("Campo de pesquisa encontrado. Realizando busca...");
