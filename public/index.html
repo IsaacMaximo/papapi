@@ -692,6 +692,27 @@
           runScraperTodos();
         }
       });
+
+      function testeapi() {
+        fetch("https://api-pap.vercel.app/papapi/teste", {
+          method: "POST",
+          credentials: 'include',
+          headers: {
+            
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ teste: "teste" }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Resposta do servidor:", data);
+            alert("Teste realizado com sucesso! Verifique o console para detalhes.");
+          })
+          .catch((error) => {
+            console.error("Erro:", error);
+            alert("Ocorreu um erro ao tentar testar a API.");
+          });
+      }
     </script>
   </body>
 </html>
