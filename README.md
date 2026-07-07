@@ -40,3 +40,11 @@ especificacoes (JSONB) - Armazena specs dinâmicas
 
 tags (ARRAY) - Para busca flexível
   Ex: ['smartphone', '5g', 'android']
+
+
+
+  filtragem
+
+  login
+
+  visual

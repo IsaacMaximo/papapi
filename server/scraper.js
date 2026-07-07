@@ -1,4 +1,4 @@
-const B= await connectBrowserless()ROWSERLESS_URL =
+const BROWSERLESS_URL =
   "wss://production-sfo.browserless.io?token=" + process.env.BROWSERLESS_TOKEN;
 
 async function getPuppeteer() {
