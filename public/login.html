@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PoupIn - Login</title>
+    <title>PoupIn · Entrar ou Cadastrar</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,54 +19,116 @@
   </head>
   <body>
     <div id="Login-Container">
-      <!-- card wrapper: both visual and functional -->
       <div class="login-card">
-        <!-- decorative brand icon -->
-        <div class="brand-icon">
-          <i class="fas fa-lock"></i>
-        </div>
-        <h2>Bem vindo denovo</h2>
-        <p class="subhead">Logue em sua conta</p>
-
-        <!-- login form -->
-        <form id="loginForm" autocomplete="off">
-          <div class="input-group">
-            <i class="fas fa-envelope"></i>
-            <input
-              type="email"
-              id="email"
-              placeholder="Email address"
-              required
-            />
-          </div>
-          <div class="input-group">
-            <i class="fas fa-key"></i>
-            <input
-              type="password"
-              id="password"
-              placeholder="Password"
-              required
-            />
-            <span class="toggle-pw" id="togglePw"
-              ><i class="fas fa-eye"></i
-            ></span>
-          </div>
-
-          <div class="form-options">
-            <label class="remember-me">
-              <input type="checkbox" id="rememberMe" /> Lembrar de mim
-            </label>
-            <a href="#" class="forgot-link">Esqueceu a senha?</a>
-          </div>
-
-          <button type="button" onclick="loginuser()" class="login-btn">
-            <i class="fas fa-sign-in-alt"></i> Logar
+        <!-- cabeçalho com abas -->
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="login">
+            <i class="fas fa-sign-in-alt"></i> Entrar
           </button>
+          <button class="tab-btn" data-tab="signup">
+            <i class="fas fa-user-plus"></i> Cadastrar
+          </button>
+        </div>
 
-          <p class="signup-cta">
-            Não tem uma conta? <a href="#">Cadastre-se</a>
-          </p>
-        </form>
+        <!-- painel de login -->
+        <div id="tab-login" class="tab-panel active">
+          <div class="brand-icon">
+            <i class="fas fa-lock"></i>
+          </div>
+          <h2>Bem vindo denovo</h2>
+          <p class="subhead">Logue em sua conta</p>
+
+          <form id="loginForm" autocomplete="off">
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input
+                type="email"
+                id="email"
+                placeholder="Email address"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <i class="fas fa-key"></i>
+              <input
+                type="password"
+                id="password"
+                placeholder="Password"
+                required
+              />
+              <span class="toggle-pw" id="togglePw"
+                ><i class="fas fa-eye"></i
+              ></span>
+            </div>
+
+            <div class="form-options">
+              <label class="remember-me">
+                <input type="checkbox" id="rememberMe" /> Lembrar de mim
+              </label>
+              <a href="#" class="forgot-link">Esqueceu a senha?</a>
+            </div>
+
+            <button type="button" onclick="loginuser()" class="login-btn">
+              <i class="fas fa-sign-in-alt"></i> Logar
+            </button>
+
+            <p class="switch-cta">
+              Não tem uma conta? <a href="#" class="switch-tab-link" data-tab="signup">Cadastre-se</a>
+            </p>
+          </form>
+        </div>
+
+        <!-- painel de cadastro -->
+        <div id="tab-signup" class="tab-panel">
+          <div class="brand-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <h2>Criar conta</h2>
+          <p class="subhead">Preencha os dados para começar</p>
+
+          <form id="signupForm" autocomplete="off">
+            <div class="input-group">
+              <i class="fas fa-user"></i>
+              <input
+                type="text"
+                id="fullName"
+                placeholder="Nome completo"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input type="email" id="signupEmail" placeholder="E-mail" required />
+            </div>
+
+            <div class="input-group">
+              <i class="fas fa-key"></i>
+              <input type="password" id="signupPassword" placeholder="Senha" required />
+              <span class="toggle-pw" id="togglePwSignup"
+                ><i class="fas fa-eye"></i
+              ></span>
+            </div>
+
+            <div class="input-group">
+              <i class="fas fa-check-circle"></i>
+              <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Confirmar senha"
+                required
+              />
+            </div>
+
+            <button type="button" onclick="cadastraruser()" class="login-btn">
+              <i class="fas fa-user-plus"></i> Cadastrar
+            </button>
+
+            <p class="switch-cta">
+              Já tem uma conta? <a href="#" class="switch-tab-link" data-tab="login">Fazer login</a>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -103,7 +165,7 @@
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(4px);
         -webkit-backdrop-filter: blur(4px);
-        padding: 2.5rem 2rem 2.2rem;
+        padding: 1.8rem 2rem 2.2rem;
         border-radius: 36px;
         border: 1px solid rgba(255, 255, 255, 0.6);
         box-shadow:
@@ -118,6 +180,63 @@
       .login-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 30px 60px rgba(0, 20, 40, 0.25);
+      }
+
+      /* abas */
+      .tab-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 60px;
+        padding: 0.3rem;
+        border: 1px solid rgba(100, 120, 150, 0.1);
+      }
+
+      .tab-btn {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 0.6rem 0.8rem;
+        border-radius: 40px;
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #4a5a72;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+      }
+
+      .tab-btn i {
+        font-size: 0.9rem;
+      }
+
+      .tab-btn.active {
+        background: linear-gradient(135deg, #1d2b4a, #2b3a67);
+        color: white;
+        box-shadow: 0 4px 12px rgba(27, 45, 75, 0.25);
+      }
+
+      .tab-btn:hover:not(.active) {
+        background: rgba(43, 58, 103, 0.06);
+      }
+
+      .tab-panel {
+        display: none;
+        animation: fade 0.25s ease;
+      }
+
+      .tab-panel.active {
+        display: block;
+      }
+
+      @keyframes fade {
+        0% { opacity: 0.6; transform: translateY(4px); }
+        100% { opacity: 1; transform: translateY(0); }
       }
 
       .brand-icon {
@@ -220,7 +339,6 @@
         color: #1d2b4a;
       }
 
-      /* options row */
       .form-options {
         display: flex;
         justify-content: space-between;
@@ -259,7 +377,6 @@
         border-bottom-color: #2b3a67;
       }
 
-      /* login button */
       .login-btn {
         background: linear-gradient(135deg, #1d2b4a, #2b3a67);
         border: none;
@@ -294,27 +411,28 @@
         transform: scale(0.97);
       }
 
-      .signup-cta {
+      .switch-cta {
         text-align: center;
         font-size: 0.9rem;
         color: #3c4e68;
         margin-top: 0.3rem;
       }
 
-      .signup-cta a {
+      .switch-cta a {
         color: #1d2b4a;
         font-weight: 600;
         text-decoration: none;
         border-bottom: 1px solid #b0c2db;
+        cursor: pointer;
       }
 
-      .signup-cta a:hover {
+      .switch-cta a:hover {
         border-bottom-color: #1d2b4a;
       }
 
       @media (max-width: 440px) {
         .login-card {
-          padding: 2rem 1.2rem;
+          padding: 1.5rem 1.2rem;
         }
         h2 {
           font-size: 1.6rem;
@@ -324,10 +442,72 @@
           height: 58px;
           font-size: 1.6rem;
         }
+        .tab-btn {
+          font-size: 0.8rem;
+          padding: 0.5rem 0.4rem;
+        }
       }
     </style>
 
     <script>
+      // ------- alternância entre abas -------
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabPanels = {
+        login: document.getElementById('tab-login'),
+        signup: document.getElementById('tab-signup')
+      };
+
+      function switchTab(tabId) {
+        // atualiza botões
+        tabBtns.forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.tab === tabId);
+        });
+        // atualiza painéis
+        Object.keys(tabPanels).forEach(key => {
+          tabPanels[key].classList.toggle('active', key === tabId);
+        });
+      }
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          switchTab(this.dataset.tab);
+        });
+      });
+
+      // links "Cadastre-se" / "Fazer login" dentro dos painéis
+      document.querySelectorAll('.switch-tab-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = this.dataset.tab;
+          if (target) switchTab(target);
+        });
+      });
+
+      // ------- mostrar/ocultar senha (login) -------
+      const togglePw = document.getElementById('togglePw');
+      const pwInput = document.getElementById('password');
+      if (togglePw && pwInput) {
+        togglePw.addEventListener('click', function() {
+          const type = pwInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          pwInput.setAttribute('type', type);
+          this.querySelector('i').classList.toggle('fa-eye');
+          this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+      }
+
+      // ------- mostrar/ocultar senha (cadastro) -------
+      const togglePwSignup = document.getElementById('togglePwSignup');
+      const pwSignupInput = document.getElementById('signupPassword');
+      if (togglePwSignup && pwSignupInput) {
+        togglePwSignup.addEventListener('click', function() {
+          const type = pwSignupInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          pwSignupInput.setAttribute('type', type);
+          this.querySelector('i').classList.toggle('fa-eye');
+          this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+      }
+
+      // ------- funções de API (mantidas) -------
       async function verificarToken() {
         fetch("https://api-pap.vercel.app/papapi/verificar-token", {
           method: "GET",
@@ -348,20 +528,12 @@
       }
       verificarToken();
 
-      function pegardados() {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const rememberMe = document.getElementById("rememberMe").checked;
-        console.log(
-          `Email: ${email}, Password: ${password}, Remember Me: ${rememberMe}`,
-        );
-      }
       function loginuser() {
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
         const rememberMe = document.getElementById("rememberMe").checked;
         console.log(
-          `Tentativa de login com Email: ${email}, password: ${password}, Remember Me: ${rememberMe}`,
+          `Tentativa de login com Email: ${email}, password: ${password}, Remember Me: ${rememberMe}`
         );
         fetch("/papapi/loginuser/", {
           credentials: "include",
@@ -389,6 +561,49 @@
           .catch((error) => {
             console.error("Erro:", error);
             alert("Ocorreu um erro ao tentar fazer login.");
+          });
+      }
+
+      function cadastraruser() {
+        const fullname = document.getElementById("fullName").value;
+        const email = document.getElementById("signupEmail").value;
+        const password = document.getElementById("signupPassword").value;
+        const confirm = document.getElementById("confirmPassword").value;
+
+        if (password !== confirm) {
+          alert("As senhas não coincidem.");
+          return;
+        }
+
+        console.log(
+          `Tentativa de cadastro com Nome: ${fullname}, Email: ${email}, password: ${password}`
+        );
+        fetch("https://api-pap.vercel.app/papapi/cadastraruser/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullname: fullname.trim(),
+            email: email.trim(),
+            password: password.trim(),
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Resposta do servidor:", data);
+            if (data.success) {
+              alert("Cadastro realizado com sucesso!");
+              // opcional: mudar para aba de login
+              switchTab('login');
+            } else {
+              console.error("Falha no cadastro:", data.message);
+              alert("Falha no cadastro: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Erro:", error);
+            alert("Ocorreu um erro ao tentar cadastrar.");
           });
       }
     </script>
