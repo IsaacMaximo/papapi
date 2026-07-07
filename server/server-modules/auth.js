@@ -47,39 +47,28 @@ async function verificarPassword(senha, hashArmazenado) {
 // ========== MIDDLEWARE DE AUTENTICAÇÃO ==========
 const autenticar = async (req, res, next) => {
   try {
-    // 🔍 LOG PARA DEBUG
-    console.log("🍪 Cookies recebidos:", req.cookies);
-    console.log("📋 Headers:", req.headers.cookie);
-
     const token = req.cookies.token;
 
     if (!token) {
-      console.log("❌ Token não encontrado nos cookies");
       return res.status(401).json({
         success: false,
         message: "Acesso negado. Faça login primeiro.",
-        debug: {
-          cookies: req.cookies,
-          headers: req.headers,
-        },
+        cookie: req.cookies,
       });
     }
 
     try {
       const decoded = jwt.verify(token, jwtSecret);
-      console.log("✅ Token válido para:", decoded.email);
       req.user = decoded;
       next();
     } catch (error) {
       if (error.name === "TokenExpiredError") {
-        console.log("⏰ Token expirado");
         return res.status(401).json({
           success: false,
           message: "Token expirado",
           code: "TOKEN_EXPIRED",
         });
       }
-      console.log("❌ Token inválido:", error.message);
       return res.status(401).json({
         success: false,
         message: "Token inválido",
