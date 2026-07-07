@@ -556,9 +556,9 @@
       </div>
       <div class="navbar-user">
         <span style="font-size: 0.9rem; color: #3c4e68; font-weight: 500"
-          >Olá, Admin</span
+          >Olá, <span id="userFullName"></span></span
         >
-        <div class="avatar">A</div>
+        <div class="avatar" id="userAvatar">A</div>
       </div>
     </nav>
 
@@ -730,7 +730,7 @@
           }
         });
 
-      function testeapi() {
+      function perfiluser() {
         fetch("https://api-pap.vercel.app/papapi/perfil", {
           method: "GET",
           credentials: "include",
@@ -747,6 +747,20 @@
             alert("Ocorreu um erro ao comunicar com a API.");
           });
       }
+      async function preencherpaguser() {
+        const perfil = await perfiluser();
+        perfil.then((data) => {
+          if (data.success) {
+            const user = data.user;
+            document.getElementById("userFullName").textContent = user.fullname;
+            const avatarDiv = document.getElementById("userAvatar");
+            avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
+          } else {
+            console.error("Falha ao obter perfil:", data.message);
+          }
+        });
+      }
+      preencherpaguser();
     </script>
   </body>
 </html>
