@@ -189,13 +189,14 @@ async function loginUser(req, res) {
       res.cookie("token", accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "prod",
-        sameSite: "strict",
+        sameSite: process.env.NODE_ENV === "prod" ? "none" : "lax",
         maxAge: 15 * 60 * 1000,
         path: "/",
+        domain: process.env.NODE_ENV === "prod" ? ".vercel.app" : undefined // Descomente se for Vercel
       });
 
-        if (rememberMe) {
-          console.log(`Usuário optou por "Lembrar de mim": ${email}`);
+      if (rememberMe) {
+        console.log(`Usuário optou por "Lembrar de mim": ${email}`);
         const payloadRefresh = {
           userId: usuario._id,
           email: usuario.email,
@@ -207,7 +208,7 @@ async function loginUser(req, res) {
         res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "prod",
-          sameSite: "strict",
+          sameSite: process.env.NODE_ENV === "prod" ? "none" : "lax",
           maxAge: 7 * 24 * 60 * 60 * 1000,
           path: "/api/refresh",
         });
@@ -221,16 +222,16 @@ async function loginUser(req, res) {
             },
           },
         );
-      }else {
+      } else {
         console.log(`Usuário NÃO optou por "Lembrar de mim": ${email}`);
-            await collection.updateOne(
-                { _id: usuario._id },
-                {
-                    $unset: { refreshToken: "" },
-                    $set: { lastLogin: new Date() },
-                },
-            );
-        }
+        await collection.updateOne(
+          { _id: usuario._id },
+          {
+            $unset: { refreshToken: "" },
+            $set: { lastLogin: new Date() },
+          },
+        );
+      }
 
       return res.json({
         success: true,
