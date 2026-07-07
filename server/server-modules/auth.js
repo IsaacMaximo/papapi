@@ -11,7 +11,6 @@ const JWT_EXPIRES_IN = "15m";
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_REFRESH_EXPIRES_IN = "7d";
 
-
 const isProduction = process.env.NODE_ENV === "prod";
 // ========== FUNÇÕES DE HASH ==========
 async function hashPassword(passparahash) {
@@ -120,8 +119,6 @@ const autenticar = async (req, res, next) => {
 
 // ========== CONTROLADORES ==========
 
-
-
 async function cadastrarUser(req, res) {
   try {
     const { fullname, email, password } = req.body;
@@ -214,8 +211,6 @@ async function loginUser(req, res) {
 
     if (senhaValida) {
       console.log(`✅ Login bem-sucedido: ${email}`);
-
-      
 
       const payload = {
         userId: usuario._id,
@@ -312,6 +307,7 @@ async function loginUser(req, res) {
 
 async function logoutUser(req, res) {
   try {
+
     const token = req.cookies.token;
 
     if (token) {
@@ -319,18 +315,17 @@ async function logoutUser(req, res) {
         const decoded = jwt.verify(token, jwtSecret);
         const db = client.db("PoupIn");
         const collection = db.collection("users");
+
         await collection.updateOne(
           { _id: decoded.userId },
           { $unset: { refreshToken: "" } },
         );
+        console.log(`✅ RefreshToken removido do banco para: ${decoded.email}`);
       } catch (error) {
-        console.log("Token já expirado, apenas limpando cookies");
+        console.log("ℹ️ Token já expirado, apenas limpando cookies");
       }
     }
 
-    
-
-    // Limpa os cookies
     const clearOptions = {
       httpOnly: true,
       secure: isProduction,
@@ -343,10 +338,13 @@ async function logoutUser(req, res) {
     }
 
     res.clearCookie("token", clearOptions);
+
     res.clearCookie("refreshToken", {
       ...clearOptions,
       path: "/api/refresh",
     });
+
+    console.log("✅ Cookies limpos com sucesso");
 
     return res.json({
       success: true,
@@ -414,7 +412,6 @@ async function refreshToken(req, res) {
       expiresIn: JWT_EXPIRES_IN,
     });
 
-    
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
