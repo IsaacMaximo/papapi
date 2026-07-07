@@ -24,6 +24,10 @@
     },
     {
       "src": "/(.*)",
+      "dest": "public/login.html"
+    },
+    {
+      "src": "/app(.*)",
       "dest": "public/index.html"
     }
   ]

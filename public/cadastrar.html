@@ -7,12 +7,17 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap"
+      rel="stylesheet"
+    />
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
   </head>
   <body>
-
     <div id="Login-Container">
       <div class="login-card">
         <div class="brand-icon">
@@ -24,7 +29,12 @@
         <form id="signupForm" autocomplete="off">
           <div class="input-group">
             <i class="fas fa-user"></i>
-            <input type="text" id="fullName" placeholder="Nome completo" required />
+            <input
+              type="text"
+              id="fullName"
+              placeholder="Nome completo"
+              required
+            />
           </div>
 
           <!-- E-mail -->
@@ -33,20 +43,25 @@
             <input type="email" id="email" placeholder="E-mail" required />
           </div>
 
-
           <div class="input-group">
             <i class="fas fa-key"></i>
             <input type="password" id="password" placeholder="Senha" required />
-            <span class="toggle-pw" id="togglePw"><i class="fas fa-eye"></i></span>
+            <span class="toggle-pw" id="togglePw"
+              ><i class="fas fa-eye"></i
+            ></span>
           </div>
 
           <div class="input-group">
             <i class="fas fa-check-circle"></i>
-            <input type="password" id="confirmPassword" placeholder="Confirmar senha" required />
+            <input
+              type="password"
+              id="confirmPassword"
+              placeholder="Confirmar senha"
+              required
+            />
           </div>
 
-
-          <button type="submit" class="login-btn">
+          <button type="button" onclick="cadastraruser()" class="login-btn">
             <i class="fas fa-user-plus"></i> Cadastrar
           </button>
 
@@ -54,7 +69,6 @@
             Já tem uma conta? <a href="#">Fazer login</a>
           </p>
         </form>
-
       </div>
     </div>
 
@@ -66,7 +80,7 @@
       }
 
       body {
-        font-family: 'Inter', Arial, sans-serif;
+        font-family: "Inter", Arial, sans-serif;
         background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
         width: 100vw;
         height: 100vh;
@@ -94,8 +108,12 @@
         padding: 2.5rem 2rem 2.2rem;
         border-radius: 36px;
         border: 1px solid rgba(255, 255, 255, 0.6);
-        box-shadow: 0 20px 50px rgba(0, 20, 40, 0.20), 0 8px 24px rgba(0, 0, 0, 0.06);
-        transition: transform 0.25s ease, box-shadow 0.3s ease;
+        box-shadow:
+          0 20px 50px rgba(0, 20, 40, 0.2),
+          0 8px 24px rgba(0, 0, 0, 0.06);
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.3s ease;
         text-align: center;
       }
 
@@ -150,7 +168,9 @@
         border-radius: 60px;
         padding: 0 1rem;
         border: 1px solid #dde3ed;
-        transition: border 0.2s, box-shadow 0.2s;
+        transition:
+          border 0.2s,
+          box-shadow 0.2s;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
       }
 
@@ -175,7 +195,7 @@
         border: none;
         padding: 0.9rem 0.7rem;
         font-size: 0.95rem;
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         background: transparent;
         width: 100%;
         outline: none;
@@ -230,7 +250,7 @@
         border-radius: 60px;
         font-weight: 600;
         font-size: 1rem;
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         color: white;
         display: inline-flex;
         align-items: center;
@@ -289,6 +309,41 @@
         }
       }
     </style>
-
+    <script>
+      function cadastraruser() {
+        const fullname = document.getElementById("fullName").value;
+        const email = document.getElementById("email").value;
+        
+        const password = document.getElementById("password").value;
+        console.log(
+          `Tentativa de cadastro com Nome: ${fullname}, Email: ${email}, password: ${password}`,
+        );
+        fetch("http://localhost:1919/papapi/cadastraruser/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullname: fullname.trim(),
+            email: email.trim(),
+            password: password.trim(),
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Resposta do servidor:", data);
+            if (data.success) {
+              alert("Cadastro realizado com sucesso!");
+            } else {
+              console.error("Falha no cadastro:", data.message);
+              alert("Falha no cadastro: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Erro:", error);
+            alert("Ocorreu um erro ao tentar cadastrar.");
+          });
+      }
+    </script>
   </body>
 </html>
