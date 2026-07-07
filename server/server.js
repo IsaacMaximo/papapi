@@ -29,13 +29,13 @@ const allowedOrigins = [
   "http://localhost:5500",
   "http://127.0.0.1:5500",
   "https://api-pap.vercel.app",
-  "https://api-pap.vercel.app", // Front-end
-  "https://api-pap.vercel.app/papapi", // Back-end (se necessário)
+  "https://api-pap.vercel.app",
+  "https://api-pap.vercel.app/papapi",
 ];
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Permite requisições sem origin (como Postman)
+
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) !== -1) {
