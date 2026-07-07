@@ -342,7 +342,8 @@
         console.log(
           `Tentativa de login com Email: ${email}, password: ${password}, Remember Me: ${rememberMe}`,
         );
-        fetch("https://api-pap.vercel.app/papapi/loginuser/", {
+        fetch("http://localhost:1919/papapi/loginuser/", {
+          credentials: 'include',
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -357,7 +358,7 @@
           .then((data) => {
             console.log("Resposta do servidor:", data);
             if (data.success) {
-              window.location.href = "https://api-pap.vercel.app/app/";
+              //window.location.href = "/app/";
               console.log("Login bem-sucedido! Redirecionando para /app...");
             } else {
               console.error("Falha no Login:", data.message);

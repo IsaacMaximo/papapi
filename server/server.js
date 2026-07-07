@@ -24,7 +24,17 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
 const cors = require("cors");
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:1919",
+      "http://localhost:5500",
+      "http://127.0.0.1:5500",
+      "https://api-pap.vercel.app",
+    ],
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 
@@ -48,7 +58,7 @@ app.get("/papapi/teste", (req, res) => {
   });
 });
 
-app.post("/papapi/teste", (req, res) => {
+app.post("/papapi/teste", autenticar, (req, res) => {
   const dados = req.body;
   res.json({
     mensagem: "Requisição POST recebida!",
