@@ -16,22 +16,6 @@ async function connectBrowserless() {
   });
 }
 
-async function testebrowserless(pagina) {
-  const response = await fetch(
-    `https://production-sfo.browserless.io/scrape?token=${process.env.BROWSERLESS_TOKEN}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        url: pagina,
-        elements: [{ selector: "h1" }],
-      }),
-    },
-  );
-  const data = await response.json();
-  console.log(data);
-  return data;
-}
 
 async function scraper_PingoDoce(pagina, pesquisa) {
   const browser = await connectBrowserless();
@@ -523,5 +507,4 @@ module.exports = {
   scraper_Auchan,
   scraper_lidl,
   scraper_Intermarche,
-  testebrowserless,
 };

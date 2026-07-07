@@ -2,13 +2,44 @@ const express = require("express");
 const app = express();
 const PORT = 1919;
 
+require("dotenv").config();
+
 const axios = require("axios");
 const cheerio = require("cheerio");
+
+const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
+const saltRounds = 12;
+const hashSecret = process.env.HASH_SECRET;
+const { connectToDatabase, client } = require("./server-modules/conndb.js");
+
+const jwt = require("jsonwebtoken");
+const jwtSecret = process.env.JWT_SECRET;
+const JWT_EXPIRES_IN = "15m";
+
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const JWT_REFRESH_EXPIRES_IN = "7d";
+
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 const cors = require("cors");
 app.use(cors());
 
 app.use(express.json());
+
+const {
+  cadastrarUser,
+  loginUser,
+  logoutUser,
+  refreshToken,
+  autenticar,
+} = require("./server-modules/auth.js");
+
+app.post("/papapi/cadastraruser", cadastrarUser);
+app.post("/papapi/loginuser", loginUser);
+app.post("/papapi/logout", logoutUser);
+app.post("/papapi/refresh-token", refreshToken);
 
 app.get("/papapi/teste", (req, res) => {
   res.json({
@@ -32,25 +63,7 @@ const {
   scraper_Auchan,
   scraper_Intermarche,
   scraper_lidl,
-  testebrowserless,
 } = require("./scraper.js");
-
-const { connectToDatabase } = require("./conndb.js");
-
-app.get("/papapi/run-scraper-testebrowserless", async (req, res) => {
-  try {
-    const output = await testebrowserless("https://www.pingodoce.pt/");
-    res.json({
-      message: "Teste do Browserless executado com sucesso!",
-      output: output,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Erro ao executar teste do Browserless",
-      error: error.message,
-    });
-  }
-});
 
 // Rota para o Pingo Doce
 app.get("/papapi/run-scraper-pingodoce", async (req, res) => {
@@ -193,6 +206,13 @@ app.get("/papapi/", (req, res) => {
   res.send("Servidor Node.js funcionando!");
 });
 
+if (process.env.NODE_ENV !== "prod") {
+  app.listen(PORT, async () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    await connectDB();
+  });
+}
+
 const connectDB = async () => {
   try {
     await connectToDatabase();
@@ -202,5 +222,4 @@ const connectDB = async () => {
   }
 };
 
-// Exporta para o Vercel (NÃO use app.listen!)
 module.exports = app;

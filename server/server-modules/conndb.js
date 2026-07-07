@@ -15,10 +15,11 @@ async function connectToDatabase() {
   try {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
-    console.log("Successfully connected to MongoDB!");
-  } finally {
-    await client.close();
+    console.log("Conectado na Base de Dados");
+  } catch (error) {
+    console.error("Erro ao conectar a Base de Dados:", error);
+    throw error;
   }
 }
 
-module.exports = { connectToDatabase };
+module.exports = { connectToDatabase, client };
