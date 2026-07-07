@@ -35,7 +35,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) !== -1) {
@@ -65,6 +64,22 @@ app.post("/papapi/cadastraruser", cadastrarUser);
 app.post("/papapi/loginuser", loginUser);
 app.post("/papapi/logout", logoutUser);
 app.post("/papapi/refresh-token", refreshToken);
+
+app.get("/papapi/debug-cookies", (req, res) => {
+  console.log("🍪 Todos os cookies recebidos:", req.cookies);
+  console.log("📋 Headers de cookie:", req.headers.cookie);
+
+  res.json({
+    success: true,
+    cookies: req.cookies,
+    cookieHeader: req.headers.cookie,
+    hasToken: !!req.cookies.token,
+    tokenValue: req.cookies.token
+      ? req.cookies.token.substring(0, 20) + "..."
+      : null,
+    allHeaders: req.headers,
+  });
+});
 
 app.get("/papapi/teste", (req, res) => {
   res.json({

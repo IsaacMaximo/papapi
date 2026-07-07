@@ -230,11 +230,6 @@ async function loginUser(req, res) {
         path: "/",
       };
 
-      // 🔥 DOMAIN é importante para Vercel
-      if (isProduction) {
-        cookieOptions.domain = ".vercel.app";
-      }
-
       res.cookie("token", accessToken, cookieOptions);
 
       // REFRESH TOKEN
