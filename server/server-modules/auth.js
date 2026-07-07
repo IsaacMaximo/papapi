@@ -87,6 +87,34 @@ const autenticar = async (req, res, next) => {
 
     try {
       const decoded = jwt.verify(token, jwtSecret);
+
+      const db = client.db("PoupIn");
+      const collection = db.collection("users");
+      const usuario = await collection.findOne({ _id: decoded.userId });
+
+      if (!usuario) {
+        console.log("❌ Usuário não encontrado para o token");
+        return res.status(401).json({
+          success: false,
+          message: "Sessão inválida. Faça login novamente.",
+          code: "USER_NOT_FOUND",
+        });
+      }
+
+      const currentVersion =
+        typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0;
+      const tokenVersion =
+        typeof decoded.version === "number" ? decoded.version : 0;
+
+      if (currentVersion !== tokenVersion) {
+        console.log(`🚫 Token revogado para: ${decoded.email}`);
+        return res.status(401).json({
+          success: false,
+          message: "Sessão encerrada. Faça login novamente.",
+          code: "TOKEN_REVOKED",
+        });
+      }
+
       console.log(`✅ Token válido para: ${decoded.email}`);
       req.user = decoded;
       req.token = token;
@@ -216,6 +244,8 @@ async function loginUser(req, res) {
         userId: usuario._id,
         email: usuario.email,
         fullname: usuario.fullname,
+        version:
+          typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0,
       };
       const accessToken = jwt.sign(payload, jwtSecret, {
         expiresIn: JWT_EXPIRES_IN,
@@ -236,6 +266,8 @@ async function loginUser(req, res) {
         const payloadRefresh = {
           userId: usuario._id,
           email: usuario.email,
+          version:
+            typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0,
         };
         const refreshToken = jwt.sign(payloadRefresh, JWT_REFRESH_SECRET, {
           expiresIn: JWT_REFRESH_EXPIRES_IN,
@@ -307,7 +339,6 @@ async function loginUser(req, res) {
 
 async function logoutUser(req, res) {
   try {
-
     const token = req.cookies.token;
 
     if (token) {
@@ -318,9 +349,12 @@ async function logoutUser(req, res) {
 
         await collection.updateOne(
           { _id: decoded.userId },
-          { $unset: { refreshToken: "" } },
+          {
+            $inc: { tokenVersion: 1 },
+            $unset: { refreshToken: "" },
+          },
         );
-        console.log(`✅ RefreshToken removido do banco para: ${decoded.email}`);
+        console.log(`✅ Sessão revogada para: ${decoded.email}`);
       } catch (error) {
         console.log("ℹ️ Token já expirado, apenas limpando cookies");
       }
@@ -406,6 +440,8 @@ async function refreshToken(req, res) {
       userId: usuario._id,
       email: usuario.email,
       fullname: usuario.fullname,
+      version:
+        typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0,
     };
 
     const newAccessToken = jwt.sign(payload, jwtSecret, {
