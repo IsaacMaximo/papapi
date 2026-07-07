@@ -760,7 +760,7 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Resposta do servidor:", data);
+            return data;
           })
           .catch((error) => {
             console.error("Erro:", error);
@@ -770,15 +770,14 @@
       async function preencherpaguser() {
         const data = await perfiluser();
         console.log("Dados do perfil:", data);
-        console.log("Dados do perfil (0):", data[0]);
 
-          if (data[0].success) {
-            const user = data[0].user;
+          if (data.success) {
+            const user = data.user;
             document.getElementById("userFullName").textContent = user.fullname;
             const avatarDiv = document.getElementById("userAvatar");
             avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
           } else {
-            console.error("Falha ao obter perfil:", data[0].message);
+            console.error("Falha ao obter perfil:", data.message);
           }
 
       }
