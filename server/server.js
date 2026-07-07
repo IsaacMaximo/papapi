@@ -66,6 +66,14 @@ app.post("/papapi/logout", logoutUser);
 app.post("/papapi/refresh-token", refreshToken);
 
 
+app.get("/papapi/verificar-token", autenticar, (req, res) => {
+  res.json({
+    success: true,
+    message: "Token válido",
+    user: req.user,
+  });
+});
+
 app.get("/papapi/perfil", autenticar, (req, res) => {
   const email = req.user.email;
   const fullname = req.user.fullname;

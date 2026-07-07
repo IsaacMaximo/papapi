@@ -556,8 +556,8 @@
       </div>
       <div class="navbar-user">
         <span style="font-size: 0.9rem; color: #3c4e68; font-weight: 500"
-          >Olá, <span id="userFullName"></span></span
-        >
+          >Olá, <span id="userFullName"></span
+        ></span>
         <div class="avatar" id="userAvatar">A</div>
       </div>
     </nav>
@@ -625,6 +625,26 @@
     </footer>
 
     <script>
+      async function verificarToken() {
+        fetch("https://api-pap.vercel.app/papapi/verificar-token", {
+          method: "GET",
+          credentials: "include",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              console.log("Token válido");
+            } else {
+              console.error("Token inválido");
+              window.location.href = "/"
+            }
+          })
+          .catch((error) => {
+            console.error("Erro ao verificar token:", error);
+          });
+      }
+      verificarToken();
+
       function enableButtons() {
         document
           .querySelectorAll(".search-section button")

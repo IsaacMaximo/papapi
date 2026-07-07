@@ -119,6 +119,9 @@ const autenticar = async (req, res, next) => {
 };
 
 // ========== CONTROLADORES ==========
+
+
+
 async function cadastrarUser(req, res) {
   try {
     const { fullname, email, password } = req.body;

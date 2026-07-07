@@ -326,7 +326,28 @@
         }
       }
     </style>
+
     <script>
+      async function verificarToken() {
+        fetch("https://api-pap.vercel.app/papapi/verificar-token", {
+          method: "GET",
+          credentials: "include",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              console.log("Token válido");
+              window.location.href = "/app/";
+            } else {
+              console.error("Token inválido");
+            }
+          })
+          .catch((error) => {
+            console.error("Erro ao verificar token:", error);
+          });
+      }
+      verificarToken();
+
       function pegardados() {
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
@@ -343,7 +364,7 @@
           `Tentativa de login com Email: ${email}, password: ${password}, Remember Me: ${rememberMe}`,
         );
         fetch("/papapi/loginuser/", {
-          credentials: 'include',
+          credentials: "include",
           method: "POST",
           headers: {
             "Content-Type": "application/json",
