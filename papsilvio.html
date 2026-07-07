@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classyns – Gestão Escolar</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-deep: #0A1F6E;
+    --blue-mid: #1A4FD6;
+    --blue-bright: #2D7FFF;
+    --blue-sky: #5BA8FF;
+    --blue-light: #C8E0FF;
+    --blue-pale: #EBF3FF;
+    --white: #FFFFFF;
+    --gray-100: #F4F7FB;
+    --gray-200: #E8EDF5;
+    --gray-400: #9BAAC8;
+    --gray-600: #5A6A8A;
+    --gray-800: #1E2D4A;
+    --success: #22C55E;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --shadow-sm: 0 2px 8px rgba(10,31,110,0.08);
+    --shadow-md: 0 8px 32px rgba(10,31,110,0.14);
+    --shadow-lg: 0 20px 60px rgba(10,31,110,0.18);
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+    --font-head: 'Sora', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--gray-100);
+    color: var(--gray-800);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== UTILITIES ===== */
+  .d-none { display: none !important; }
+  .flex { display: flex; }
+  .flex-col { flex-direction: column; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-2 { gap: 8px; }
+  .gap-3 { gap: 12px; }
+  .gap-4 { gap: 16px; }
+  .text-center { text-align: center; }
+  .w-full { width: 100%; }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue-mid), var(--blue-bright));
+    color: var(--white);
+    box-shadow: 0 4px 14px rgba(45,127,255,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,127,255,0.45); }
+  .btn-secondary {
+    background: var(--blue-pale);
+    color: var(--blue-mid);
+    border: 1.5px solid var(--blue-light);
+  }
+  .btn-secondary:hover { background: var(--blue-light); }
+  .btn-danger { background: #FEE2E2; color: var(--danger); border: 1.5px solid #FECACA; }
+  .btn-danger:hover { background: #FECACA; }
+  .btn-success { background: #DCFCE7; color: #16A34A; border: 1.5px solid #BBF7D0; }
+  .btn-success:hover { background: #BBF7D0; }
+  .btn-lg { padding: 14px 28px; font-size: 16px; border-radius: var(--radius-md); }
+  .btn-sm { padding: 6px 14px; font-size: 13px; }
+  .btn-icon { padding: 8px; border-radius: 8px; width: 36px; height: 36px; justify-content: center; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-body { padding: 20px 24px; }
+  .card-title { font-family: var(--font-head); font-weight: 700; font-size: 16px; color: var(--gray-800); }
+
+  /* ===== BADGES ===== */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-head);
+  }
+  .badge-present { background: #DCFCE7; color: #16A34A; }
+  .badge-absent { background: #FEE2E2; color: var(--danger); }
+  .badge-late { background: #FEF9C3; color: #854D0E; }
+  .badge-upcoming { background: var(--blue-pale); color: var(--blue-mid); }
+
+  /* ===== TOAST ===== */
+  #toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .toast {
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    padding: 14px 20px;
+    box-shadow: var(--shadow-md);
+    border-left: 4px solid var(--blue-bright);
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 260px;
+    animation: slideIn 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .toast.success { border-color: var(--success); }
+  .toast.error { border-color: var(--danger); }
+  .toast.warning { border-color: var(--warning); }
+  @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,31,110,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: scaleIn 0.25s ease;
+  }
+  @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-body { padding: 24px 28px; }
+  .modal-footer { padding: 16px 28px 24px; display: flex; gap: 12px; justify-content: flex-end; }
+  .modal-title { font-family: var(--font-head); font-weight: 700; font-size: 18px; }
+
+  /* ===== FORMS ===== */
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--gray-600);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--gray-800);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .form-control:focus {
+    border-color: var(--blue-bright);
+    box-shadow: 0 0 0 3px rgba(45,127,255,0.15);
+  }
+  select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239BAAC8' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+
+  /* ===== LOGIN PAGE ===== */
+  #page-login {
+    min-height: 100vh;
+    background: linear-gradient(145deg, var(--blue-deep) 0%, var(--blue-mid) 50%, var(--blue-bright) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  #page-login::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    top: -200px; right: -150px;
+  }
+  #page-login::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    bottom: -150px; left: -100px;
+  }
+  .login-box {
+    background: rgba(255,255,255,0.97);
+    border-radius: var(--radius-xl);
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    z-index: 1;
+  }
+  .login-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 36px;
+    gap: 12px;
+  }
+  .login-logo img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(45,127,255,0.3));
+  }
+  .login-logo h1 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 32px;
+    background: linear-gradient(135deg, var(--blue-deep), var(--blue-bright));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .login-logo p { font-size: 14px; color: var(--gray-400); font-weight: 400; }
+  .role-tabs {
+    display: flex;
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 24px;
+    gap: 4px;
+  }
+  .role-tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .role-tab.active {
+    background: var(--white);
+    color: var(--blue-mid);
+    box-shadow: var(--shadow-sm);
+  }
+  .login-footer { text-align: center; margin-top: 20px; font-size: 13px; color: var(--gray-400); }
+  .login-footer a { color: var(--blue-bright); text-decoration: none; font-weight: 600; }
+
+  /* ===== APP SHELL ===== */
+  #app-shell {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ===== SIDEBAR ===== */
+  #sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, var(--blue-deep) 0%, #0D2878 100%);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    z-index: 100;
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-logo img { width: 40px; height: 40px; object-fit: contain; }
+  .sidebar-logo span {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--white);
+  }
+  .sidebar-user {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue-bright), var(--blue-sky));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .avatar-sm { width: 32px; height: 32px; font-size: 12px; }
+  .sidebar-user-info .name { font-family: var(--font-head); font-weight: 600; font-size: 14px; color: var(--white); }
+  .sidebar-user-info .role-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: var(--blue-light);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: var(--font-head);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .sidebar-nav { padding: 16px 12px; flex: 1; }
+  .nav-section-title {
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.35);
+    padding: 8px 8px 4px;
+    margin-top: 8px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    border-radius: var(--radius-sm);
+    color: rgba(255,255,255,0.65);
+    font-family: var(--font-head);
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+  .nav-item.active { background: rgba(45,127,255,0.35); color: var(--white); }
+  .nav-item .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+  .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .btn-logout {
+    width: 100%;
+    background: rgba(239,68,68,0.15);
+    color: #FCA5A5;
+    border: 1px solid rgba(239,68,68,0.25);
+    padding: 11px 16px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { background: rgba(239,68,68,0.25); color: #FEE2E2; }
+
+  /* ===== MOBILE HEADER ===== */
+  #mobile-header {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--blue-deep);
+    padding: 14px 20px;
+    z-index: 200;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-md);
+  }
+  .mobile-logo { display: flex; align-items: center; gap: 8px; }
+  .mobile-logo img { width: 32px; height: 32px; object-fit: contain; }
+  .mobile-logo span { font-family: var(--font-head); font-weight: 800; font-size: 18px; color: var(--white); }
+  #hamburger {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: var(--white);
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99;
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  #main-content {
+    margin-left: 260px;
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .page-header {
+    background: var(--white);
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .page-header h2 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--gray-800);
+  }
+  .page-header p { font-size: 14px; color: var(--gray-400); margin-top: 2px; }
+  .page-body { padding: 28px 32px; flex: 1; }
+
+  /* ===== DASHBOARD STATS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .stat-icon {
+    width: 52px; height: 52px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .stat-icon.blue { background: var(--blue-pale); }
+  .stat-icon.green { background: #DCFCE7; }
+  .stat-icon.yellow { background: #FEF9C3; }
+  .stat-icon.red { background: #FEE2E2; }
+  .stat-info .value {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--gray-800);
+    line-height: 1;
+  }
+  .stat-info .label { font-size: 13px; color: var(--gray-400); margin-top: 4px; }
+
+  /* ===== GRID LAYOUTS ===== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  /* ===== TABLES ===== */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: var(--font-head);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-400);
+    background: var(--gray-100);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  tbody td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--gray-800);
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--gray-100); }
+
+  /* ===== SEARCH ===== */
+  .search-bar {
+    position: relative;
+    flex: 1;
+    max-width: 320px;
+  }
+  .search-bar input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 14px;
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-bar input:focus { border-color: var(--blue-bright); }
+  .search-bar .search-icon {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 16px;
+  }
+
+  /* ===== ATTENDANCE ===== */
+  .attendance-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .att-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 16px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .att-row:hover { background: var(--gray-100); }
+  .att-row .student-name { flex: 1; font-weight: 500; }
+  .att-row .att-num { font-size: 13px; color: var(--gray-400); width: 28px; }
+  .att-buttons { display: flex; gap: 6px; }
+  .att-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1.5px solid transparent;
+    font-family: var(--font-head);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--gray-100);
+    color: var(--gray-600);
+  }
+  .att-btn:hover { transform: scale(1.05); }
+  .att-btn.selected-present { background: #DCFCE7; color: #16A34A; border-color: #86EFAC; }
+  .att-btn.selected-absent { background: #FEE2E2; color: var(--danger); border-color: #FCA5A5; }
+  .att-btn.selected-late { background: #FEF9C3; color: #92400E; border-color: #FDE68A; }
+
+  /* ===== CALENDAR MINI ===== */
+  .mini-cal { font-family: var(--font-head); }
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .cal-nav h4 { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+  .cal-nav button { background: none; border: none; cursor: pointer; color: var(--gray-400); font-size: 16px; padding: 4px 8px; border-radius: 6px; }
+  .cal-nav button:hover { background: var(--gray-100); color: var(--blue-mid); }
+  .cal-days-header { display: grid; grid-template-columns: repeat(7,1fr); text-align: center; font-size: 11px; font-weight: 700; color: var(--gray-400); margin-bottom: 6px; }
+  .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+    color: var(--gray-600);
+  }
+  .cal-day:hover { background: var(--blue-pale); color: var(--blue-mid); }
+  .cal-day.today { background: var(--blue-mid); color: var(--white); font-weight: 700; }
+  .cal-day.has-event { position: relative; }
+  .cal-day.has-event::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--blue-bright); }
+  .cal-day.other-month { color: var(--gray-200); }
+  .cal-day.selected { background: var(--blue-pale); color: var(--blue-mid); border: 1.5px solid var(--blue-bright); }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-bar { background: var(--gray-200); border-radius: 20px; height: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--blue-mid), var(--blue-bright)); transition: width 0.5s ease; }
+  .progress-fill.green { background: linear-gradient(90deg, #16A34A, #22C55E); }
+  .progress-fill.yellow { background: linear-gradient(90deg, #D97706, #F59E0B); }
+  .progress-fill.red { background: linear-gradient(90deg, #DC2626, #EF4444); }
+
+  /* ===== VIEWS ===== */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-400);
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h3 { font-family: var(--font-head); font-weight: 700; font-size: 18px; color: var(--gray-600); margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; }
+
+  /* ===== NOTIFICATION DOT ===== */
+  .notif-dot {
+    width: 8px; height: 8px;
+    background: var(--danger);
+    border-radius: 50%;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* ===== TABS ===== */
+  .tabs { display: flex; gap: 4px; background: var(--gray-100); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 20px; }
+  .tab-btn {
+    flex: 1;
+    padding: 9px 16px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .tab-btn.active { background: var(--white); color: var(--blue-mid); box-shadow: var(--shadow-sm); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1024px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); }
+    #sidebar.open { transform: translateX(0); }
+    #mobile-header { display: flex; }
+    #sidebar-overlay.show { display: block; }
+    #main-content { margin-left: 0; padding-top: 64px; }
+    .page-body { padding: 20px 16px; }
+    .page-header { padding: 16px; }
+    .page-header h2 { font-size: 20px; }
+    .login-box { padding: 32px 24px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .modal-body, .modal-header, .modal-footer { padding: 16px 20px; }
+    .att-buttons { flex-wrap: wrap; }
+  }
+
+  /* ===== DIVIDER ===== */
+  .divider { height: 1px; background: var(--gray-200); margin: 20px 0; }
+
+  /* ===== INFO LABEL ===== */
+  .info-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .info-label span:first-child { font-size: 13px; color: var(--gray-600); font-weight: 500; }
+  .info-label span:last-child { font-size: 13px; font-family: var(--font-head); font-weight: 700; color: var(--gray-800); }
+
+  /* ===== SCHEDULE ITEM ===== */
+  .schedule-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .schedule-item:last-child { border-bottom: none; }
+  .schedule-time { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--gray-400); width: 80px; flex-shrink: 0; padding-top: 2px; }
+  .schedule-info .subj { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  .schedule-info .room { font-size: 12px; color: var(--gray-400); }
+  .schedule-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+
+  /* dot colors */
+  .dot-blue { background: var(--blue-bright); }
+  .dot-green { background: var(--success); }
+  .dot-yellow { background: var(--warning); }
+  .dot-red { background: var(--danger); }
+  .dot-purple { background: #8B5CF6; }
+
+  /* ===== PILL TABS ===== */
+  .pill-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .pill-tab {
+    padding: 7px 18px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 20px;
+    background: var(--white);
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pill-tab.active, .pill-tab:hover { border-color: var(--blue-bright); color: var(--blue-mid); background: var(--blue-pale); }
+
+  /* ===== CHECKBOX ===== */
+  .checkbox-group { display: flex; flex-direction: column; gap: 10px; }
+  .checkbox-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .checkbox-item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--blue-bright); cursor: pointer; }
+  .checkbox-item label { font-size: 14px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div id="toast-container"></div>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="page-login">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="/mnt/user-data/uploads/1776252939090_WhatsApp_Image_2026-04-15_at_12_30_01.jpeg" alt="Classyns Logo" id="logo-img" onerror="this.style.display='none'">
+      <div style="font-size:56px;display:none" id="logo-fallback">🎓</div>
+      <h1>Classyns</h1>
+      <p>Gestão Escolar Inteligente</p>
+    </div>
+
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="setRole('aluno', this)">
+        🎒 Aluno
+      </button>
+      <button class="role-tab" onclick="setRole('professor', this)">
+        👨‍🏫 Professor
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">E-mail</label>
+      <input class="form-control" type="email" id="login-email" placeholder="exemplo@escola.pt" value="aluno@classyns.pt">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Palavra-passe</label>
+      <input class="form-control" type="password" id="login-pass" placeholder="••••••••" value="123456">
+    </div>
+
+    <button class="btn btn-primary btn-lg w-full" onclick="doLogin()" style="justify-content:center;margin-top:8px">
+      Entrar na Conta →
+    </button>
+
+    <div class="login-footer">
+      <div style="margin-bottom:8px"><a href="#" onclick="showForgotModal();return false;">Esqueceu-se da palavra-passe?</a></div>
+      <div>Credenciais de teste: <strong>aluno@classyns.pt</strong> / <strong>123456</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP SHELL ===== -->
+<div id="app-shell" class="hidden">
+
+  <!-- Mobile Header -->
+  <div id="mobile-header">
+    <div class="mobile-logo">
+      <img src="/mnt/user-data/uploads/1776252939090_WhatsApp_Image_2026-04-15_at_12_30_01.jpeg" alt="" style="width:28px;height:28px;object-fit:contain" onerror="this.style.display='none'">
+      <span>Classyns</span>
+    </div>
+    <button id="hamburger" onclick="toggleSidebar()">☰</button>
+  </div>
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <img src="/mnt/user-data/uploads/1776252939090_WhatsApp_Image_2026-04-15_at_12_30_01.jpeg" alt="" onerror="this.style.display='none'">
+      <span>Classyns</span>
+    </div>
+    <div class="sidebar-user">
+      <div class="avatar" id="sb-avatar">AL</div>
+      <div class="sidebar-user-info">
+        <div class="name" id="sb-name">Ana Lima</div>
+        <div class="role-badge" id="sb-role">Aluno</div>
+      </div>
+    </div>
+    <div class="sidebar-nav" id="sidebar-nav">
+      <!-- dinamicamente preenchido -->
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()">
+        🚪 Terminar Sessão
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div id="main-content">
+    <div class="page-header">
+      <div>
+        <h2 id="page-title">Painel de Controlo</h2>
+        <p id="page-subtitle">Bem-vindo de volta!</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span id="header-date" style="font-size:13px;color:var(--gray-400)"></span>
+        <div class="avatar avatar-sm" id="header-avatar">AL</div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <!-- VIEWS -->
+      <div id="view-dashboard" class="view active"></div>
+      <div id="view-presencas" class="view"></div>
+      <div id="view-testes" class="view"></div>
+      <div id="view-horario" class="view"></div>
+      <div id="view-turmas" class="view"></div>
+      <div id="view-alunos" class="view"></div>
+      <div id="view-relatorios" class="view"></div>
+      <div id="view-perfil" class="view"></div>
+      <div id="view-notificacoes" class="view"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Modal Genérico -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Título</div>
+      <button class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const DEMO_USERS = {
+  'aluno@classyns.pt':   { pass: '123456', role: 'aluno',    name: 'Ana Lima',        turma: '10.º A' },
+  'aluno2@classyns.pt':  { pass: '123456', role: 'aluno',    name: 'Bruno Santos',    turma: '10.º A' },
+  'professor@classyns.pt':{ pass: '123456', role: 'professor', name: 'Prof. Cardoso', disciplina: 'Matemática' },
+};
+
+const TURMAS = ['10.º A', '10.º B', '11.º A', '11.º B', '12.º A'];
+const DISCIPLINAS = ['Matemática', 'Português', 'Física e Química', 'Biologia', 'História', 'Inglês', 'Educação Física'];
+
+const ALUNOS_TURMA = {
+  '10.º A': [
+    { id:1, nome:'Ana Lima', num:1 },
+    { id:2, nome:'Bruno Santos', num:2 },
+    { id:3, nome:'Catarina Ferreira', num:3 },
+    { id:4, nome:'Daniel Oliveira', num:4 },
+    { id:5, nome:'Eva Martins', num:5 },
+    { id:6, nome:'Francisco Costa', num:6 },
+    { id:7, nome:'Gabriela Pereira', num:7 },
+    { id:8, nome:'Hugo Silva', num:8 },
+    { id:9, nome:'Inês Rodrigues', num:9 },
+    { id:10, nome:'João Alves', num:10 },
+    { id:11, nome:'Leonor Nunes', num:11 },
+    { id:12, nome:'Miguel Sousa', num:12 },
+  ],
+  '10.º B': [
+    { id:13, nome:'Nuno Pinto', num:1 },
+    { id:14, nome:'Olívia Santos', num:2 },
+    { id:15, nome:'Pedro Carvalho', num:3 },
+    { id:16, nome:'Raquel Morais', num:4 },
+    { id:17, nome:'Simão Vieira', num:5 },
+    { id:18, nome:'Teresa Lima', num:6 },
+  ],
+  '11.º A': [
+    { id:19, nome:'Ulisses Faria', num:1 },
+    { id:20, nome:'Vera Cruz', num:2 },
+    { id:21, nome:'Xavier Lopes', num:3 },
+  ],
+};
+
+// Presenças: { 'YYYY-MM-DD_turma_disciplina': { alunoId: 'P'|'F'|'A' } }
+let presencas = JSON.parse(localStorage.getItem('classyns_presencas') || '{}');
+
+// Testes: [{id, turma, disciplina, data, hora, sala, titulo, tipo}]
+let testes = JSON.parse(localStorage.getItem('classyns_testes') || '[]');
+if (!testes.length) {
+  const today = new Date();
+  testes = [
+    { id:1, turma:'10.º A', disciplina:'Matemática', data: fmtDate(addDays(today,3)), hora:'09:00', sala:'A1', titulo:'Teste 1 – Funções', tipo:'teste' },
+    { id:2, turma:'10.º B', disciplina:'Português',  data: fmtDate(addDays(today,7)), hora:'10:00', sala:'B2', titulo:'Teste 1 – Leitura', tipo:'teste' },
+    { id:3, turma:'10.º A', disciplina:'Física e Química', data: fmtDate(addDays(today,-2)), hora:'11:00', sala:'C3', titulo:'Ficha de Trabalho', tipo:'ficha' },
+    { id:4, turma:'11.º A', disciplina:'Inglês', data: fmtDate(addDays(today,14)), hora:'14:00', sala:'D4', titulo:'Teste Oral', tipo:'oral' },
+  ];
+  saveTestes();
+}
+
+let currentUser = null;
+let currentRole = 'aluno';
+let activeView = 'dashboard';
+let calendarDate = new Date();
+let selectedDate = new Date();
+
+function fmtDate(d) {
+  return d.toISOString().slice(0,10);
+}
+function addDays(d, n) {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+function saveTestes() { localStorage.setItem('classyns_testes', JSON.stringify(testes)); }
+function savePresencas() { localStorage.setItem('classyns_presencas', JSON.stringify(presencas)); }
+
+// ===== LOGIN =====
+let loginRole = 'aluno';
+function setRole(role, el) {
+  loginRole = role;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (role === 'aluno') {
+    document.getElementById('login-email').value = 'aluno@classyns.pt';
+  } else {
+    document.getElementById('login-email').value = 'professor@classyns.pt';
+  }
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const user = DEMO_USERS[email];
+  if (!user || user.pass !== pass) {
+    showToast('❌ Credenciais inválidas. Tente novamente.', 'error');
+    return;
+  }
+  currentUser = { ...user, email };
+  document.getElementById('page-login').classList.add('hidden');
+  document.getElementById('app-shell').classList.remove('hidden');
+  initApp();
+  showToast(`✅ Bem-vindo, ${currentUser.name}!`, 'success');
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('app-shell').classList.add('hidden');
+  document.getElementById('page-login').classList.remove('hidden');
+  document.getElementById('login-pass').value = '';
+  showToast('👋 Sessão terminada com sucesso.', 'info');
+}
+
+// ===== APP INIT =====
+function initApp() {
+  const u = currentUser;
+  const initials = u.name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+  document.getElementById('sb-avatar').textContent = initials;
+  document.getElementById('sb-name').textContent = u.name;
+  document.getElementById('sb-role').textContent = u.role === 'professor' ? 'Professor' : 'Aluno';
+  document.getElementById('header-avatar').textContent = initials;
+
+  const now = new Date();
+  document.getElementById('header-date').textContent = now.toLocaleDateString('pt-PT', { weekday:'long', day:'numeric', month:'long' });
+
+  buildNav();
+  navigateTo('dashboard');
+}
+
+function buildNav() {
+  const nav = document.getElementById('sidebar-nav');
+  const isProf = currentUser.role === 'professor';
+
+  const items = isProf ? [
+    { icon:'🏠', label:'Painel', view:'dashboard' },
+    { section: 'AULAS' },
+    { icon:'✅', label:'Registar Presenças', view:'presencas' },
+    { icon:'📋', label:'Turmas', view:'turmas' },
+    { icon:'👥', label:'Alunos', view:'alunos' },
+    { section: 'AVALIAÇÃO' },
+    { icon:'📝', label:'Testes e Fichas', view:'testes' },
+    { icon:'📊', label:'Relatórios', view:'relatorios' },
+    { section: 'PESSOAL' },
+    { icon:'📅', label:'Horário', view:'horario' },
+    { icon:'🔔', label:'Notificações', view:'notificacoes', dot: true },
+    { icon:'👤', label:'O Meu Perfil', view:'perfil' },
+  ] : [
+    { icon:'🏠', label:'Painel', view:'dashboard' },
+    { section: 'ESCOLA' },
+    { icon:'✅', label:'As Minhas Presenças', view:'presencas' },
+    { icon:'📝', label:'Testes e Fichas', view:'testes' },
+    { icon:'📅', label:'Horário', view:'horario' },
+    { section: 'PESSOAL' },
+    { icon:'🔔', label:'Notificações', view:'notificacoes', dot: true },
+    { icon:'👤', label:'O Meu Perfil', view:'perfil' },
+  ];
+
+  nav.innerHTML = '';
+  items.forEach(item => {
+    if (item.section) {
+      nav.innerHTML += `<div class="nav-section-title">${item.section}</div>`;
+    } else {
+      nav.innerHTML += `
+        <button class="nav-item" id="nav-${item.view}" onclick="navigateTo('${item.view}')">
+          <span class="nav-icon">${item.icon}</span>
+          ${item.label}
+          ${item.dot ? '<span class="notif-dot"></span>' : ''}
+        </button>`;
+    }
+  });
+}
+
+function navigateTo(view) {
+  activeView = view;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + view);
+  if (navEl) navEl.classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  closeSidebar();
+
+  const titles = {
+    dashboard: ['Painel de Controlo', currentUser.role === 'professor' ? 'Resumo geral das suas aulas' : 'Resumo da sua atividade escolar'],
+    presencas: ['Presenças', currentUser.role === 'professor' ? 'Registe as presenças dos alunos' : 'O histórico das suas presenças'],
+    testes: ['Testes e Fichas', 'Consulte e marque avaliações'],
+    horario: ['Horário', 'O seu horário semanal'],
+    turmas: ['Turmas', 'Gestão das turmas'],
+    alunos: ['Alunos', 'Lista de alunos por turma'],
+    relatorios: ['Relatórios', 'Análise de presenças e desempenho'],
+    perfil: ['O Meu Perfil', 'Dados pessoais e definições'],
+    notificacoes: ['Notificações', 'Avisos e lembretes'],
+  };
+  const [title, sub] = titles[view] || ['', ''];
+  document.getElementById('page-title').textContent = title;
+  document.getElementById('page-subtitle').textContent = sub;
+
+  renderView(view);
+}
+
+// ===== RENDER VIEWS =====
+function renderView(view) {
+  const container = document.getElementById('view-' + view);
+  if (currentUser.role === 'professor') {
+    renderProfView(view, container);
+  } else {
+    renderAlunoView(view, container);
+  }
+}
+
+// ===== PROFESSOR VIEWS =====
+function renderProfView(view, el) {
+  switch(view) {
+    case 'dashboard': renderProfDashboard(el); break;
+    case 'presencas': renderProfPresencas(el); break;
+    case 'testes': renderTestes(el, true); break;
+    case 'horario': renderHorario(el, true); break;
+    case 'turmas': renderTurmas(el); break;
+    case 'alunos': renderAlunos(el); break;
+    case 'relatorios': renderRelatorios(el); break;
+    case 'perfil': renderPerfil(el); break;
+    case 'notificacoes': renderNotificacoes(el); break;
+  }
+}
+
+function renderProfDashboard(el) {
+  const totalAlunos = Object.values(ALUNOS_TURMA).flat().length;
+  const testesProximos = testes.filter(t => new Date(t.data) >= new Date()).length;
+  const aulas = 12;
+  el.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">👥</div>
+        <div class="stat-info"><div class="value">${totalAlunos}</div><div class="label">Alunos Total</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-info"><div class="value">92%</div><div class="label">Assiduidade Média</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon yellow">📝</div>
+        <div class="stat-info"><div class="value">${testesProximos}</div><div class="label">Testes Marcados</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">📚</div>
+        <div class="stat-info"><div class="value">${TURMAS.length}</div><div class="label">Turmas</div></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📅 Aula de Hoje</div>
+          <button class="btn btn-primary btn-sm" onclick="navigateTo('presencas')">Registar →</button>
+        </div>
+        <div class="card-body">
+          <div class="schedule-item">
+            <div class="schedule-time">08:30</div>
+            <div class="schedule-dot dot-blue"></div>
+            <div class="schedule-info"><div class="subj">Matemática – 10.º A</div><div class="room">Sala A1 · 50 min</div></div>
+          </div>
+          <div class="schedule-item">
+            <div class="schedule-time">10:30</div>
+            <div class="schedule-dot dot-green"></div>
+            <div class="schedule-info"><div class="subj">Matemática – 11.º A</div><div class="room">Sala B2 · 50 min</div></div>
+          </div>
+          <div class="schedule-item">
+            <div class="schedule-time">14:00</div>
+            <div class="schedule-dot dot-yellow"></div>
+            <div class="schedule-info"><div class="subj">Matemática – 10.º B</div><div class="room">Sala C3 · 50 min</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 Assiduidade por Turma</div>
+        </div>
+        <div class="card-body">
+          ${TURMAS.slice(0,4).map(t => {
+            const pct = 75 + Math.floor(Math.random()*20);
+            const cls = pct >= 90 ? 'green' : pct >= 75 ? '' : 'red';
+            return `
+              <div style="margin-bottom:16px">
+                <div class="info-label"><span>${t}</span><span>${pct}%</span></div>
+                <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-header">
+        <div class="card-title">📝 Próximas Avaliações</div>
+        <button class="btn btn-primary btn-sm" onclick="navigateTo('testes')">Ver Todos →</button>
+      </div>
+      <div class="card-body table-wrap">
+        <table>
+          <thead><tr><th>Turma</th><th>Disciplina</th><th>Título</th><th>Data</th><th>Sala</th></tr></thead>
+          <tbody>
+            ${testes.filter(t => new Date(t.data) >= new Date()).slice(0,4).map(t => `
+              <tr>
+                <td>${t.turma}</td>
+                <td>${t.disciplina}</td>
+                <td>${t.titulo}</td>
+                <td>${formatDate(t.data)}</td>
+                <td><span class="badge badge-upcoming">${t.sala}</span></td>
+              </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--gray-400)">Sem avaliações marcadas</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderProfPresencas(el) {
+  const today = fmtDate(new Date());
+  let selTurma = TURMAS[0];
+  let selDisc = DISCIPLINAS[0];
+  let selDate = today;
+
+  function getKey() { return `${selDate}_${selTurma}_${selDisc}`; }
+  function getAtt() { return presencas[getKey()] || {}; }
+
+  function render() {
+    const att = getAtt();
+    const alunos = ALUNOS_TURMA[selTurma] || [];
+    const total = alunos.length;
+    const pres = alunos.filter(a => att[a.id] === 'P').length;
+    const falt = alunos.filter(a => att[a.id] === 'F').length;
+    const atra = alunos.filter(a => att[a.id] === 'A').length;
+
+    el.innerHTML = `
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-body" style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end">
+          <div style="flex:1;min-width:150px">
+            <label class="form-label">Data</label>
+            <input class="form-control" type="date" id="att-date" value="${selDate}" max="${today}">
+          </div>
+          <div style="flex:1;min-width:150px">
+            <label class="form-label">Turma</label>
+            <select class="form-control" id="att-turma">
+              ${TURMAS.map(t => `<option ${t===selTurma?'selected':''}>${t}</option>`).join('')}
+            </select>
+          </div>
+          <div style="flex:1;min-width:180px">
+            <label class="form-label">Disciplina</label>
+            <select class="form-control" id="att-disc">
+              ${DISCIPLINAS.map(d => `<option ${d===selDisc?'selected':''}>${d}</option>`).join('')}
+            </select>
+          </div>
+          <button class="btn btn-secondary" onclick="applyFilters()">Carregar</button>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-icon green">✅</div>
+          <div class="stat-info"><div class="value">${pres}</div><div class="label">Presentes</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">❌</div>
+          <div class="stat-info"><div class="value">${falt}</div><div class="label">Ausentes</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow">⏰</div>
+          <div class="stat-info"><div class="value">${atra}</div><div class="label">Atrasados</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Lista de Alunos — ${selTurma} · ${selDisc} · ${formatDate(selDate)}</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-success btn-sm" onclick="markAll('P')">✅ Todos Presentes</button>
+            <button class="btn btn-danger btn-sm" onclick="markAll('F')">❌ Todos Ausentes</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="attendance-grid">
+            ${alunos.map(a => {
+              const state = att[a.id] || '';
+              return `
+                <div class="att-row">
+                  <span class="att-num">${a.num}</span>
+                  <span class="student-name">${a.nome}</span>
+                  <div class="att-buttons">
+                    <button class="att-btn ${state==='P'?'selected-present':''}" onclick="markAtt(${a.id},'P')">✅ Presente</button>
+                    <button class="att-btn ${state==='F'?'selected-absent':''}" onclick="markAtt(${a.id},'F')">❌ Falta</button>
+                    <button class="att-btn ${state==='A'?'selected-late':''}" onclick="markAtt(${a.id},'A')">⏰ Atraso</button>
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
+        <div style="padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:12px">
+          <button class="btn btn-primary" onclick="saveAtt()">💾 Guardar Presenças</button>
+          <button class="btn btn-secondary" onclick="clearAtt()">🔄 Limpar</button>
+        </div>
+      </div>`;
+
+    document.getElementById('att-date').addEventListener('change', e => { selDate = e.target.value; render(); });
+    document.getElementById('att-turma').addEventListener('change', e => { selTurma = e.target.value; render(); });
+    document.getElementById('att-disc').addEventListener('change', e => { selDisc = e.target.value; render(); });
+
+    window.applyFilters = render;
+    window.markAll = function(status) {
+      const alunos2 = ALUNOS_TURMA[selTurma] || [];
+      if (!presencas[getKey()]) presencas[getKey()] = {};
+      alunos2.forEach(a => presencas[getKey()][a.id] = status);
+      render();
+    };
+    window.markAtt = function(id, status) {
+      if (!presencas[getKey()]) presencas[getKey()] = {};
+      presencas[getKey()][id] = status;
+      render();
+    };
+    window.saveAtt = function() {
+      savePresencas();
+      showToast('✅ Presenças guardadas com sucesso!', 'success');
+    };
+    window.clearAtt = function() {
+      delete presencas[getKey()];
+      render();
+      showToast('🔄 Presenças limpas.', 'info');
+    };
+  }
+  render();
+}
+
+function renderTestes(el, isProf) {
+  function render(filter) {
+    const now = new Date();
+    let filtered = filter === 'passados'
+      ? testes.filter(t => new Date(t.data) < now)
+      : filter === 'proximos'
+      ? testes.filter(t => new Date(t.data) >= now)
+      : testes;
+
+    // If student, only show their turma
+    if (!isProf && currentUser.turma) {
+      filtered = filtered.filter(t => t.turma === currentUser.turma);
+    }
+
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+        <div class="pill-tabs">
+          <button class="pill-tab ${filter==='todos'?'active':''}" onclick="renderFilter('todos')">Todos</button>
+          <button class="pill-tab ${filter==='proximos'?'active':''}" onclick="renderFilter('proximos')">Próximos</button>
+          <button class="pill-tab ${filter==='passados'?'active':''}" onclick="renderFilter('passados')">Passados</button>
+        </div>
+        ${isProf ? `<button class="btn btn-primary" onclick="showNovoTesteModal()">+ Marcar Avaliação</button>` : ''}
+      </div>
+      <div class="card">
+        <div class="card-body table-wrap">
+          <table>
+            <thead>
+              <tr>
+                ${isProf ? '<th>Turma</th>' : ''}
+                <th>Disciplina</th><th>Título</th><th>Tipo</th><th>Data</th><th>Hora</th><th>Sala</th>
+                ${isProf ? '<th>Ações</th>' : ''}
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.length ? filtered.sort((a,b) => new Date(a.data)-new Date(b.data)).map(t => {
+                const past = new Date(t.data) < now;
+                return `<tr>
+                  ${isProf ? `<td>${t.turma}</td>` : ''}
+                  <td>${t.disciplina}</td>
+                  <td><strong>${t.titulo}</strong></td>
+                  <td><span class="badge ${past?'badge-absent':'badge-upcoming'}">${t.tipo}</span></td>
+                  <td>${formatDate(t.data)}</td>
+                  <td>${t.hora}</td>
+                  <td>${t.sala}</td>
+                  ${isProf ? `<td><div style="display:flex;gap:6px">
+                    <button class="btn btn-sm btn-secondary" onclick="editTeste(${t.id})">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteTeste(${t.id})">🗑️</button>
+                  </div></td>` : ''}
+                </tr>`;
+              }).join('') : `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray-400)">Nenhuma avaliação encontrada</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+
+    window.renderFilter = render;
+  }
+  render('todos');
+
+  window.showNovoTesteModal = function() {
+    openModal('➕ Marcar Nova Avaliação', `
+      <div class="form-group"><label class="form-label">Turma</label>
+        <select class="form-control" id="nt-turma">${TURMAS.map(t=>`<option>${t}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Disciplina</label>
+        <select class="form-control" id="nt-disc">${DISCIPLINAS.map(d=>`<option>${d}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Título</label>
+        <input class="form-control" id="nt-titulo" placeholder="Ex: Teste 1 – Funções"></div>
+      <div class="form-group"><label class="form-label">Tipo</label>
+        <select class="form-control" id="nt-tipo"><option>teste</option><option>ficha</option><option>oral</option><option>projeto</option></select></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group"><label class="form-label">Data</label>
+          <input class="form-control" type="date" id="nt-data" value="${fmtDate(new Date())}"></div>
+        <div class="form-group"><label class="form-label">Hora</label>
+          <input class="form-control" type="time" id="nt-hora" value="09:00"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Sala</label>
+        <input class="form-control" id="nt-sala" placeholder="Ex: A1"></div>
+    `, [
+      { label: 'Cancelar', cls: 'btn-secondary', action: closeModal },
+      { label: '💾 Guardar', cls: 'btn-primary', action: () => {
+        const titulo = document.getElementById('nt-titulo').value.trim();
+        if (!titulo) { showToast('⚠️ Preencha o título.', 'warning'); return; }
+        const novo = {
+          id: Date.now(),
+          turma: document.getElementById('nt-turma').value,
+          disciplina: document.getElementById('nt-disc').value,
+          titulo,
+          tipo: document.getElementById('nt-tipo').value,
+          data: document.getElementById('nt-data').value,
+          hora: document.getElementById('nt-hora').value,
+          sala: document.getElementById('nt-sala').value,
+        };
+        testes.push(novo);
+        saveTestes();
+        closeModal();
+        render('todos');
+        showToast('✅ Avaliação marcada com sucesso!', 'success');
+      }}
+    ]);
+  };
+
+  window.editTeste = function(id) {
+    const t = testes.find(x => x.id === id);
+    if (!t) return;
+    openModal('✏️ Editar Avaliação', `
+      <div class="form-group"><label class="form-label">Turma</label>
+        <select class="form-control" id="et-turma">${TURMAS.map(x=>`<option ${x===t.turma?'selected':''}>${x}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Disciplina</label>
+        <select class="form-control" id="et-disc">${DISCIPLINAS.map(d=>`<option ${d===t.disciplina?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Título</label>
+        <input class="form-control" id="et-titulo" value="${t.titulo}"></div>
+      <div class="form-group"><label class="form-label">Tipo</label>
+        <select class="form-control" id="et-tipo">${['teste','ficha','oral','projeto'].map(x=>`<option ${x===t.tipo?'selected':''}>${x}</option>`).join('')}</select></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group"><label class="form-label">Data</label>
+          <input class="form-control" type="date" id="et-data" value="${t.data}"></div>
+        <div class="form-group"><label class="form-label">Hora</label>
+          <input class="form-control" type="time" id="et-hora" value="${t.hora}"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Sala</label>
+        <input class="form-control" id="et-sala" value="${t.sala}"></div>
+    `, [
+      { label: 'Cancelar', cls: 'btn-secondary', action: closeModal },
+      { label: '💾 Atualizar', cls: 'btn-primary', action: () => {
+        t.turma = document.getElementById('et-turma').value;
+        t.disciplina = document.getElementById('et-disc').value;
+        t.titulo = document.getElementById('et-titulo').value;
+        t.tipo = document.getElementById('et-tipo').value;
+        t.data = document.getElementById('et-data').value;
+        t.hora = document.getElementById('et-hora').value;
+        t.sala = document.getElementById('et-sala').value;
+        saveTestes();
+        closeModal();
+        render('todos');
+        showToast('✅ Avaliação atualizada!', 'success');
+      }}
+    ]);
+  };
+
+  window.deleteTeste = function(id) {
+    openModal('🗑️ Eliminar Avaliação', '<p>Tem a certeza que deseja eliminar esta avaliação? Esta ação não pode ser desfeita.</p>', [
+      { label: 'Cancelar', cls: 'btn-secondary', action: closeModal },
+      { label: '🗑️ Eliminar', cls: 'btn-danger', action: () => {
+        testes = testes.filter(x => x.id !== id);
+        saveTestes();
+        closeModal();
+        render('todos');
+        showToast('🗑️ Avaliação eliminada.', 'error');
+      }}
+    ]);
+  };
+}
+
+function renderHorario(el, isProf) {
+  const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+  const slots = ['08:30', '09:30', '10:30', '11:30', '12:30', '14:00', '15:00', '16:00'];
+  const colors = ['dot-blue','dot-green','dot-yellow','dot-purple','dot-red'];
+
+  const schedule = isProf ? [
+    { day:0, slot:0, subj:'Matemática 10.ºA', room:'A1' },
+    { day:0, slot:2, subj:'Matemática 11.ºA', room:'B2' },
+    { day:1, slot:1, subj:'Matemática 10.ºB', room:'C3' },
+    { day:1, slot:4, subj:'Matemática 10.ºA', room:'A1' },
+    { day:2, slot:0, subj:'Matemática 12.ºA', room:'D4' },
+    { day:2, slot:3, subj:'Matemática 11.ºB', room:'B2' },
+    { day:3, slot:2, subj:'Matemática 10.ºA', room:'A1' },
+    { day:4, slot:1, subj:'Matemática 10.ºB', room:'C3' },
+  ] : [
+    { day:0, slot:0, subj:'Matemática', room:'A1' },
+    { day:0, slot:2, subj:'Português', room:'B2' },
+    { day:1, slot:1, subj:'Física e Química', room:'Lab1' },
+    { day:1, slot:4, subj:'Inglês', room:'C3' },
+    { day:2, slot:0, subj:'Biologia', room:'Lab2' },
+    { day:2, slot:3, subj:'História', room:'D4' },
+    { day:3, slot:2, subj:'Matemática', room:'A1' },
+    { day:3, slot:5, subj:'Ed. Física', room:'Gin1' },
+    { day:4, slot:1, subj:'Português', room:'B2' },
+  ];
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-header"><div class="card-title">📅 Horário Semanal</div></div>
+      <div class="card-body table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:80px">Hora</th>
+              ${days.map(d=>`<th>${d}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${slots.map((slot, si) => `
+              <tr>
+                <td style="font-family:var(--font-head);font-weight:700;font-size:13px;color:var(--gray-400)">${slot}</td>
+                ${days.map((d,di) => {
+                  const s = schedule.find(x => x.day===di && x.slot===si);
+                  if (s) {
+                    const c = colors[si % colors.length];
+                    return `<td>
+                      <div style="background:var(--blue-pale);border-radius:8px;padding:8px 10px;border-left:3px solid var(--blue-bright)">
+                        <div style="font-weight:600;font-size:13px">${s.subj}</div>
+                        <div style="font-size:11px;color:var(--gray-400);margin-top:2px">🚪 ${s.room}</div>
+                      </div></td>`;
+                  }
+                  return '<td></td>';
+                }).join('')}
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderTurmas(el) {
+  el.innerHTML = `
+    <div class="stats-grid" style="margin-bottom:20px">
+      ${TURMAS.map(t => {
+        const alunos = ALUNOS_TURMA[t] || [];
+        return `
+          <div class="card" style="cursor:pointer" onclick="navigateTo('alunos')">
+            <div class="card-body" style="display:flex;align-items:center;gap:16px">
+              <div class="stat-icon blue" style="font-size:22px">🎒</div>
+              <div>
+                <div style="font-family:var(--font-head);font-weight:800;font-size:18px">${t}</div>
+                <div style="font-size:13px;color:var(--gray-400)">${alunos.length} alunos</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" style="margin-left:auto">Ver →</button>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function renderAlunos(el) {
+  let selTurma = TURMAS[0];
+  function render() {
+    const alunos = ALUNOS_TURMA[selTurma] || [];
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+        <select class="form-control" style="max-width:200px" onchange="selTurmaAluno(this.value)">
+          ${TURMAS.map(t=>`<option ${t===selTurma?'selected':''}>${t}</option>`).join('')}
+        </select>
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-aluno" placeholder="Pesquisar aluno..." oninput="filterAlunos(this.value)">
+        </div>
+        <span style="font-size:13px;color:var(--gray-400)">${alunos.length} alunos</span>
+      </div>
+      <div class="card">
+        <div class="card-body table-wrap">
+          <table>
+            <thead><tr><th>Nº</th><th>Nome</th><th>Assiduidade</th><th>Ações</th></tr></thead>
+            <tbody id="alunos-tbody">
+              ${alunos.map(a => {
+                const pct = 80 + Math.floor(Math.random()*18);
+                const cls = pct>=90?'green':pct>=75?'':'red';
+                return `<tr data-nome="${a.nome.toLowerCase()}">
+                  <td>${a.num}</td>
+                  <td><div style="display:flex;align-items:center;gap:10px">
+                    <div class="avatar avatar-sm">${a.nome.split(' ').slice(0,2).map(w=>w[0]).join('')}</div>
+                    ${a.nome}
+                  </div></td>
+                  <td style="width:200px">
+                    <div class="info-label" style="margin-bottom:4px"><span></span><span>${pct}%</span></div>
+                    <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div>
+                  </td>
+                  <td><button class="btn btn-sm btn-secondary" onclick="verAluno('${a.nome}',${pct})">Ver Perfil</button></td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+
+    window.selTurmaAluno = v => { selTurma = v; render(); };
+    window.filterAlunos = q => {
+      document.querySelectorAll('#alunos-tbody tr').forEach(tr => {
+        tr.style.display = tr.dataset.nome.includes(q.toLowerCase()) ? '' : 'none';
+      });
+    };
+    window.verAluno = (nome, pct) => {
+      openModal(`👤 ${nome}`, `
+        <div style="text-align:center;margin-bottom:20px">
+          <div class="avatar" style="width:64px;height:64px;font-size:24px;margin:0 auto 12px">${nome.split(' ').slice(0,2).map(w=>w[0]).join('')}</div>
+          <div style="font-family:var(--font-head);font-weight:700;font-size:18px">${nome}</div>
+          <div style="font-size:13px;color:var(--gray-400)">${selTurma}</div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-label"><span>Assiduidade Geral</span><span>${pct}%</span></div>
+        <div class="progress-bar" style="margin-bottom:16px"><div class="progress-fill ${pct>=90?'green':pct>=75?'':'red'}" style="width:${pct}%"></div></div>
+        <div class="info-label"><span>Faltas no período</span><span>${Math.floor((100-pct)/5)}</span></div>
+        <div class="info-label"><span>Atrasos</span><span>${Math.floor(Math.random()*4)}</span></div>
+        <div class="info-label"><span>Testes realizados</span><span>3</span></div>
+      `, [{ label: 'Fechar', cls: 'btn-secondary', action: closeModal }]);
+    };
+  }
+  render();
+}
+
+function renderRelatorios(el) {
+  el.innerHTML = `
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">📊 Assiduidade por Turma</div></div>
+        <div class="card-body">
+          ${TURMAS.map(t => {
+            const pct = 75 + Math.floor(Math.random()*20);
+            return `
+              <div style="margin-bottom:16px">
+                <div class="info-label"><span>${t}</span><span style="font-weight:700">${pct}%</span></div>
+                <div class="progress-bar"><div class="progress-fill ${pct>=90?'green':pct>=75?'':'red'}" style="width:${pct}%"></div></div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📈 Resumo do Período</div></div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            ${[
+              ['Total de aulas lecionadas','48'],
+              ['Média de presenças','93%'],
+              ['Total de faltas registadas','34'],
+              ['Alunos em risco (>3 faltas)','2'],
+              ['Avaliações realizadas','6'],
+            ].map(([k,v]) => `
+              <div class="info-label">
+                <span>${k}</span>
+                <span style="font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--blue-mid)">${v}</span>
+              </div>
+              <div class="divider" style="margin:0"></div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🎯 Alunos em Risco de Excluir por Faltas</div>
+      </div>
+      <div class="card-body table-wrap">
+        <table>
+          <thead><tr><th>Aluno</th><th>Turma</th><th>Faltas</th><th>Limite</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Francisco Costa</td><td>10.º A</td><td>4</td><td>5</td>
+              <td><span class="badge badge-late">⚠️ Atenção</span></td>
+            </tr>
+            <tr>
+              <td>Miguel Sousa</td><td>10.º A</td><td>3</td><td>5</td>
+              <td><span class="badge badge-upcoming">ℹ️ Normal</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ===== ALUNO VIEWS =====
+function renderAlunoView(view, el) {
+  switch(view) {
+    case 'dashboard': renderAlunoDashboard(el); break;
+    case 'presencas': renderAlunoPresencas(el); break;
+    case 'testes': renderTestes(el, false); break;
+    case 'horario': renderHorario(el, false); break;
+    case 'perfil': renderPerfil(el); break;
+    case 'notificacoes': renderNotificacoes(el); break;
+  }
+}
+
+function renderAlunoDashboard(el) {
+  const turma = currentUser.turma || '10.º A';
+  const testesT = testes.filter(t => t.turma === turma && new Date(t.data) >= new Date());
+  el.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-info"><div class="value">92%</div><div class="label">Assiduidade</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">❌</div>
+        <div class="stat-info"><div class="value">2</div><div class="label">Faltas</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon yellow">📝</div>
+        <div class="stat-info"><div class="value">${testesT.length}</div><div class="label">Testes Próximos</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">📚</div>
+        <div class="stat-info"><div class="value">${DISCIPLINAS.length}</div><div class="label">Disciplinas</div></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 Assiduidade por Disciplina</div>
+        </div>
+        <div class="card-body">
+          ${DISCIPLINAS.slice(0,5).map(d => {
+            const pct = 80 + Math.floor(Math.random()*18);
+            return `
+              <div style="margin-bottom:14px">
+                <div class="info-label"><span>${d}</span><span>${pct}%</span></div>
+                <div class="progress-bar"><div class="progress-fill ${pct>=90?'green':pct>=75?'':'red'}" style="width:${pct}%"></div></div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📝 Próximas Avaliações — ${turma}</div>
+          <button class="btn btn-secondary btn-sm" onclick="navigateTo('testes')">Ver Todas →</button>
+        </div>
+        <div class="card-body">
+          ${testesT.length ? testesT.slice(0,4).map(t => `
+            <div class="schedule-item">
+              <div class="schedule-time">${formatDate(t.data)}</div>
+              <div class="schedule-dot dot-blue"></div>
+              <div class="schedule-info">
+                <div class="subj">${t.titulo}</div>
+                <div class="room">${t.disciplina} · ${t.hora} · Sala ${t.sala}</div>
+              </div>
+            </div>`).join('') : `<div class="empty-state" style="padding:30px">
+              <div class="icon">🎉</div>
+              <h3>Sem testes próximos!</h3>
+            </div>`}
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-header">
+        <div class="card-title">📅 Aulas de Hoje</div>
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('horario')">Horário →</button>
+      </div>
+      <div class="card-body">
+        <div class="schedule-item"><div class="schedule-time">08:30</div><div class="schedule-dot dot-blue"></div><div class="schedule-info"><div class="subj">Matemática</div><div class="room">Sala A1 · Prof. Cardoso</div></div></div>
+        <div class="schedule-item"><div class="schedule-time">10:30</div><div class="schedule-dot dot-green"></div><div class="schedule-info"><div class="subj">Português</div><div class="room">Sala B2 · Prof. Faria</div></div></div>
+        <div class="schedule-item"><div class="schedule-time">14:00</div><div class="schedule-dot dot-yellow"></div><div class="schedule-info"><div class="subj">Física e Química</div><div class="room">Lab1 · Prof. Nunes</div></div></div>
+      </div>
+    </div>`;
+}
+
+function renderAlunoPresencas(el) {
+  const turma = currentUser.turma || '10.º A';
+  const alunoId = 1; // Ana Lima
+  el.innerHTML = `
+    <div class="stats-grid" style="margin-bottom:20px">
+      <div class="stat-card"><div class="stat-icon green">✅</div><div class="stat-info"><div class="value">46</div><div class="label">Presenças</div></div></div>
+      <div class="stat-card"><div class="stat-icon red">❌</div><div class="stat-info"><div class="value">2</div><div class="label">Faltas</div></div></div>
+      <div class="stat-card"><div class="stat-icon yellow">⏰</div><div class="stat-info"><div class="value">1</div><div class="label">Atrasos</div></div></div>
+      <div class="stat-card"><div class="stat-icon blue">📊</div><div class="stat-info"><div class="value">92%</div><div class="label">Taxa de Presença</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📋 Histórico de Presenças</div></div>
+      <div class="card-body table-wrap">
+        <table>
+          <thead><tr><th>Data</th><th>Disciplina</th><th>Estado</th></tr></thead>
+          <tbody>
+            ${DISCIPLINAS.slice(0,7).map((d, i) => {
+              const days = [0,1,2,3,5,7,8];
+              const date = addDays(new Date(), -days[i]);
+              const states = ['P','P','P','P','F','P','A'];
+              const s = states[i];
+              const badgeCls = s==='P'?'badge-present':s==='F'?'badge-absent':'badge-late';
+              const label = s==='P'?'✅ Presente':s==='F'?'❌ Falta':'⏰ Atraso';
+              return `<tr>
+                <td>${formatDate(fmtDate(date))}</td>
+                <td>${d}</td>
+                <td><span class="badge ${badgeCls}">${label}</span></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderPerfil(el) {
+  const u = currentUser;
+  el.innerHTML = `
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-body" style="text-align:center;padding:40px">
+          <div class="avatar" style="width:80px;height:80px;font-size:30px;margin:0 auto 16px">
+            ${u.name.split(' ').slice(0,2).map(w=>w[0]).join('')}
+          </div>
+          <div style="font-family:var(--font-head);font-weight:800;font-size:20px;margin-bottom:4px">${u.name}</div>
+          <div style="font-size:14px;color:var(--gray-400);margin-bottom:4px">${u.email}</div>
+          <span class="badge badge-upcoming">${u.role === 'professor' ? '👨‍🏫 Professor' : '🎒 Aluno'}</span>
+          ${u.turma ? `<div style="font-size:13px;color:var(--gray-600);margin-top:8px">Turma: <strong>${u.turma}</strong></div>` : ''}
+          ${u.disciplina ? `<div style="font-size:13px;color:var(--gray-600);margin-top:8px">Disciplina: <strong>${u.disciplina}</strong></div>` : ''}
+          <div class="divider"></div>
+          <button class="btn btn-secondary w-full" onclick="showEditPerfil()" style="justify-content:center">✏️ Editar Perfil</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">🔒 Segurança</div></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Palavra-passe Atual</label>
+            <input class="form-control" type="password" placeholder="••••••••" id="p-atual">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nova Palavra-passe</label>
+            <input class="form-control" type="password" placeholder="••••••••" id="p-nova">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar Nova Palavra-passe</label>
+            <input class="form-control" type="password" placeholder="••••••••" id="p-conf">
+          </div>
+          <button class="btn btn-primary" onclick="alterarPass()">🔒 Alterar Palavra-passe</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-header"><div class="card-title">🔔 Notificações</div></div>
+      <div class="card-body">
+        <div class="checkbox-group">
+          <div class="checkbox-item"><input type="checkbox" id="n1" checked><label for="n1">Avisos de testes e fichas</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="n2" checked><label for="n2">Registo de faltas</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="n3"><label for="n3">Alterações de horário</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="n4" checked><label for="n4">Lembretes de avaliações</label></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px" onclick="saveNotifPrefs()">💾 Guardar Preferências</button>
+      </div>
+    </div>`;
+
+  window.alterarPass = function() {
+    const a = document.getElementById('p-atual').value;
+    const n = document.getElementById('p-nova').value;
+    const c = document.getElementById('p-conf').value;
+    if (!a || !n || !c) { showToast('⚠️ Preencha todos os campos.', 'warning'); return; }
+    if (n !== c) { showToast('❌ As palavras-passe não coincidem.', 'error'); return; }
+    if (n.length < 6) { showToast('⚠️ Mínimo 6 caracteres.', 'warning'); return; }
+    showToast('✅ Palavra-passe alterada com sucesso!', 'success');
+    document.getElementById('p-atual').value = '';
+    document.getElementById('p-nova').value = '';
+    document.getElementById('p-conf').value = '';
+  };
+  window.saveNotifPrefs = () => showToast('✅ Preferências guardadas!', 'success');
+  window.showEditPerfil = () => {
+    openModal('✏️ Editar Perfil', `
+      <div class="form-group"><label class="form-label">Nome</label>
+        <input class="form-control" id="ep-nome" value="${u.name}"></div>
+      <div class="form-group"><label class="form-label">E-mail</label>
+        <input class="form-control" type="email" id="ep-email" value="${u.email}"></div>
+      ${u.turma ? `<div class="form-group"><label class="form-label">Turma</label><input class="form-control" id="ep-turma" value="${u.turma}" readonly></div>` : ''}
+    `, [
+      { label: 'Cancelar', cls: 'btn-secondary', action: closeModal },
+      { label: '💾 Guardar', cls: 'btn-primary', action: () => {
+        currentUser.name = document.getElementById('ep-nome').value;
+        closeModal();
+        initApp();
+        navigateTo('perfil');
+        showToast('✅ Perfil atualizado!', 'success');
+      }}
+    ]);
+  };
+}
+
+function renderNotificacoes(el) {
+  const notifs = [
+    { icon:'📝', title:'Teste de Matemática marcado', desc:'Teste 1 – Funções · 10.º A · ' + formatDate(fmtDate(addDays(new Date(),3))), time:'Há 2 horas', unread:true },
+    { icon:'❌', title:'Falta registada', desc:'Física e Química · ' + formatDate(fmtDate(addDays(new Date(),-2))), time:'Há 1 dia', unread:true },
+    { icon:'📅', title:'Alteração de horário', desc:'Aula de Português transferida para Sala C3', time:'Há 2 dias', unread:false },
+    { icon:'⏰', title:'Lembrete: Teste amanhã!', desc:'Biologia · 10.º A · Sala Lab2', time:'Há 3 dias', unread:false },
+  ];
+  el.innerHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+      <button class="btn btn-secondary btn-sm" onclick="markAllRead()">✓ Marcar todas como lidas</button>
+    </div>
+    <div class="card">
+      ${notifs.map((n,i) => `
+        <div style="display:flex;gap:16px;padding:18px 24px;border-bottom:1px solid var(--gray-200);${n.unread?'background:var(--blue-pale)':''}" id="notif-${i}">
+          <div style="font-size:28px;flex-shrink:0">${n.icon}</div>
+          <div style="flex:1">
+            <div style="font-family:var(--font-head);font-weight:${n.unread?700:500};margin-bottom:4px">${n.title}</div>
+            <div style="font-size:13px;color:var(--gray-600)">${n.desc}</div>
+            <div style="font-size:12px;color:var(--gray-400);margin-top:6px">${n.time}</div>
+          </div>
+          ${n.unread ? '<div style="width:10px;height:10px;border-radius:50%;background:var(--blue-bright);margin-top:6px;flex-shrink:0"></div>' : ''}
+        </div>`).join('')}
+    </div>`;
+
+  window.markAllRead = () => {
+    document.querySelectorAll('[id^=notif-]').forEach(el => {
+      el.style.background = '';
+      const dot = el.querySelector('[style*="border-radius:50%"]');
+      if (dot) dot.remove();
+      const title = el.querySelector('[style*="font-weight:700"]');
+      if (title) title.style.fontWeight = '500';
+    });
+    showToast('✅ Todas as notificações marcadas como lidas.', 'success');
+  };
+}
+
+// ===== MODAL SYSTEM =====
+function openModal(title, bodyHTML, buttons) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  const footer = document.getElementById('modal-footer');
+  footer.innerHTML = '';
+  (buttons || []).forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = `btn ${b.cls}`;
+    btn.innerHTML = b.label;
+    btn.onclick = b.action;
+    footer.appendChild(btn);
+  });
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+// ===== FORGOT PASSWORD =====
+function showForgotModal() {
+  document.getElementById('page-login');
+  const div = document.createElement('div');
+  div.className = 'modal-overlay';
+  div.id = 'forgot-overlay';
+  div.onclick = (e) => { if(e.target===div) div.remove(); };
+  div.innerHTML = `
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">🔑 Recuperar Palavra-passe</div>
+        <button class="btn btn-sm btn-secondary" onclick="document.getElementById('forgot-overlay').remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:16px;color:var(--gray-600);font-size:14px">Introduza o seu e-mail e enviaremos instruções para redefinir a sua palavra-passe.</p>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input class="form-control" type="email" id="forgot-email" placeholder="exemplo@escola.pt">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="document.getElementById('forgot-overlay').remove()">Cancelar</button>
+        <button class="btn btn-primary" onclick="sendRecover()">Enviar Link →</button>
+      </div>
+    </div>`;
+  document.body.appendChild(div);
+  window.sendRecover = () => {
+    const email = document.getElementById('forgot-email').value;
+    if (!email) { showToast('⚠️ Introduza o e-mail.', 'warning'); return; }
+    document.getElementById('forgot-overlay').remove();
+    showToast(`📧 E-mail de recuperação enviado para ${email}`, 'success');
+  };
+}
+
+// ===== TOAST =====
+function showToast(msg, type='info') {
+  const container = document.getElementById('toast-container');
+  const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// ===== SIDEBAR MOBILE =====
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ===== UTILS =====
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+// ===== FIX LOGO =====
+document.getElementById('logo-img').onerror = function() {
+  this.style.display = 'none';
+  document.getElementById('logo-fallback').style.display = 'block';
+};
+</script>
+</body>
+</html>

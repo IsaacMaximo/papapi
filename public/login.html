@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoupIn - Login</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  </head>
+  <body>
+
+    <div id="Login-Container">
+      <!-- card wrapper: both visual and functional -->
+      <div class="login-card">
+        <!-- decorative brand icon -->
+        <div class="brand-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+        <h2>Bem vindo denovo</h2>
+        <p class="subhead">Logue em sua conta</p>
+
+        <!-- login form -->
+        <form id="loginForm" autocomplete="off">
+          <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="Email address" required />
+          </div>
+          <div class="input-group">
+            <i class="fas fa-key"></i>
+            <input type="password" id="password" placeholder="Password" required />
+            <span class="toggle-pw" id="togglePw"><i class="fas fa-eye"></i></span>
+          </div>
+
+          <div class="form-options">
+            <label class="remember-me">
+              <input type="checkbox" checked /> Lembrar de mim
+            </label>
+            <a href="#" class="forgot-link">Esqueceu a senha?</a>
+          </div>
+
+          <button type="submit" class="login-btn">
+            <i class="fas fa-sign-in-alt"></i> Logar
+          </button>
+
+          <p class="signup-cta">
+            Não tem uma conta? <a href="#">Cadastre-se</a>
+          </p>
+        </form>
+
+      </div>
+    </div>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Inter', Arial, sans-serif;
+        background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+      }
+
+      #Login-Container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding: 1.5rem;
+      }
+
+      .login-card {
+        width: 100%;
+        max-width: 420px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        padding: 2.5rem 2rem 2.2rem;
+        border-radius: 36px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 20px 50px rgba(0, 20, 40, 0.20), 0 8px 24px rgba(0, 0, 0, 0.06);
+        transition: transform 0.25s ease, box-shadow 0.3s ease;
+        text-align: center;
+      }
+
+      .login-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 30px 60px rgba(0, 20, 40, 0.25);
+      }
+
+      .brand-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 68px;
+        height: 68px;
+        background: linear-gradient(135deg, #2b3a67, #1d2b4a);
+        border-radius: 50%;
+        color: white;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 8px 16px rgba(27, 45, 75, 0.25);
+      }
+
+      h2 {
+        font-weight: 600;
+        font-size: 1.9rem;
+        letter-spacing: -0.02em;
+        color: #0b1a30;
+        margin-bottom: 0.1rem;
+      }
+
+      .subhead {
+        color: #4a5a72;
+        font-weight: 400;
+        font-size: 0.95rem;
+        margin-bottom: 1.8rem;
+        border-bottom: 1px solid rgba(100, 120, 150, 0.15);
+        padding-bottom: 0.9rem;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        text-align: left;
+      }
+
+      .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 60px;
+        padding: 0 1rem;
+        border: 1px solid #dde3ed;
+        transition: border 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      }
+
+      .input-group:focus-within {
+        border-color: #2b3a67;
+        box-shadow: 0 0 0 4px rgba(43, 58, 103, 0.12);
+      }
+
+      .input-group i {
+        color: #7b8aa3;
+        font-size: 1rem;
+        width: 1.4rem;
+        text-align: center;
+        transition: color 0.2s;
+      }
+
+      .input-group:focus-within i {
+        color: #2b3a67;
+      }
+
+      .input-group input {
+        border: none;
+        padding: 0.9rem 0.7rem;
+        font-size: 0.95rem;
+        font-family: 'Inter', sans-serif;
+        background: transparent;
+        width: 100%;
+        outline: none;
+        color: #0f1e34;
+        font-weight: 500;
+      }
+
+      .input-group input::placeholder {
+        color: #99a9be;
+        font-weight: 400;
+        font-size: 0.9rem;
+      }
+
+      .toggle-pw {
+        cursor: pointer;
+        color: #7b8aa3;
+        font-size: 0.95rem;
+        padding: 0 0.25rem;
+        transition: color 0.2s;
+        user-select: none;
+      }
+
+      .toggle-pw:hover {
+        color: #1d2b4a;
+      }
+
+      /* options row */
+      .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+        margin-top: 0.2rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: #1f3147;
+        font-weight: 450;
+        cursor: pointer;
+      }
+
+      .remember-me input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: #2b3a67;
+        cursor: pointer;
+      }
+
+      .forgot-link {
+        color: #2b3a67;
+        font-weight: 500;
+        text-decoration: none;
+        border-bottom: 1px dotted rgba(43, 58, 103, 0.25);
+        transition: border 0.2s;
+      }
+
+      .forgot-link:hover {
+        border-bottom-color: #2b3a67;
+      }
+
+      /* login button */
+      .login-btn {
+        background: linear-gradient(135deg, #1d2b4a, #2b3a67);
+        border: none;
+        padding: 0.9rem 1.2rem;
+        border-radius: 60px;
+        font-weight: 600;
+        font-size: 1rem;
+        font-family: 'Inter', sans-serif;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 8px 18px rgba(27, 45, 75, 0.25);
+        margin-top: 0.3rem;
+        letter-spacing: 0.3px;
+      }
+
+      .login-btn i {
+        font-size: 1rem;
+      }
+
+      .login-btn:hover {
+        background: linear-gradient(135deg, #243755, #31467a);
+        transform: scale(1.01);
+        box-shadow: 0 12px 24px rgba(27, 45, 75, 0.35);
+      }
+
+      .login-btn:active {
+        transform: scale(0.97);
+      }
+
+      .signup-cta {
+        text-align: center;
+        font-size: 0.9rem;
+        color: #3c4e68;
+        margin-top: 0.3rem;
+      }
+
+      .signup-cta a {
+        color: #1d2b4a;
+        font-weight: 600;
+        text-decoration: none;
+        border-bottom: 1px solid #b0c2db;
+      }
+
+      .signup-cta a:hover {
+        border-bottom-color: #1d2b4a;
+      }
+
+
+
+      @media (max-width: 440px) {
+        .login-card {
+          padding: 2rem 1.2rem;
+        }
+        h2 {
+          font-size: 1.6rem;
+        }
+        .brand-icon {
+          width: 58px;
+          height: 58px;
+          font-size: 1.6rem;
+        }
+      }
+    </style>
+  </body>
+</html>
