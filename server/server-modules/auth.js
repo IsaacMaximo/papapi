@@ -44,34 +44,66 @@ async function verificarPassword(senha, hashArmazenado) {
   }
 }
 
-// ========== MIDDLEWARE DE AUTENTICAÇÃO ==========
+// ========== MIDDLEWARE DE AUTENTICAÇÃO MELHORADO ==========
 const autenticar = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    // 🔥 TENTA PEGAR O TOKEN DE VÁRIAS FORMAS
+    let token = null;
+
+    // 1. Do cookie (navegador)
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+      console.log("🍪 Token obtido do cookie");
+    }
+
+    // 2. Do header Authorization (Yaak/Postman/API)
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.substring(7);
+        console.log("🔑 Token obtido do Authorization header");
+      }
+    }
+
+    // 3. Do body (fallback para testes)
+    if (!token && req.body && req.body.token) {
+      token = req.body.token;
+      console.log("📦 Token obtido do body");
+    }
 
     if (!token) {
+      console.log("❌ Token não encontrado em nenhum lugar");
       return res.status(401).json({
         success: false,
         message: "Acesso negado. Faça login primeiro.",
-        cookie: req.cookies,
+        debug: {
+          hasCookie: !!req.cookies,
+          hasAuthHeader: !!req.headers.authorization,
+          cookieKeys: req.cookies ? Object.keys(req.cookies) : [],
+        },
       });
     }
 
     try {
       const decoded = jwt.verify(token, jwtSecret);
+      console.log(`✅ Token válido para: ${decoded.email}`);
       req.user = decoded;
+      req.token = token; // Guarda o token para uso posterior
       next();
     } catch (error) {
       if (error.name === "TokenExpiredError") {
+        console.log("⏰ Token expirado");
         return res.status(401).json({
           success: false,
           message: "Token expirado",
           code: "TOKEN_EXPIRED",
         });
       }
+      console.log("❌ Token inválido:", error.message);
       return res.status(401).json({
         success: false,
         message: "Token inválido",
+        error: error.message,
       });
     }
   } catch (error) {
@@ -176,7 +208,9 @@ async function loginUser(req, res) {
     const senhaValida = await verificarPassword(password, hashArmazenado);
 
     if (senhaValida) {
-      console.log(`Login bem-sucedido: ${email}`);
+      console.log(`✅ Login bem-sucedido: ${email}`);
+
+      const isProduction = process.env.NODE_ENV === "prod";
 
       const payload = {
         userId: usuario._id,
@@ -187,17 +221,25 @@ async function loginUser(req, res) {
         expiresIn: JWT_EXPIRES_IN,
       });
 
-      res.cookie("token", accessToken, {
+      // ✅ CONFIGURAÇÃO DO COOKIE MELHORADA
+      const cookieOptions = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "prod",
-        sameSite: process.env.NODE_ENV === "prod" ? "none" : "lax",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 15 * 60 * 1000,
         path: "/",
-        domain: process.env.NODE_ENV === "prod" ? ".vercel.app" : undefined // Descomente se for Vercel
-      });
+      };
 
+      // 🔥 DOMAIN é importante para Vercel
+      if (isProduction) {
+        cookieOptions.domain = ".vercel.app";
+      }
+
+      res.cookie("token", accessToken, cookieOptions);
+
+      // REFRESH TOKEN
       if (rememberMe) {
-        console.log(`Usuário optou por "Lembrar de mim": ${email}`);
+        console.log(`✅ Usuário optou por "Lembrar de mim": ${email}`);
         const payloadRefresh = {
           userId: usuario._id,
           email: usuario.email,
@@ -206,13 +248,19 @@ async function loginUser(req, res) {
           expiresIn: JWT_REFRESH_EXPIRES_IN,
         });
 
-        res.cookie("refreshToken", refreshToken, {
+        const refreshOptions = {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "prod",
-          sameSite: process.env.NODE_ENV === "prod" ? "none" : "lax",
+          secure: isProduction,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 7 * 24 * 60 * 60 * 1000,
           path: "/api/refresh",
-        });
+        };
+
+        if (isProduction) {
+          refreshOptions.domain = ".vercel.app";
+        }
+
+        res.cookie("refreshToken", refreshToken, refreshOptions);
 
         await collection.updateOne(
           { _id: usuario._id },
@@ -224,7 +272,7 @@ async function loginUser(req, res) {
           },
         );
       } else {
-        console.log(`Usuário NÃO optou por "Lembrar de mim": ${email}`);
+        console.log(`ℹ️ Usuário NÃO optou por "Lembrar de mim": ${email}`);
         await collection.updateOne(
           { _id: usuario._id },
           {
@@ -234,10 +282,11 @@ async function loginUser(req, res) {
         );
       }
 
+      // 🔥 RETORNA O TOKEN TAMBÉM (para clientes API como Yaak)
       return res.json({
         success: true,
         message: "Login realizado com sucesso!",
-        token: accessToken,
+        token: accessToken, // 🔥 IMPORTANTE para Yaak/Postman
         user: {
           id: usuario._id,
           fullname: usuario.fullname,
@@ -281,17 +330,23 @@ async function logoutUser(req, res) {
       }
     }
 
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "prod",
-      sameSite: "strict",
-      path: "/",
-    });
+    const isProduction = process.env.NODE_ENV === "prod";
 
-    res.clearCookie("refreshToken", {
+    // Limpa os cookies
+    const clearOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "prod",
-      sameSite: "strict",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
+    };
+
+    if (isProduction) {
+      clearOptions.domain = ".vercel.app";
+    }
+
+    res.clearCookie("token", clearOptions);
+    res.clearCookie("refreshToken", {
+      ...clearOptions,
       path: "/api/refresh",
     });
 
@@ -361,17 +416,25 @@ async function refreshToken(req, res) {
       expiresIn: JWT_EXPIRES_IN,
     });
 
-    res.cookie("token", newAccessToken, {
+    const isProduction = process.env.NODE_ENV === "prod";
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "prod",
-      sameSite: "strict",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 15 * 60 * 1000,
       path: "/",
-    });
+    };
+
+    if (isProduction) {
+      cookieOptions.domain = ".vercel.app";
+    }
+
+    res.cookie("token", newAccessToken, cookieOptions);
 
     return res.json({
       success: true,
       message: "Token renovado com sucesso",
+      token: newAccessToken, // 🔥 Retorna o token também
       expiresIn: 15 * 60,
     });
   } catch (error) {
