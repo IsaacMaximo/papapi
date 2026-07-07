@@ -342,7 +342,7 @@
         console.log(
           `Tentativa de login com Email: ${email}, password: ${password}, Remember Me: ${rememberMe}`,
         );
-        fetch("http://localhost:1919/papapi/loginuser/", {
+        fetch("/papapi/loginuser/", {
           credentials: 'include',
           method: "POST",
           headers: {
