@@ -2,6 +2,7 @@
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { ObjectId } = require("mongodb");
 const { client } = require("./conndb.js");
 
 const saltRounds = 12;
@@ -12,6 +13,23 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_REFRESH_EXPIRES_IN = "7d";
 
 const isProduction = process.env.NODE_ENV === "prod";
+
+function normalizeUserId(userId) {
+  if (userId instanceof ObjectId) {
+    return userId;
+  }
+
+  if (typeof userId === "string") {
+    try {
+      return new ObjectId(userId);
+    } catch (error) {
+      return userId;
+    }
+  }
+
+  return userId;
+}
+
 // ========== FUNÇÕES DE HASH ==========
 async function hashPassword(passparahash) {
   try {
@@ -90,7 +108,8 @@ const autenticar = async (req, res, next) => {
 
       const db = client.db("PoupIn");
       const collection = db.collection("users");
-      const usuario = await collection.findOne({ _id: decoded.userId });
+      const userId = normalizeUserId(decoded.userId);
+      const usuario = await collection.findOne({ _id: userId });
 
       if (!usuario) {
         console.log("❌ Usuário não encontrado para o token");
@@ -348,7 +367,7 @@ async function logoutUser(req, res) {
         const collection = db.collection("users");
 
         await collection.updateOne(
-          { _id: decoded.userId },
+          { _id: normalizeUserId(decoded.userId) },
           {
             $inc: { tokenVersion: 1 },
             $unset: { refreshToken: "" },
@@ -425,7 +444,7 @@ async function refreshToken(req, res) {
     const db = client.db("PoupIn");
     const collection = db.collection("users");
     const usuario = await collection.findOne({
-      _id: decoded.userId,
+      _id: normalizeUserId(decoded.userId),
       refreshToken: refreshToken,
     });
 
