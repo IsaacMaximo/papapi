@@ -318,7 +318,7 @@
         console.log(
           `Tentativa de cadastro com Nome: ${fullname}, Email: ${email}, password: ${password}`,
         );
-        fetch("http://localhost:1919/papapi/cadastraruser/", {
+        fetch("https://api-pap.vercel.app/papapi/cadastraruser/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
