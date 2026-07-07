@@ -27,7 +27,7 @@
       "dest": "public/login.html"
     },
     {
-      "src": "/app(.*)",
+      "src": "/app/(.*)",
       "dest": "public/index.html"
     }
   ]
