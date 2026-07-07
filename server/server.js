@@ -65,19 +65,18 @@ app.post("/papapi/loginuser", loginUser);
 app.post("/papapi/logout", logoutUser);
 app.post("/papapi/refresh-token", refreshToken);
 
-app.get("/papapi/debug-cookies", (req, res) => {
-  console.log("🍪 Todos os cookies recebidos:", req.cookies);
-  console.log("📋 Headers de cookie:", req.headers.cookie);
+
+app.get("/papapi/perfil", autenticar, (req, res) => {
+  const email = req.user.email;
+  const fullname = req.user.fullname;
 
   res.json({
     success: true,
-    cookies: req.cookies,
-    cookieHeader: req.headers.cookie,
-    hasToken: !!req.cookies.token,
-    tokenValue: req.cookies.token
-      ? req.cookies.token.substring(0, 20) + "..."
-      : null,
-    allHeaders: req.headers,
+    message: "Perfil do usuário",
+    user: {
+      email: email,
+      fullname: fullname,
+    },
   });
 });
 
@@ -89,10 +88,8 @@ app.get("/papapi/teste", (req, res) => {
 });
 
 app.post("/papapi/teste", autenticar, (req, res) => {
-  const dados = req.body;
   res.json({
     mensagem: "Requisição POST recebida!",
-    dados_recebidos: dados,
     timestamp: new Date().toISOString(),
   });
 });

@@ -11,6 +11,8 @@ const JWT_EXPIRES_IN = "15m";
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_REFRESH_EXPIRES_IN = "7d";
 
+
+const isProduction = process.env.NODE_ENV === "prod";
 // ========== FUNÇÕES DE HASH ==========
 async function hashPassword(passparahash) {
   try {
@@ -88,7 +90,7 @@ const autenticar = async (req, res, next) => {
       const decoded = jwt.verify(token, jwtSecret);
       console.log(`✅ Token válido para: ${decoded.email}`);
       req.user = decoded;
-      req.token = token; // Guarda o token para uso posterior
+      req.token = token;
       next();
     } catch (error) {
       if (error.name === "TokenExpiredError") {
@@ -210,7 +212,7 @@ async function loginUser(req, res) {
     if (senhaValida) {
       console.log(`✅ Login bem-sucedido: ${email}`);
 
-      const isProduction = process.env.NODE_ENV === "prod";
+      
 
       const payload = {
         userId: usuario._id,
@@ -221,7 +223,6 @@ async function loginUser(req, res) {
         expiresIn: JWT_EXPIRES_IN,
       });
 
-      // ✅ CONFIGURAÇÃO DO COOKIE MELHORADA
       const cookieOptions = {
         httpOnly: true,
         secure: isProduction,
@@ -232,7 +233,6 @@ async function loginUser(req, res) {
 
       res.cookie("token", accessToken, cookieOptions);
 
-      // REFRESH TOKEN
       if (rememberMe) {
         console.log(`✅ Usuário optou por "Lembrar de mim": ${email}`);
         const payloadRefresh = {
@@ -325,7 +325,7 @@ async function logoutUser(req, res) {
       }
     }
 
-    const isProduction = process.env.NODE_ENV === "prod";
+    
 
     // Limpa os cookies
     const clearOptions = {
@@ -411,7 +411,7 @@ async function refreshToken(req, res) {
       expiresIn: JWT_EXPIRES_IN,
     });
 
-    const isProduction = process.env.NODE_ENV === "prod";
+    
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
