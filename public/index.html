@@ -636,7 +636,7 @@
               console.log("Token válido");
             } else {
               console.error("Token inválido");
-              window.location.href = "/"
+              window.location.href = "/";
             }
           })
           .catch((error) => {
@@ -750,37 +750,78 @@
           }
         });
 
-      function perfiluser() {
-        fetch("https://api-pap.vercel.app/papapi/perfil", {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            return data;
-          })
-          .catch((error) => {
-            console.error("Erro:", error);
-            alert("Ocorreu um erro ao comunicar com a API.");
-          });
-      }
-      async function preencherpaguser() {
-        const data = await perfiluser();
-        console.log("Dados do perfil:", data);
+      async function perfiluser() {
+        try {
+          const response = await fetch(
+            "https://api-pap.vercel.app/papapi/perfil",
+            {
+              method: "GET",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            },
+          );
 
-          if (data.success) {
-            const user = data.user;
-            document.getElementById("userFullName").textContent = user.fullname;
-            const avatarDiv = document.getElementById("userAvatar");
-            avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
-          } else {
-            console.error("Falha ao obter perfil:", data.message);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
           }
 
+          const data = await response.json();
+          console.log("📥 Resposta do servidor:", data);
+          return data;
+        } catch (error) {
+          console.error("❌ Erro:", error);
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
       }
+
+      async function preencherpaguser() {
+        try {
+          const data = await perfiluser();
+          console.log("📊 Dados do perfil:", data);
+
+          if (data && data.success) {
+            const user = data.user;
+
+            // Só coloca o nome
+            const nameElement = document.getElementById("userFullName");
+            if (nameElement) {
+              nameElement.textContent = user.fullname;
+            }
+
+            // Só coloca a inicial no avatar
+            const avatarDiv = document.getElementById("userAvatar");
+            if (avatarDiv) {
+              avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
+            }
+
+            console.log("✅ Perfil carregado para:", user.fullname);
+          } else {
+            console.error(
+              "❌ Falha ao obter perfil:",
+              data?.message || "Erro desconhecido",
+            );
+
+            // Se não estiver logado, mostra "Visitante" e "?"
+            const nameElement = document.getElementById("userFullName");
+            if (nameElement) {
+              nameElement.textContent = "Visitante";
+            }
+
+            const avatarDiv = document.getElementById("userAvatar");
+            if (avatarDiv) {
+              avatarDiv.textContent = "?";
+            }
+          }
+        } catch (error) {
+          console.error("❌ Erro ao preencher perfil:", error);
+        }
+      }
+
       preencherpaguser();
     </script>
   </body>
