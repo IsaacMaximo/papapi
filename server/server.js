@@ -24,15 +24,30 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
 const cors = require("cors");
+const allowedOrigins = [
+  "http://localhost:1919",
+  "http://localhost:5500",
+  "http://127.0.0.1:5500",
+  "https://api-pap.vercel.app",
+  "https://api-pap.vercel.app", // Front-end
+  "https://api-pap.vercel.app/papapi", // Back-end (se necessário)
+];
 app.use(
   cors({
-    origin: [
-      "http://localhost:1919",
-      "http://localhost:5500",
-      "http://127.0.0.1:5500",
-      "https://api-pap.vercel.app",
-    ],
+    origin: function (origin, callback) {
+      // Permite requisições sem origin (como Postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.log("❌ CORS bloqueado para:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   }),
 );
 
