@@ -60,12 +60,20 @@ const {
   logoutUser,
   refreshToken,
   autenticar,
+  recuperarsenha,
+  verificarCodigo,
+  redefinirSenhaComCodigo,
+  enviarHelloWorld,
 } = require("./server-modules/auth.js");
 
 app.post("/papapi/cadastraruser", cadastrarUser);
 app.post("/papapi/loginuser", loginUser);
 app.post("/papapi/logout", logoutUser);
 app.post("/papapi/refresh-token", refreshToken);
+app.post("/papapi/recuperar-senha", recuperarsenha);
+app.post("/papapi/verificarCodigo", verificarCodigo);
+app.post("/papapi/redefinir-senha-codigo", redefinirSenhaComCodigo);
+app.post("/papapi/enviarHelloWorld", enviarHelloWorld);
 
 app.get("/papapi/getambiente", (req, res) => {
   res.json({
@@ -102,6 +110,7 @@ app.get("/papapi/teste", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
 
 app.post("/papapi/teste", autenticar, (req, res) => {
   res.json({

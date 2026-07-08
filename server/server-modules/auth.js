@@ -13,6 +13,37 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_REFRESH_EXPIRES_IN = "7d";
 
 const isProduction = process.env.NODE_ENV === "prod";
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const emailfrom = process.env.RESEND_EMAIL_FROM;
+
+
+async function enviarHelloWorld() {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "onboarding@resend.dev" || "onboarding@resend.dev",
+      to: ["isaac.08maximo@gmail.com"],
+      subject: "👋 Hello World!",
+      html: `
+        <h1 style="color: #2b3a67;">Hello World! 🌍</h1>
+        <p>Este é meu primeiro e-mail com o Resend!</p>
+        <p>Funcionou! 🎉</p>
+      `,
+      text: "Hello World! Este é meu primeiro e-mail com o Resend!",
+    });
+
+    if (error) {
+      console.log("❌ Erro:", error);
+    } else {
+      console.log("✅ E-mail enviado com sucesso!");
+      console.log("📧 ID:", data.id);
+    }
+  } catch (error) {
+    console.log("❌ Erro inesperado:", error);
+  }
+}
 
 function normalizeUserId(userId) {
   if (userId instanceof ObjectId) {
@@ -497,11 +528,135 @@ async function refreshToken(req, res) {
   }
 }
 
-// Exportar tudo
+async function recuperarsenha(req, res) {
+  const { email } = req.body;
+
+  const db = client.db("PoupIn");
+  const collection = db.collection("users");
+
+  const existingUser = await collection.findOne({ email: email });
+  if (!existingUser) {
+    return res.status(409).json({
+      success: false,
+      message: "Usuário não encontrado",
+    });
+  }
+
+  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 600000);
+
+  await collection.updateOne(
+    { email: email },
+    {
+      $set: {
+        resetCode: resetCode,
+        resetCodeExpires: expiresAt,
+        resetEmail: email,
+      },
+    },
+  );
+
+  console.log(`Código de recuperação para ${email}: ${resetCode}`);
+
+  res.json({
+    success: true,
+    message: "Código enviado com sucesso!",
+    code: resetCode, //tirar isso dps
+  });
+}
+
+async function verificarCodigo(req, res) {
+  const { email, code } = req.body;
+
+  const db = client.db("PoupIn");
+  const collection = db.collection("users");
+
+  const user = await collection.findOne({
+    email: email,
+    resetCode: code,
+    resetCodeExpires: { $gt: new Date() },
+  });
+
+  if (!user) {
+    return res.status(400).json({
+      success: false,
+      message: "Código inválido ou expirado",
+    });
+  }
+
+  res.json({
+    success: true,
+    message: "Código verificado com sucesso",
+  });
+}
+
+// auth.js - CORREÇÕES
+
+async function redefinirSenhaComCodigo(req, res) {
+  const { email, code, newPassword } = req.body;
+
+  // Validação básica
+  if (!email || !code || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "Email, código e nova senha são obrigatórios",
+    });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: "A senha deve ter pelo menos 6 caracteres",
+    });
+  }
+
+  const db = client.db("PoupIn");
+  const collection = db.collection("users");
+
+  const user = await collection.findOne({
+    email: email,
+    resetCode: code,
+    resetCodeExpires: { $gt: new Date() },
+  });
+
+  if (!user) {
+    return res.status(400).json({
+      success: false,
+      message: "Código inválido ou expirado",
+    });
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  await collection.updateOne(
+    { _id: user._id },
+    {
+      $set: {
+        password: hashedPassword,
+        updatedAt: new Date(),
+      },
+      $unset: {
+        resetCode: "",
+        resetCodeExpires: "",
+        resetEmail: "",
+      },
+    },
+  );
+
+  res.json({
+    success: true,
+    message: "Senha redefinida com sucesso!",
+  });
+}
+
 module.exports = {
   cadastrarUser,
   loginUser,
   logoutUser,
   refreshToken,
   autenticar,
+  recuperarsenha,
+  verificarCodigo,
+  redefinirSenhaComCodigo,
+  enviarHelloWorld,
 };

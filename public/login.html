@@ -65,7 +65,9 @@
               <label class="remember-me">
                 <input type="checkbox" id="rememberMe" /> Lembrar de mim
               </label>
-              <a href="#" class="forgot-link">Esqueceu a senha?</a>
+              <a href="#" class="forgot-link" id="forgotPasswordLink"
+                >Esqueceu a senha?</a
+              >
             </div>
 
             <button type="button" onclick="loginuser()" class="login-btn">
@@ -141,6 +143,39 @@
               Já tem uma conta?
               <a href="#" class="switch-tab-link" data-tab="login"
                 >Fazer login</a
+              >
+            </p>
+          </form>
+        </div>
+
+        <!-- PAINEL DE RECUPERAR SENHA -->
+        <div id="tab-forgot" class="tab-panel">
+          <div class="brand-icon">
+            <i class="fas fa-key"></i>
+          </div>
+          <h2>Recuperar Senha</h2>
+          <p class="subhead">
+            Digite seu e-mail para receber o link de redefinição
+          </p>
+
+          <form id="forgotForm" autocomplete="off">
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input
+                type="email"
+                id="forgotEmail"
+                placeholder="Seu e-mail"
+                required
+              />
+            </div>
+
+            <button type="button" onclick="recuperarSenha()" class="login-btn">
+              <i class="fas fa-paper-plane"></i> Enviar link
+            </button>
+
+            <p class="switch-cta">
+              <a href="#" class="switch-tab-link" data-tab="login"
+                ><i class="fas fa-arrow-left"></i> Voltar ao login</a
               >
             </p>
           </form>
@@ -393,6 +428,7 @@
         text-decoration: none;
         border-bottom: 1px dotted rgba(43, 58, 103, 0.25);
         transition: border 0.2s;
+        cursor: pointer;
       }
 
       .forgot-link:hover {
@@ -474,33 +510,23 @@
     <script>
       const getConfig = () => {
         const host = window.location.hostname;
-
-        // Mapeamento de ambientes
         const environments = {
           localhost: { ambiente: "dev", urlapi: "http://localhost:1919" },
           "127.0.0.1": { ambiente: "dev", urlapi: "http://localhost:1919" },
         };
-
-        if (environments[host]) {
-          return environments[host];
-        }
-
-        return {
-          ambiente: "prod",
-          urlapi: "https://api-pap.vercel.app",
-        };
+        return (
+          environments[host] || {
+            ambiente: "prod",
+            urlapi: "https://api-pap.vercel.app",
+          }
+        );
       };
 
-      // CONFIG DISPONÍVEL IMEDIATAMENTE
       const CONFIG = getConfig();
       const { ambiente, urlapi } = CONFIG;
 
       console.log(`🌍 Ambiente: ${ambiente}`);
       console.log(`🔗 API URL: ${urlapi}`);
-
-      // ============================================
-      // AGORA VOCÊ PODE USAR urlapi EM TODAS AS FUNÇÕES
-      // ============================================
 
       function verificarToken() {
         fetch(`${urlapi}/papapi/verificar-token`, {
@@ -511,19 +537,12 @@
           .then((data) => {
             if (!data.success) {
               console.log("Token inválido ou ausente.");
-              
-            }if (data.success){
-              if (CONFIG.ambiente === "prod") {
-                console.log(
-                  "Token valido. Redirecionando para /login.html (prod)",
-                );
-                window.location.href = "/index.html";
-              } else {
-                console.log(
-                  "Token valido. Redirecionando para /login.html (dev)",
-                );
-                window.location.href = "/app/";
-              }
+            }
+            if (data.success) {
+              const redirectPath =
+                CONFIG.ambiente === "prod" ? "/index.html" : "/app/";
+              console.log("Token válido. Redirecionando para", redirectPath);
+              window.location.href = redirectPath;
             }
           })
           .catch((error) => {
@@ -536,18 +555,21 @@
       const tabPanels = {
         login: document.getElementById("tab-login"),
         signup: document.getElementById("tab-signup"),
+        forgot: document.getElementById("tab-forgot"),
       };
 
       function switchTab(tabId) {
-        // atualiza botões
         tabBtns.forEach((btn) => {
           btn.classList.toggle("active", btn.dataset.tab === tabId);
         });
-        // atualiza painéis
         Object.keys(tabPanels).forEach((key) => {
-          tabPanels[key].classList.toggle("active", key === tabId);
+          if (tabPanels[key]) {
+            tabPanels[key].classList.toggle("active", key === tabId);
+          }
         });
       }
+
+      switchTab("login");
 
       tabBtns.forEach((btn) => {
         btn.addEventListener("click", function (e) {
@@ -555,7 +577,6 @@
         });
       });
 
-      // links "Cadastre-se" / "Fazer login" dentro dos painéis
       document.querySelectorAll(".switch-tab-link").forEach((link) => {
         link.addEventListener("click", function (e) {
           e.preventDefault();
@@ -564,41 +585,36 @@
         });
       });
 
-      // ------- mostrar/ocultar senha (login) -------
-      const togglePw = document.getElementById("togglePw");
-      const pwInput = document.getElementById("password");
-      if (togglePw && pwInput) {
-        togglePw.addEventListener("click", function () {
-          const type =
-            pwInput.getAttribute("type") === "password" ? "text" : "password";
-          pwInput.setAttribute("type", type);
-          this.querySelector("i").classList.toggle("fa-eye");
-          this.querySelector("i").classList.toggle("fa-eye-slash");
+      document
+        .getElementById("forgotPasswordLink")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          switchTab("forgot");
         });
+
+      function setupPasswordToggle(toggleBtnId, inputId) {
+        const toggle = document.getElementById(toggleBtnId);
+        const input = document.getElementById(inputId);
+        if (toggle && input) {
+          toggle.addEventListener("click", function () {
+            const type =
+              input.getAttribute("type") === "password" ? "text" : "password";
+            input.setAttribute("type", type);
+            this.querySelector("i").classList.toggle("fa-eye");
+            this.querySelector("i").classList.toggle("fa-eye-slash");
+          });
+        }
       }
 
-      // ------- mostrar/ocultar senha (cadastro) -------
-      const togglePwSignup = document.getElementById("togglePwSignup");
-      const pwSignupInput = document.getElementById("signupPassword");
-      if (togglePwSignup && pwSignupInput) {
-        togglePwSignup.addEventListener("click", function () {
-          const type =
-            pwSignupInput.getAttribute("type") === "password"
-              ? "text"
-              : "password";
-          pwSignupInput.setAttribute("type", type);
-          this.querySelector("i").classList.toggle("fa-eye");
-          this.querySelector("i").classList.toggle("fa-eye-slash");
-        });
-      }
+      setupPasswordToggle("togglePw", "password");
+      setupPasswordToggle("togglePwSignup", "signupPassword");
 
       function loginuser() {
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
         const rememberMe = document.getElementById("rememberMe").checked;
-        console.log(
-          `Tentativa de login com Email: ${email}, password: ${password}, Remember Me: ${rememberMe}`,
-        );
+
+        console.log(`Tentativa de login com Email: ${email}`);
         fetch(`${urlapi}/papapi/loginuser/`, {
           credentials: "include",
           method: "POST",
@@ -615,18 +631,13 @@
           .then((data) => {
             console.log("Resposta do servidor:", data);
             if (data.success) {
-              if (CONFIG.ambiente === "prod") {
-                console.log(
-                  "Login bem-sucedido! Redirecionando para /app/ (prod)",
-                );
-                window.location.href = "/app/";
-              } else {
-                console.log(
-                  "Login bem-sucedido! Redirecionando para /app/ (dev)",
-                );
-                window.location.href = "/public/index.html";
-              }
-              console.log("Login bem-sucedido! Redirecionando para /app...");
+              const redirectPath =
+                CONFIG.ambiente === "prod" ? "/app/" : "/public/index.html";
+              console.log(
+                "Login bem-sucedido! Redirecionando para",
+                redirectPath,
+              );
+              window.location.href = redirectPath;
             } else {
               console.error("Falha no Login:", data.message);
               alert("Falha no Login: " + data.message);
@@ -650,7 +661,7 @@
         }
 
         console.log(
-          `Tentativa de cadastro com Nome: ${fullname}, Email: ${email}, password: ${password}`,
+          `Tentativa de cadastro com Nome: ${fullname}, Email: ${email}`,
         );
         fetch(`${urlapi}/papapi/cadastraruser/`, {
           method: "POST",
@@ -668,7 +679,6 @@
             console.log("Resposta do servidor:", data);
             if (data.success) {
               alert("Cadastro realizado com sucesso!");
-              // opcional: mudar para aba de login
               switchTab("login");
             } else {
               console.error("Falha no cadastro:", data.message);
@@ -679,6 +689,151 @@
             console.error("Erro:", error);
             alert("Ocorreu um erro ao tentar cadastrar.");
           });
+      }
+
+      // Função atualizada de recuperação (envia email)
+      function recuperarSenha() {
+        const email = document.getElementById("forgotEmail").value;
+
+        if (!email.trim()) {
+          alert("Por favor, digite seu e-mail.");
+          return;
+        }
+
+        // Mostra loading
+        const btn = document.querySelector("#tab-forgot .login-btn");
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        btn.disabled = true;
+
+        fetch(`${urlapi}/papapi/recuperar-senha`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email.trim(),
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Mostra campo para digitar o código
+              mostrarCampoCodigo(email, data.code);
+            } else {
+              alert("❌ " + (data.message || "Falha ao recuperar senha"));
+            }
+          })
+          .catch((error) => {
+            console.error("Erro:", error);
+            alert("❌ Ocorreu um erro ao tentar recuperar a senha.");
+          })
+          .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          });
+      }
+
+      function mostrarCampoCodigo(email, code) {
+        const panel = document.getElementById("tab-forgot");
+        const form = panel.querySelector("form");
+
+        // Salva o email para uso posterior
+        form.dataset.email = email;
+        form.dataset.code = code;
+
+        // Modifica o formulário
+        form.innerHTML = `
+    <div class="input-group">
+      <i class="fas fa-key"></i>
+      <input type="text" id="resetCode" placeholder="Digite o código enviado" maxlength="6" required />
+    </div>
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="newPassword" placeholder="Nova senha" required />
+    </div>
+    <div class="input-group">
+      <i class="fas fa-check-circle"></i>
+      <input type="password" id="confirmNewPassword" placeholder="Confirmar nova senha" required />
+    </div>
+
+    <button type="button" onclick="confirmarCodigo()" class="login-btn">
+      <i class="fas fa-check"></i> Redefinir Senha
+    </button>
+
+    <p class="switch-cta">
+      <a href="#" onclick="voltarRecuperacao()">
+        <i class="fas fa-arrow-left"></i> Voltar
+      </a>
+    </p>
+  `;
+      }
+
+      function confirmarCodigo() {
+        const form = document.querySelector("#tab-forgot form");
+        const email = form.dataset.email;
+        const code = document.getElementById("resetCode").value;
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword =
+          document.getElementById("confirmNewPassword").value;
+
+        if (!code || code.length !== 6) {
+          alert("Digite o código de 6 dígitos enviado para seu email");
+          return;
+        }
+
+        if (newPassword.length < 6) {
+          alert("A senha deve ter pelo menos 6 caracteres");
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          alert("As senhas não coincidem");
+          return;
+        }
+
+        const btn = document.querySelector("#tab-forgot .login-btn");
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redefinindo...';
+        btn.disabled = true;
+
+        fetch(`${urlapi}/papapi/redefinir-senha-codigo`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            code: code,
+            newPassword: newPassword,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert("✅ Senha redefinida com sucesso!");
+              // Volta para o login
+              switchTab("login");
+              // Limpa campos
+              document.getElementById("email").value = "";
+              document.getElementById("password").value = "";
+            } else {
+              alert("❌ " + (data.message || "Erro ao redefinir senha"));
+            }
+          })
+          .catch((error) => {
+            console.error("Erro:", error);
+            alert("❌ Erro ao conectar ao servidor");
+          })
+          .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          });
+      }
+
+      function voltarRecuperacao() {
+
+        location.reload();
       }
     </script>
   </body>
