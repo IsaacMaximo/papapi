@@ -665,7 +665,30 @@
           .then((response) => response.json())
           .then((data) => {
             if (!data.success) {
-              window.location.href = "/login.html";
+              if (CONFIG.ambiente === "dev") {
+                console.log(
+                  "Token inválido ou ausente. Redirecionando para /login.html (dev)",
+                );
+                window.location.href = "/login.html";
+              } else {
+                console.log(
+                  "Token inválido ou ausente. Redirecionando para /login.html (prod)",
+                );
+                window.location.href = "/";
+              }
+            }
+            if (data.success) {
+              if (CONFIG.ambiente === "dev") {
+                console.log(
+                  "Token inválido ou ausente. Redirecionando para /login.html (dev)",
+                );
+                window.location.href = "/index.html";
+              } else {
+                console.log(
+                  "Token inválido ou ausente. Redirecionando para /login.html (prod)",
+                );
+                window.location.href = "/app/";
+              }
             }
           })
           .catch((error) => {
@@ -681,7 +704,6 @@
               );
               window.location.href = "/";
             }
-            
           });
       }
       verificarToken();
