@@ -538,17 +538,6 @@
           })
           .catch((error) => {
             console.error("Erro ao verificar token:", error);
-            if (CONFIG.ambiente === "dev") {
-              console.log(
-                "Erro ao verificar token. Redirecionando para /login.html (dev)",
-              );
-              window.location.href = "/login.html";
-            } else {
-              console.log(
-                "Erro ao verificar token. Redirecionando para /login.html (prod)",
-              );
-              window.location.href = "/";
-            }
           });
       }
       verificarToken();
