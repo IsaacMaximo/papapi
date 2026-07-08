@@ -15,28 +15,19 @@ async function connectBrowserless() {
     timeout: 5000,
   });
 }
-
-
 async function scraper_PingoDoce(pagina, pesquisa) {
   const browser = await connectBrowserless();
   const page = await browser.newPage();
 
   const startTime = Date.now();
 
-  await page.goto(pagina);
+  const urlBusca = `https://www.pingodoce.pt/on/demandware.store/Sites-pingo-doce-Site/default/Search-Show?q=${encodeURIComponent(pesquisa)}`;
+  await page.goto(urlBusca);
 
   const title = await page.title();
   console.log("Título da página:", title);
 
-  const searchSelector = "input[name='q']";
-  await page.waitForSelector(searchSelector);
-  console.log("Campo de pesquisa encontrado. Realizando busca...");
-  await page.type(searchSelector, pesquisa);
-  console.log(`Texto digitado no campo de pesquisa: ${pesquisa}`);
-  await page.keyboard.press("Enter");
-  console.log(`Realizando pesquisa por: ${pesquisa}`);
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
-  console.log("Pesquisa concluída. Página de resultados carregada.");
+  console.log(`Pesquisa realizada para: ${pesquisa}`);
 
   const resultText = await page.$eval(
     ".search-results-container-count",
@@ -60,7 +51,16 @@ async function scraper_PingoDoce(pagina, pesquisa) {
   if (showMoreButton) {
     await showMoreButton.click();
     console.log("Clicando no botão 'Mostrar mais'");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const nextUrl = await page.evaluate(
+      (btn) => btn.getAttribute("data-url"),
+      showMoreButton,
+    );
+    console.log(`📎 URL do botão: ${nextUrl}`);
+
+    await page.evaluate(() => {
+      document.querySelector(".show-more button")?.click();
+    });
   }
 
   await page.waitForSelector(".product-tile-pd", { timeout: 10000 });
@@ -78,7 +78,6 @@ async function scraper_PingoDoce(pagina, pesquisa) {
       const priceBruto = item.querySelector(".value")?.getAttribute("content");
 
       if (priceBruto) {
-        // Corrigido: replace de ponto por vírgula
         price = priceBruto.replace(/\./g, ",") + "€";
       }
 
@@ -127,20 +126,9 @@ async function scraper_Continente(pagina, pesquisa) {
 
   const startTime = Date.now();
 
-  await page.goto(pagina);
+  const urlBusca = `https://www.continente.pt/pesquisa/?q=${encodeURIComponent(pesquisa)}`;
+  await page.goto(urlBusca);
 
-  const title = await page.title();
-  console.log("Título da página:", title);
-
-  const searchSelector = "input[name='q']";
-  await page.waitForSelector(searchSelector);
-
-  console.log("Campo de pesquisa encontrado. Realizando busca...");
-  await page.type(searchSelector, pesquisa);
-  console.log(`Texto digitado no campo de pesquisa: ${pesquisa}`);
-  await page.keyboard.press("Enter");
-  console.log(`Realizando pesquisa por: ${pesquisa}`);
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
   console.log("Pesquisa concluída. Página de resultados carregada.");
 
   if (await page.$(".search-noresults-wrapper")) {
@@ -223,22 +211,9 @@ async function scraper_Auchan(pagina, pesquisa) {
 
   const startTime = Date.now();
 
-  await page.goto(pagina);
+  const urlBusca = `https://www.auchan.pt/pt/pesquisa?search-button=&q=${encodeURIComponent(pesquisa)}`;
+  await page.goto(urlBusca, { waitUntil: "domcontentloaded" });
 
-  const title = await page.title();
-  console.log("Título da página:", title);
-
-  const searchSelector = "input[name='q']";
-  await page.waitForSelector(searchSelector);
-
-  console.log("Campo de pesquisa encontrado. Realizando busca...");
-  await page.type(searchSelector, pesquisa);
-  console.log(`Texto digitado no campo de pesquisa: ${pesquisa}`);
-
-  await page.keyboard.press("Enter");
-  console.log(`Realizando pesquisa por: ${pesquisa}`);
-
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
   console.log("Pesquisa concluída. Página de resultados carregada.");
 
   if (await page.$(".auc-noresults__error--message")) {
@@ -317,23 +292,12 @@ async function scraper_Auchan(pagina, pesquisa) {
 async function scraper_lidl(pagina, pesquisa) {
   const browser = await connectBrowserless();
   const page = await browser.newPage();
+
   const startTime = Date.now();
 
-  await page.goto(pagina);
-  const title = await page.title();
-  console.log("Título da página:", title);
-  const searchSelector = "input[data-id='search-input-field']";
+  const urlBusca = `https://www.lidl.pt/q/search?q=${encodeURIComponent(pesquisa)}`;
+  await page.goto(urlBusca, { waitUntil: "domcontentloaded" });
 
-  await page.waitForSelector(searchSelector);
-  console.log("Campo de pesquisa encontrado. Realizando busca...");
-
-  await page.type(searchSelector, pesquisa);
-  console.log(`Texto digitado no campo de pesquisa: ${pesquisa}`);
-
-  await page.keyboard.press("Enter");
-  console.log(`Realizando pesquisa por: ${pesquisa}`);
-
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
   console.log("Pesquisa concluída. Página de resultados carregada.");
 
   if (await page.$(".s-products-not-found-message-wrapper")) {

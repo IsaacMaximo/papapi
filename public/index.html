@@ -32,7 +32,6 @@
         margin: 0;
       }
 
-      /* ===== NAVBAR ===== */
       .navbar {
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(8px);
@@ -117,7 +116,6 @@
         transform: scale(1.05);
       }
 
-      /* ===== MAIN CONTENT ===== */
       .main-content {
         flex: 1;
         padding: 2rem;
@@ -152,7 +150,6 @@
         margin-top: 0.3rem;
       }
 
-      /* ===== SEARCH FORM ===== */
       .search-section {
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(4px);
@@ -165,7 +162,7 @@
         flex-wrap: wrap;
         align-items: center;
         gap: 0.6rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
       }
 
       .search-section .search-input-wrap {
@@ -256,7 +253,6 @@
         box-shadow: 0 8px 20px rgba(27, 75, 60, 0.3);
       }
 
-      /* ===== RESULTS ===== */
       #results {
         display: flex;
         flex-direction: column;
@@ -399,7 +395,6 @@
         font-weight: 500;
       }
 
-      /* ===== FOOTER ===== */
       .footer {
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(8px);
@@ -475,6 +470,161 @@
         margin-top: 0.5rem;
       }
 
+      .search-filtrar {
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border-radius: 20px;
+        padding: 0.8rem 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+      }
+
+      .search-filtrar .filter-label {
+        font-weight: 500;
+        font-size: 0.85rem;
+        color: #4a5a72;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
+      }
+
+      .search-filtrar .filter-label i {
+        color: #2b3a67;
+        font-size: 0.9rem;
+      }
+
+      .search-filtrar .filter-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .search-filtrar .filter-options .filter-chip {
+        background: transparent;
+        border: 1.5px solid rgba(43, 58, 103, 0.2);
+        padding: 0.35rem 1rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #4a5a72;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: "Inter", sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      .search-filtrar .filter-options .filter-chip:hover {
+        border-color: #2b3a67;
+        color: #1d2b4a;
+        background: rgba(255, 255, 255, 0.8);
+        transform: translateY(-1px);
+      }
+
+      .search-filtrar .filter-options .filter-chip.active {
+        background: linear-gradient(135deg, #1d2b4a, #2b3a67);
+        color: white;
+        border-color: #2b3a67;
+        box-shadow: 0 4px 12px rgba(27, 45, 75, 0.2);
+      }
+
+      .search-filtrar .filter-options .filter-chip.active i {
+        color: white;
+      }
+
+      .search-filtrar .filter-options .filter-chip i {
+        font-size: 0.7rem;
+        color: #7b8aa3;
+      }
+
+      .search-filtrar .filter-clear {
+        background: transparent;
+        border: none;
+        color: #7b8aa3;
+        font-size: 0.75rem;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        padding: 0.2rem 0.5rem;
+        transition: color 0.2s;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+
+      .search-filtrar .filter-clear:hover {
+        color: #b13e3e;
+      }
+
+      @media (max-width: 768px) {
+        .search-filtrar {
+          padding: 0.6rem 1rem;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.6rem;
+        }
+
+        .search-filtrar .filter-label {
+          font-size: 0.8rem;
+          justify-content: center;
+        }
+
+        .search-filtrar .filter-options {
+          justify-content: center;
+        }
+
+        .search-filtrar .filter-options .filter-chip {
+          font-size: 0.7rem;
+          padding: 0.25rem 0.8rem;
+        }
+
+        .search-filtrar .filter-clear {
+          margin-left: 0;
+          justify-content: center;
+          font-size: 0.7rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .search-filtrar {
+          padding: 0.4rem 0.6rem;
+          gap: 0.4rem;
+          border-radius: 14px;
+        }
+
+        .search-filtrar .filter-label {
+          font-size: 0.7rem;
+        }
+
+        .search-filtrar .filter-options {
+          gap: 0.3rem;
+        }
+
+        .search-filtrar .filter-options .filter-chip {
+          font-size: 0.6rem;
+          padding: 0.2rem 0.6rem;
+          gap: 0.2rem;
+        }
+
+        .search-filtrar .filter-options .filter-chip i {
+          font-size: 0.55rem;
+        }
+
+        .search-filtrar .filter-clear {
+          font-size: 0.6rem;
+        }
+      }
+
       /* ===== RESPONSIVE ===== */
       @media (max-width: 768px) {
         .navbar {
@@ -543,6 +693,272 @@
         }
       }
     </style>
+    <style>
+      /* RESET e BASE */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* OVERLAY */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        padding: 1.5rem;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .popup-overlay.active {
+        display: flex;
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      /* CONTAINER */
+      .popup-container {
+        width: 100%;
+        max-width: 480px;
+        animation: slideUp 0.3s ease;
+      }
+
+      @keyframes slideUp {
+        0% {
+          transform: translateY(30px) scale(0.95);
+          opacity: 0;
+        }
+        100% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* CARD */
+      .popup-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border-radius: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* HEADER */
+      .popup-header {
+        padding: 1.8rem 2rem 1.2rem;
+        text-align: center;
+        position: relative;
+        border-bottom: 1px solid rgba(100, 120, 150, 0.1);
+      }
+
+      .popup-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #2b3a67, #1d2b4a);
+        border-radius: 50%;
+        color: white;
+        font-size: 1.8rem;
+        margin-bottom: 0.8rem;
+        box-shadow: 0 8px 20px rgba(27, 45, 75, 0.25);
+      }
+
+      .popup-header h2 {
+        font-family: "Inter", Arial, sans-serif;
+        font-weight: 600;
+        font-size: 1.6rem;
+        color: #0b1a30;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+
+      .popup-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.05);
+        border: none;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        font-size: 1.1rem;
+        color: #4a5a72;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .popup-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+        transform: rotate(90deg);
+        color: #1d2b4a;
+      }
+
+      /* BODY */
+      .popup-body {
+        padding: 1.8rem 2rem;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .popup-body::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .popup-body::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .popup-body::-webkit-scrollbar-thumb {
+        background: #2b3a67;
+        border-radius: 10px;
+      }
+
+      .popup-content {
+        font-family: "Inter", Arial, sans-serif;
+        color: #1f3147;
+        line-height: 1.6;
+      }
+
+      .popup-content h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0b1a30;
+        margin-bottom: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .popup-content h3:first-child {
+        margin-top: 0;
+      }
+
+      .popup-content p {
+        margin-bottom: 0.8rem;
+        color: #3c4e68;
+        font-size: 0.95rem;
+      }
+
+      .popup-content ul {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0 1rem;
+      }
+
+      .popup-content ul li {
+        padding: 0.4rem 0;
+        color: #3c4e68;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
+      .popup-content ul li i {
+        color: #2b3a67;
+        width: 1.2rem;
+      }
+
+      /* FOOTER */
+      .popup-footer {
+        padding: 1.2rem 2rem 1.8rem;
+        display: flex;
+        gap: 0.8rem;
+        justify-content: flex-end;
+        border-top: 1px solid rgba(100, 120, 150, 0.1);
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      .popup-btn {
+        padding: 0.7rem 1.5rem;
+        border-radius: 60px;
+        border: none;
+        font-family: "Inter", Arial, sans-serif;
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .popup-btn-primary {
+        background: linear-gradient(135deg, #1d2b4a, #2b3a67);
+        color: white;
+        box-shadow: 0 4px 12px rgba(27, 45, 75, 0.25);
+      }
+
+      .popup-btn-primary:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 20px rgba(27, 45, 75, 0.35);
+      }
+
+      .popup-btn-secondary {
+        background: rgba(0, 0, 0, 0.05);
+        color: #4a5a72;
+      }
+
+      .popup-btn-secondary:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      /* Responsivo */
+      @media (max-width: 440px) {
+        .popup-header {
+          padding: 1.5rem 1.2rem 1rem;
+        }
+        .popup-body {
+          padding: 1.2rem 1.2rem;
+          max-height: 300px;
+        }
+        .popup-footer {
+          padding: 1rem 1.2rem 1.5rem;
+          flex-direction: column;
+        }
+        .popup-btn {
+          justify-content: center;
+          width: 100%;
+        }
+        .popup-header h2 {
+          font-size: 1.3rem;
+        }
+        .popup-icon {
+          width: 50px;
+          height: 50px;
+          font-size: 1.4rem;
+        }
+        .popup-close {
+          width: 32px;
+          height: 32px;
+          font-size: 0.9rem;
+          top: 0.8rem;
+          right: 0.8rem;
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- ===== NAVBAR ===== -->
@@ -565,6 +981,46 @@
       </div>
     </nav>
 
+    <div id="popupOverlay" class="popup-overlay" style="display: none">
+      <div class="popup-container">
+        <div class="popup-card">
+          <!-- Cabeçalho -->
+          <div class="popup-header">
+            <div class="popup-icon">
+              <i class="fas fa-cog"></i>
+            </div>
+            <h2 id="popupTitle">Configurações</h2>
+            <button class="popup-close" onclick="fecharpopup()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <!-- Conteúdo -->
+          <div class="popup-body">
+            <div class="popup-content" id="popupContent">
+              <p>Carregando conteúdo...</p>
+            </div>
+          </div>
+
+          <!-- Rodapé com ações -->
+          <div class="popup-footer">
+            <button
+              class="popup-btn popup-btn-secondary"
+              onclick="fecharpopup()"
+            >
+              <i class="fas fa-times"></i> Fechar
+            </button>
+            <button
+              class="popup-btn popup-btn-primary"
+              onclick="confirmarPopup()"
+            >
+              <i class="fas fa-check"></i> Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== MAIN CONTENT ===== -->
     <div class="main-content">
       <div class="page-header">
@@ -573,48 +1029,103 @@
       </div>
 
       <!-- Search Form -->
-      <div class="search-section">
-        <div class="search-input-wrap">
-          <i class="fas fa-search"></i>
-          <input
-            type="text"
-            id="produto"
-            placeholder="Digite o nome do produto..."
-          />
+      <div id="allsearchsection">
+        <div class="search-section">
+          <div class="search-input-wrap">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="produto"
+              placeholder="Digite o nome do produto..."
+            />
+          </div>
+          <div class="btn-group">
+            <button onclick="runScraper('continente')">
+              <i class="fas fa-store"></i> Continente
+            </button>
+            <button onclick="runScraper('pingodoce')">
+              <i class="fas fa-store"></i> Pingo Doce
+            </button>
+            <button onclick="runScraper('auchan')">
+              <i class="fas fa-store"></i> Auchan
+            </button>
+            <button onclick="runScraper('lidl')">
+              <i class="fas fa-store"></i> Lidl
+            </button>
+            <button class="btn-todos" onclick="runScraperTodos()">
+              <i class="fas fa-list"></i> TODOS
+            </button>
+          </div>
         </div>
-        <div class="btn-group">
-          <button onclick="runScraper('continente')">
-            <i class="fas fa-store"></i> Continente
-          </button>
-          <button onclick="runScraper('pingodoce')">
-            <i class="fas fa-store"></i> Pingo Doce
-          </button>
-          <button onclick="runScraper('auchan')">
-            <i class="fas fa-store"></i> Auchan
-          </button>
-          <button onclick="runScraper('lidl')">
-            <i class="fas fa-store"></i> Lidl
-          </button>
-          <button class="btn-todos" onclick="runScraperTodos()">
-            <i class="fas fa-list"></i> TODOS
+        <!-- ===== FILTER SECTION ===== -->
+        <div class="search-filtrar">
+          <span class="filter-label">
+            <i class="fas fa-sliders-h"></i> Filtrar:
+          </span>
+          <div class="filter-options">
+            <button
+              onclick="apicarfiltro('todos')"
+              id="filter-todos"
+              class="filter-chip active"
+            >
+              <i class="fas fa-th-list"></i> Todos
+            </button>
+            <button
+              onclick="apicarfiltro('menor-preco')"
+              id="filter-menor-preco"
+              class="filter-chip"
+            >
+              <i class="fas fa-arrow-up"></i> Menor Preço
+            </button>
+            <button
+              onclick="apicarfiltro('maior-preco')"
+              id="filter-maior-preco"
+              class="filter-chip"
+            >
+              <i class="fas fa-arrow-down"></i> Maior Preço
+            </button>
+            <button
+              onclick="apicarfiltro('az')"
+              id="filter-az"
+              class="filter-chip"
+            >
+              <i class="fas fa-sort-alpha-down"></i> A-Z
+            </button>
+            <button
+              onclick="apicarfiltro('za')"
+              id="filter-za"
+              class="filter-chip"
+            >
+              <i class="fas fa-sort-alpha-up"></i> Z-A
+            </button>
+          </div>
+          <button
+            onclick="limparFiltros()"
+            id="filter-clear"
+            class="filter-clear"
+          >
+            <i class="fas fa-times-circle"></i> Limpar
           </button>
         </div>
       </div>
 
-      <!-- Results -->
       <div id="results"></div>
     </div>
 
-    <!-- ===== FOOTER ===== -->
     <footer class="footer">
       <div class="footer-brand">
         <i class="fas fa-handshake"></i> PoupIn v2.0
       </div>
       <div class="footer-links">
-        <a href="#"><i class="fas fa-info-circle"></i> Sobre</a>
-        <a href="#"><i class="fas fa-shield-alt"></i> Privacidade</a>
-        <a href="#"><i class="fas fa-envelope"></i> Contato</a>
-        <a href="#"><i class="fas fa-file-alt"></i> Termos</a>
+        <a onclick="abrirpopup(`Sobre`)" href="#"
+          ><i class="fas fa-info-circle"></i> Sobre</a
+        >
+        <a onclick="abrirpopup(`Privacidade`)" href="#"
+          ><i class="fas fa-shield-alt"></i> Privacidade</a
+        >
+        <a onclick="abrirpopup(`Termos`)" href="#"
+          ><i class="fas fa-file-alt"></i> Termos</a
+        >
       </div>
       <div class="footer-social">
         <a href="https://github.com/IsaacMaximo"
@@ -632,10 +1143,106 @@
     </footer>
 
     <script>
+      function abrirpopup(tipo) {
+        const overlay = document.getElementById("popupOverlay");
+        const title = document.getElementById("popupTitle");
+        const content = document.getElementById("popupContent");
+
+        const conteudos = {
+          Sobre: {
+            titulo: "Sobre",
+            html: `
+                    <h3><i class="fas fa-rocket" style="color: #2b3a67; margin-right: 0.5rem;"></i> Nossa Missão</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                    <h3><i class="fas fa-users" style="color: #2b3a67; margin-right: 0.5rem;"></i> Nossa Equipe</h3>
+                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Versão 2.0.1</li>
+                        <li><i class="fas fa-check-circle"></i> Atualizado em 2026</li>
+                    </ul>
+                `,
+          },
+          Privacidade: {
+            titulo: "Política de Privacidade",
+            html: `
+                    <h3><i class="fas fa-database" style="color: #2b3a67; margin-right: 0.5rem;"></i> Coleta de Dados</h3>
+                    <p>Coletamos apenas os dados necessários para melhorar sua experiência. Nunca compartilhamos suas informações com terceiros.</p>
+                    <h3><i class="fas fa-lock" style="color: #2b3a67; margin-right: 0.5rem;"></i> Segurança</h3>
+                    <p>Utilizamos criptografia de ponta a ponta para proteger seus dados. Seus dados estão seguros conosco.</p>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Dados criptografados</li>
+                        <li><i class="fas fa-check-circle"></i> Sem compartilhamento com terceiros</li>
+                        <li><i class="fas fa-check-circle"></i> Você controla seus dados</li>
+                    </ul>
+                `,
+          },
+          Termos: {
+            titulo: "Termos de Uso",
+            html: `
+                    <h3><i class="fas fa-file-contract" style="color: #2b3a67; margin-right: 0.5rem;"></i> Condições Gerais</h3>
+                    <p>Ao utilizar este serviço, você concorda com todos os termos descritos abaixo. É importante ler atentamente.</p>
+                    <h3><i class="fas fa-gavel" style="color: #2b3a67; margin-right: 0.5rem;"></i> Responsabilidades</h3>
+                    <p>O usuário é responsável por suas ações dentro da plataforma. Nos reservamos o direito de moderar conteúdo inadequado.</p>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Uso responsável</li>
+                        <li><i class="fas fa-check-circle"></i> Proibido conteúdo ofensivo</li>
+                        <li><i class="fas fa-check-circle"></i> Respeito às leis locais</li>
+                    </ul>
+                `,
+          },
+        };
+
+        // Busca o conteúdo ou usa um padrão
+        const conteudo = conteudos[tipo] || {
+          titulo: tipo,
+          html: `<p>Conteúdo para "${tipo}" não encontrado.</p>`,
+        };
+
+        // Atualiza o popup
+        title.textContent = conteudo.titulo;
+        content.innerHTML = conteudo.html;
+
+        // Mostra o popup
+        overlay.style.display = "flex";
+        overlay.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function fecharpopup() {
+        const overlay = document.getElementById("popupOverlay");
+        overlay.style.display = "none";
+        overlay.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      function confirmarPopup() {
+        // Aqui você pode adicionar a lógica de confirmação
+        alert("Ação confirmada!");
+        fecharpopup();
+      }
+
+      // Fechar ao clicar no overlay
+      document.addEventListener("DOMContentLoaded", function () {
+        const overlay = document.getElementById("popupOverlay");
+        overlay.addEventListener("click", function (e) {
+          if (e.target === overlay) {
+            fecharpopup();
+          }
+        });
+
+        // Fechar com ESC
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            const overlayActive = document.getElementById("popupOverlay");
+            if (overlayActive.style.display === "flex") {
+              fecharpopup();
+            }
+          }
+        });
+      });
       const getConfig = () => {
         const host = window.location.hostname;
 
-        // Mapeamento de ambientes
         const environments = {
           localhost: { ambiente: "dev", urlapi: "http://localhost:1919" },
           "127.0.0.1": { ambiente: "dev", urlapi: "http://localhost:1919" },
@@ -669,7 +1276,7 @@
                 console.log(
                   "Token inválido ou ausente. Redirecionando para /login.html (dev)",
                 );
-                window.location.href = "/login.html";
+                //window.location.href = "/public/login.html";
               } else {
                 console.log(
                   "Token inválido ou ausente. Redirecionando para /login.html (prod)",
@@ -709,26 +1316,29 @@
 
       function displayResults(loja, data) {
         const resultsDiv = document.getElementById("results");
-        let html = `<div class="store-section">
-                  <div class="store-header"><i class="fas fa-tag"></i> ${loja.toUpperCase()}</div>`;
+        let html = `<div class="store-section" data-store="${loja}">
+              <div class="store-header">
+                <i class="fas fa-tag"></i> ${loja.toUpperCase()}
+                <span class="store-count">${data.output && data.output.products ? data.output.products.length : 0} produtos</span>
+              </div>`;
 
         if (
           data.output &&
           data.output.products &&
           data.output.products.length > 0
         ) {
-          html += `<div class="store-info"><i class="fas fa-box"></i> Encontrados ${data.output.products.length} produtos</div>
-                        <div class="products-grid">`;
+          html += `<div class="store-info"><i class="fas fa-clock"></i> Atualizado: ${new Date().toLocaleString("pt-PT")}</div>
+                    <div class="products-grid">`;
 
           data.output.products.forEach((product) => {
-            html += `<div class="product-card">
-                              <img src="${product.image || "placeholder.jpg"}" alt="${product.name}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f2f5%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2212%22%3Eimagem%3C/text%3E%3C/svg%3E'">
-                              <div class="product-info">
-                                  <div class="product-name">${product.name}</div>
-                                  <div class="product-price">${product.price}</div>
-                                  <a href="${product.urldoproduto}" target="_blank" class="product-link"><i class="fas fa-external-link-alt"></i> Ver Produto</a>
-                              </div>
-                          </div>`;
+            html += `<div class="product-card" data-price="${parseFloat(product.price.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0}" data-name="${product.name}">
+                          <img src="${product.image || "placeholder.jpg"}" alt="${product.name}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f2f5%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2212%22%3Eimagem%3C/text%3E%3C/svg%3E'">
+                          <div class="product-info">
+                              <div class="product-name">${product.name}</div>
+                              <div class="product-price">${product.price}</div>
+                              <a href="${product.urldoproduto}" target="_blank" class="product-link"><i class="fas fa-external-link-alt"></i> Ver Produto</a>
+                          </div>
+                      </div>`;
           });
           html += `</div>`;
         } else {
@@ -787,7 +1397,219 @@
         } finally {
           buttons.forEach((btn) => (btn.disabled = false));
           document.body.style.cursor = "default";
+          limparFiltros();
         }
+      }
+
+      function filtrarPorNome() {
+        const searchTerm = document
+          .getElementById("produto")
+          .value.toLowerCase()
+          .trim();
+        const storeSections = document.querySelectorAll(".store-section");
+
+        storeSections.forEach((section) => {
+          const productCards = section.querySelectorAll(".product-card");
+          let visibleCount = 0;
+
+          productCards.forEach((card) => {
+            const productName = (card.dataset.name || "").toLowerCase();
+            if (searchTerm === "" || productName.includes(searchTerm)) {
+              card.style.display = "";
+              visibleCount++;
+            } else {
+              card.style.display = "none";
+            }
+          });
+
+          // Atualiza contador
+          const countSpan = section.querySelector(".store-count");
+          if (countSpan) {
+            const total = section.querySelectorAll(".product-card").length;
+            countSpan.textContent = `${visibleCount} de ${total} produtos`;
+          }
+
+          // Mostra/esconde a seção
+          if (visibleCount === 0) {
+            section.style.display = "none";
+          } else {
+            section.style.display = "";
+          }
+        });
+
+        // Verifica se há resultados
+        const visibleSections = document.querySelectorAll(
+          ".store-section:not([style*='display: none'])",
+        );
+        const existingMsg = document.querySelector(".no-results");
+        if (existingMsg) existingMsg.remove();
+
+        if (
+          visibleSections.length === 0 &&
+          document.querySelector(".store-section")
+        ) {
+          const resultsDiv = document.getElementById("results");
+          const noResultsMsg = document.createElement("div");
+          noResultsMsg.className = "no-results";
+          noResultsMsg.innerHTML = `
+        <i class="fas fa-search"></i>
+        Nenhum produto encontrado para "<strong>${searchTerm || "esta busca"}</strong>"
+      `;
+          resultsDiv.appendChild(noResultsMsg);
+        }
+      }
+
+      async function apicarfiltro(filtro) {
+        const filterButtons = document.querySelectorAll(".filter-chip");
+        filterButtons.forEach((btn) => btn.classList.remove("active"));
+
+        const activeButton = document.getElementById(`filter-${filtro}`);
+        if (activeButton) {
+          activeButton.classList.add("active");
+        }
+
+        const resultsDiv = document.getElementById("results");
+        const storeSections = resultsDiv.querySelectorAll(".store-section");
+        const searchTerm = document
+          .getElementById("produto")
+          .value.toLowerCase()
+          .trim();
+
+        storeSections.forEach((section) => {
+          const productsGrid = section.querySelector(".products-grid");
+          if (!productsGrid) return;
+
+          // 🔥 PEGA TODOS OS CARDS
+          const allCards = Array.from(
+            productsGrid.querySelectorAll(".product-card"),
+          );
+
+          // 🔥 FILTRA POR NOME
+          let filteredCards = allCards.filter((card) => {
+            const productName = (card.dataset.name || "").toLowerCase();
+            return searchTerm === "" || productName.includes(searchTerm);
+          });
+
+          // 🔥 ORDENA
+          let sortedProducts = [...filteredCards];
+
+          switch (filtro) {
+            case "menor-preco":
+              sortedProducts.sort((a, b) => {
+                const priceA = parseFloat(a.dataset.price || 0);
+                const priceB = parseFloat(b.dataset.price || 0);
+                return priceA - priceB;
+              });
+              break;
+            case "maior-preco":
+              sortedProducts.sort((a, b) => {
+                const priceA = parseFloat(a.dataset.price || 0);
+                const priceB = parseFloat(b.dataset.price || 0);
+                return priceB - priceA;
+              });
+              break;
+            case "az":
+              sortedProducts.sort((a, b) => {
+                const nameA = (a.dataset.name || "").toLowerCase();
+                const nameB = (b.dataset.name || "").toLowerCase();
+                return nameA.localeCompare(nameB);
+              });
+              break;
+            case "za":
+              sortedProducts.sort((a, b) => {
+                const nameA = (a.dataset.name || "").toLowerCase();
+                const nameB = (b.dataset.name || "").toLowerCase();
+                return nameB.localeCompare(nameA);
+              });
+              break;
+            case "todos":
+              sortedProducts = [...filteredCards];
+              break;
+            default:
+              console.warn("Filtro desconhecido:", filtro);
+              return;
+          }
+
+          // 🔥 MUDANÇA AQUI: NÃO RECRIA O GRID, SÓ MOSTRA/ESCONDE E REORDENA
+          // Mostra/esconde os cards
+          allCards.forEach((card) => {
+            const isVisible = sortedProducts.includes(card);
+            card.style.display = isVisible ? "" : "none";
+          });
+
+          // 🔥 REORDENA OS CARDS (se não for "todos")
+          if (filtro !== "todos") {
+            sortedProducts.forEach((card) => {
+              productsGrid.appendChild(card);
+            });
+          }
+
+          // Atualiza contador
+          const countSpan = section.querySelector(".store-count");
+          if (countSpan) {
+            const total = allCards.length;
+            const visible = sortedProducts.length;
+            countSpan.textContent = `${visible} de ${total} produtos`;
+          }
+
+          // Mostra/esconde a seção
+          if (sortedProducts.length === 0) {
+            section.style.display = "none";
+          } else {
+            section.style.display = "";
+          }
+        });
+
+        // Mostra mensagem de "sem resultados"
+        const visibleSections = document.querySelectorAll(
+          ".store-section:not([style*='display: none'])",
+        );
+        const existingMsg = document.querySelector(".no-results");
+        if (existingMsg) existingMsg.remove();
+
+        if (
+          visibleSections.length === 0 &&
+          document.querySelector(".store-section")
+        ) {
+          const resultsDiv = document.getElementById("results");
+          const noResultsMsg = document.createElement("div");
+          noResultsMsg.className = "no-results";
+          noResultsMsg.innerHTML = `
+      <i class="fas fa-search"></i>
+      Nenhum produto encontrado para "<strong>${searchTerm || "esta busca"}</strong>"
+    `;
+          resultsDiv.appendChild(noResultsMsg);
+        }
+      }
+
+      function limparFiltros() {
+        const searchInput = document.getElementById("produto");
+        if (searchInput) {
+          searchInput.value = "";
+        }
+
+        // 🔥 RESETA PARA "todos"
+        const filterButtons = document.querySelectorAll(".filter-chip");
+        filterButtons.forEach((btn) => btn.classList.remove("active"));
+        const todosBtn = document.getElementById("filter-todos");
+        if (todosBtn) todosBtn.classList.add("active");
+
+        // 🔥 MOSTRA TODOS OS CARDS DE TODAS AS SEÇÕES
+        document.querySelectorAll(".store-section").forEach((section) => {
+          const cards = section.querySelectorAll(".product-card");
+          cards.forEach((card) => {
+            card.style.display = "";
+          });
+          const countSpan = section.querySelector(".store-count");
+          if (countSpan) {
+            countSpan.textContent = `${cards.length} produtos`;
+          }
+          section.style.display = "";
+        });
+
+        // Remove mensagem de "sem resultados"
+        const existingMsg = document.querySelector(".no-results");
+        if (existingMsg) existingMsg.remove();
       }
 
       // Enter key support
@@ -799,6 +1621,18 @@
             runScraperTodos();
           }
         });
+
+      // Busca em tempo real
+      document.getElementById("produto").addEventListener("input", function () {
+        // Se houver resultados, aplica o filtro atual
+        const activeFilter = document.querySelector(".filter-chip.active");
+        if (activeFilter) {
+          const filterId = activeFilter.id.replace("filter-", "");
+          apicarfiltro(filterId);
+        } else {
+          apicarfiltro("todos");
+        }
+      });
 
       async function perfiluser() {
         try {
