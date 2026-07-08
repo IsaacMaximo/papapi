@@ -632,41 +632,30 @@
     </footer>
 
     <script>
-      // ============================================
-      // CONFIGURAÇÃO BASEADA NO HOSTNAME
-      // ============================================
-
       const getConfig = () => {
         const host = window.location.hostname;
 
         // Mapeamento de ambientes
         const environments = {
-          'localhost': { ambiente: 'dev', urlapi: 'http://localhost:1919' },
-          '127.0.0.1': { ambiente: 'dev', urlapi: 'http://localhost:1919' },
-          // Adicione outros domínios de desenvolvimento se necessário
-          // 'meusite.test': { ambiente: 'dev', urlapi: 'http://localhost:1919' },
+          localhost: { ambiente: "dev", urlapi: "http://localhost:1919" },
+          "127.0.0.1": { ambiente: "dev", urlapi: "http://localhost:1919" },
         };
 
-        // Se for um domínio conhecido, usa a configuração
         if (environments[host]) {
           return environments[host];
         }
 
-        // Qualquer outro domínio = produção
         return {
-          ambiente: 'prod',
-          urlapi: 'https://api-pap.vercel.app'
+          ambiente: "prod",
+          urlapi: "https://api-pap.vercel.app",
         };
       };
 
-      // CONFIG DISPONÍVEL IMEDIATAMENTE
       const CONFIG = getConfig();
       const { ambiente, urlapi } = CONFIG;
 
       console.log(`🌍 Ambiente: ${ambiente}`);
       console.log(`🔗 API URL: ${urlapi}`);
-
-
 
       function verificarToken() {
         fetch(`${urlapi}/papapi/verificar-token`, {
@@ -684,33 +673,32 @@
             window.location.href = "/login.html";
           });
       }
+      verificarToken();
 
+      function enableButtons() {
+        document
+          .querySelectorAll(".search-section button")
+          .forEach((button) => (button.disabled = false));
+      }
 
+      const lojas = ["continente", "pingodoce", "auchan", "lidl"];
+      const search = document.getElementById("produto");
 
-          function enableButtons() {
-            document
-              .querySelectorAll(".search-section button")
-              .forEach((button) => (button.disabled = false));
-          }
-
-          const lojas = ["continente", "pingodoce", "auchan", "lidl"];
-          const search = document.getElementById("produto");
-
-          function displayResults(loja, data) {
-            const resultsDiv = document.getElementById("results");
-            let html = `<div class="store-section">
+      function displayResults(loja, data) {
+        const resultsDiv = document.getElementById("results");
+        let html = `<div class="store-section">
                   <div class="store-header"><i class="fas fa-tag"></i> ${loja.toUpperCase()}</div>`;
 
-            if (
-              data.output &&
-              data.output.products &&
-              data.output.products.length > 0
-            ) {
-              html += `<div class="store-info"><i class="fas fa-box"></i> Encontrados ${data.output.products.length} produtos</div>
+        if (
+          data.output &&
+          data.output.products &&
+          data.output.products.length > 0
+        ) {
+          html += `<div class="store-info"><i class="fas fa-box"></i> Encontrados ${data.output.products.length} produtos</div>
                         <div class="products-grid">`;
 
-              data.output.products.forEach((product) => {
-                html += `<div class="product-card">
+          data.output.products.forEach((product) => {
+            html += `<div class="product-card">
                               <img src="${product.image || "placeholder.jpg"}" alt="${product.name}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f2f5%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2212%22%3Eimagem%3C/text%3E%3C/svg%3E'">
                               <div class="product-info">
                                   <div class="product-name">${product.name}</div>
@@ -718,174 +706,175 @@
                                   <a href="${product.urldoproduto}" target="_blank" class="product-link"><i class="fas fa-external-link-alt"></i> Ver Produto</a>
                               </div>
                           </div>`;
-              });
-              html += `</div>`;
+          });
+          html += `</div>`;
+        } else {
+          html += `<div class="error-message"><i class="fas fa-search-minus"></i> Nenhum produto encontrado</div>`;
+        }
+        html += `</div>`;
+        resultsDiv.innerHTML += html;
+      }
+
+      function runScraper(LOJA) {
+        const buttons = document.querySelectorAll(".search-section button");
+        buttons.forEach((btn) => (btn.disabled = true));
+        document.body.style.cursor = "wait";
+        document.getElementById("results").innerHTML =
+          '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
+
+        fetch(
+          `${urlapi}/papapi/run-scraper-` + LOJA + "?produto=" + search.value,
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("results").innerHTML = "";
+            displayResults(LOJA, data);
+            document.body.style.cursor = "default";
+            enableButtons();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("results").innerHTML =
+              '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar dados</div>';
+            document.body.style.cursor = "default";
+            enableButtons();
+          });
+      }
+
+      async function runScraperTodos() {
+        const buttons = document.querySelectorAll(".search-section button");
+        buttons.forEach((btn) => (btn.disabled = true));
+        document.body.style.cursor = "wait";
+        document.getElementById("results").innerHTML =
+          '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando todas as lojas...</div>';
+
+        try {
+          document.getElementById("results").innerHTML = "";
+          for (const loja of lojas) {
+            const response = await fetch(
+              `${urlapi}/papapi/run-scraper-${loja}?produto=${search.value}`,
+            );
+            const data = await response.json();
+            displayResults(loja, data);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          document.getElementById("results").innerHTML +=
+            '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar dados</div>';
+        } finally {
+          buttons.forEach((btn) => (btn.disabled = false));
+          document.body.style.cursor = "default";
+        }
+      }
+
+      // Enter key support
+      document
+        .getElementById("produto")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            runScraperTodos();
+          }
+        });
+
+      async function perfiluser() {
+        try {
+          const response = await fetch(`${urlapi}/papapi/perfil`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Erro:", error);
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      }
+
+      async function preencherpaguser() {
+        try {
+          const data = await perfiluser();
+          console.log("📊 Dados do perfil:", data);
+
+          if (data && data.success) {
+            const user = data.user;
+
+            const nameElement = document.getElementById("userFullName");
+            if (nameElement) {
+              nameElement.textContent = user.fullname;
+            }
+
+            const avatarDiv = document.getElementById("userAvatar");
+            if (avatarDiv) {
+              avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
+            }
+
+            console.log("Perfil carregado para:", user.fullname);
+          } else {
+            console.error(
+              "Falha ao obter perfil:",
+              data?.message || "Erro desconhecido",
+            );
+
+            const nameElement = document.getElementById("userFullName");
+            if (nameElement) {
+              nameElement.textContent = "Visitante";
+            }
+
+            const avatarDiv = document.getElementById("userAvatar");
+            if (avatarDiv) {
+              avatarDiv.textContent = "?";
+            }
+          }
+        } catch (error) {
+          console.error("Erro ao preencher perfil:", error);
+        }
+      }
+
+      preencherpaguser();
+
+      async function logout() {
+        try {
+          const response = await fetch(`${urlapi}/papapi/logout`, {
+            method: "POST",
+            credentials: "include",
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log("Logout:", data);
+
+          if (data.success) {
+            if (CONFIG.ambiente === "dev") {
+              console.log(
+                "Logout bem-sucedido. Redirecionando para /login.html",
+              );
+              window.location.href = "/public/login.html";
             } else {
-              html += `<div class="error-message"><i class="fas fa-search-minus"></i> Nenhum produto encontrado</div>`;
+              console.log("Logout bem-sucedido. Redirecionando para /");
+              window.location.href = "/";
             }
-            html += `</div>`;
-            resultsDiv.innerHTML += html;
+          } else {
+            console.error("Falha ao fazer logout:", data.message);
           }
-
-          function runScraper(LOJA) {
-            const buttons = document.querySelectorAll(".search-section button");
-            buttons.forEach((btn) => (btn.disabled = true));
-            document.body.style.cursor = "wait";
-            document.getElementById("results").innerHTML =
-              '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
-
-            fetch(
-              `${urlapi}/papapi/run-scraper-` + LOJA + "?produto=" + search.value,
-            )
-              .then((response) => response.json())
-              .then((data) => {
-                document.getElementById("results").innerHTML = "";
-                displayResults(LOJA, data);
-                document.body.style.cursor = "default";
-                enableButtons();
-              })
-              .catch((error) => {
-                console.error("Error:", error);
-                document.getElementById("results").innerHTML =
-                  '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar dados</div>';
-                document.body.style.cursor = "default";
-                enableButtons();
-              });
-          }
-
-          async function runScraperTodos() {
-            const buttons = document.querySelectorAll(".search-section button");
-            buttons.forEach((btn) => (btn.disabled = true));
-            document.body.style.cursor = "wait";
-            document.getElementById("results").innerHTML =
-              '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando todas as lojas...</div>';
-
-            try {
-              document.getElementById("results").innerHTML = "";
-              for (const loja of lojas) {
-                const response = await fetch(
-                  `${urlapi}/papapi/run-scraper-${loja}?produto=${search.value}`,
-                );
-                const data = await response.json();
-                displayResults(loja, data);
-              }
-            } catch (error) {
-              console.error("Error:", error);
-              document.getElementById("results").innerHTML +=
-                '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar dados</div>';
-            } finally {
-              buttons.forEach((btn) => (btn.disabled = false));
-              document.body.style.cursor = "default";
-            }
-          }
-
-          // Enter key support
-          document
-            .getElementById("produto")
-            .addEventListener("keypress", function (e) {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                runScraperTodos();
-              }
-            });
-
-          async function perfiluser() {
-            try {
-              const response = await fetch(`${urlapi}/papapi/perfil`, {
-                method: "GET",
-                credentials: "include",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-
-              if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-              }
-
-              const data = await response.json();
-              return data;
-            } catch (error) {
-              console.error("Erro:", error);
-              return {
-                success: false,
-                message: error.message,
-              };
-            }
-          }
-
-          async function preencherpaguser() {
-            try {
-              const data = await perfiluser();
-              console.log("📊 Dados do perfil:", data);
-
-              if (data && data.success) {
-                const user = data.user;
-
-                const nameElement = document.getElementById("userFullName");
-                if (nameElement) {
-                  nameElement.textContent = user.fullname;
-                }
-
-                const avatarDiv = document.getElementById("userAvatar");
-                if (avatarDiv) {
-                  avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
-                }
-
-                console.log("Perfil carregado para:", user.fullname);
-              } else {
-                console.error(
-                  "Falha ao obter perfil:",
-                  data?.message || "Erro desconhecido",
-                );
-
-                const nameElement = document.getElementById("userFullName");
-                if (nameElement) {
-                  nameElement.textContent = "Visitante";
-                }
-
-                const avatarDiv = document.getElementById("userAvatar");
-                if (avatarDiv) {
-                  avatarDiv.textContent = "?";
-                }
-              }
-            } catch (error) {
-              console.error("Erro ao preencher perfil:", error);
-            }
-          }
-
-          preencherpaguser();
-
-          async function logout() {
-            try {
-              const response = await fetch(`${urlapi}/papapi/logout`, {
-                method: "POST",
-                credentials: "include",
-              });
-
-              if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-              }
-
-              const data = await response.json();
-              console.log("Logout:", data);
-
-              if (data.success) {
-                if (CONFIG.ambiente === "dev") {
-                  console.log("Logout bem-sucedido. Redirecionando para /login.html");
-                  window.location.href = "/public/login.html";
-                } else {
-                  console.log("Logout bem-sucedido. Redirecionando para /");
-                  window.location.href = "/";
-                }
-                
-              } else {
-                console.error("Falha ao fazer logout:", data.message);
-              }
-            } catch (error) {
-              console.error("Erro ao fazer logout:", error);
-            }
-          }
+        } catch (error) {
+          console.error("Erro ao fazer logout:", error);
+        }
+      }
     </script>
   </body>
 </html>
