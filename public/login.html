@@ -73,7 +73,10 @@
             </button>
 
             <p class="switch-cta">
-              Não tem uma conta? <a href="#" class="switch-tab-link" data-tab="signup">Cadastre-se</a>
+              Não tem uma conta?
+              <a href="#" class="switch-tab-link" data-tab="signup"
+                >Cadastre-se</a
+              >
             </p>
           </form>
         </div>
@@ -99,12 +102,22 @@
 
             <div class="input-group">
               <i class="fas fa-envelope"></i>
-              <input type="email" id="signupEmail" placeholder="E-mail" required />
+              <input
+                type="email"
+                id="signupEmail"
+                placeholder="E-mail"
+                required
+              />
             </div>
 
             <div class="input-group">
               <i class="fas fa-key"></i>
-              <input type="password" id="signupPassword" placeholder="Senha" required />
+              <input
+                type="password"
+                id="signupPassword"
+                placeholder="Senha"
+                required
+              />
               <span class="toggle-pw" id="togglePwSignup"
                 ><i class="fas fa-eye"></i
               ></span>
@@ -125,7 +138,10 @@
             </button>
 
             <p class="switch-cta">
-              Já tem uma conta? <a href="#" class="switch-tab-link" data-tab="login">Fazer login</a>
+              Já tem uma conta?
+              <a href="#" class="switch-tab-link" data-tab="login"
+                >Fazer login</a
+              >
             </p>
           </form>
         </div>
@@ -235,8 +251,14 @@
       }
 
       @keyframes fade {
-        0% { opacity: 0.6; transform: translateY(4px); }
-        100% { opacity: 1; transform: translateY(0); }
+        0% {
+          opacity: 0.6;
+          transform: translateY(4px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .brand-icon {
@@ -450,33 +472,79 @@
     </style>
 
     <script>
-      // ------- alternância entre abas -------
-      const tabBtns = document.querySelectorAll('.tab-btn');
+      const getConfig = () => {
+        const host = window.location.hostname;
+
+        // Mapeamento de ambientes
+        const environments = {
+          localhost: { ambiente: "dev", urlapi: "http://localhost:1919" },
+          "127.0.0.1": { ambiente: "dev", urlapi: "http://localhost:1919" },
+        };
+
+        if (environments[host]) {
+          return environments[host];
+        }
+
+        return {
+          ambiente: "prod",
+          urlapi: "https://api-pap.vercel.app",
+        };
+      };
+
+      // CONFIG DISPONÍVEL IMEDIATAMENTE
+      const CONFIG = getConfig();
+      const { ambiente, urlapi } = CONFIG;
+
+      console.log(`🌍 Ambiente: ${ambiente}`);
+      console.log(`🔗 API URL: ${urlapi}`);
+
+      // ============================================
+      // AGORA VOCÊ PODE USAR urlapi EM TODAS AS FUNÇÕES
+      // ============================================
+
+      function verificarToken() {
+        fetch(`${urlapi}/papapi/verificar-token`, {
+          method: "GET",
+          credentials: "include",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (!data.success) {
+              window.location.href = "/login.html";
+            }
+          })
+          .catch((error) => {
+            console.error("Erro ao verificar token:", error);
+            window.location.href = "/login.html";
+          });
+      }
+
+      const tabBtns = document.querySelectorAll(".tab-btn");
       const tabPanels = {
-        login: document.getElementById('tab-login'),
-        signup: document.getElementById('tab-signup')
+        login: document.getElementById("tab-login"),
+        signup: document.getElementById("tab-signup"),
       };
 
       function switchTab(tabId) {
         // atualiza botões
-        tabBtns.forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.tab === tabId);
+        tabBtns.forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.tab === tabId);
         });
         // atualiza painéis
-        Object.keys(tabPanels).forEach(key => {
-          tabPanels[key].classList.toggle('active', key === tabId);
+        Object.keys(tabPanels).forEach((key) => {
+          tabPanels[key].classList.toggle("active", key === tabId);
         });
       }
 
-      tabBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
+      tabBtns.forEach((btn) => {
+        btn.addEventListener("click", function (e) {
           switchTab(this.dataset.tab);
         });
       });
 
       // links "Cadastre-se" / "Fazer login" dentro dos painéis
-      document.querySelectorAll('.switch-tab-link').forEach(link => {
-        link.addEventListener('click', function(e) {
+      document.querySelectorAll(".switch-tab-link").forEach((link) => {
+        link.addEventListener("click", function (e) {
           e.preventDefault();
           const target = this.dataset.tab;
           if (target) switchTab(target);
@@ -484,58 +552,41 @@
       });
 
       // ------- mostrar/ocultar senha (login) -------
-      const togglePw = document.getElementById('togglePw');
-      const pwInput = document.getElementById('password');
+      const togglePw = document.getElementById("togglePw");
+      const pwInput = document.getElementById("password");
       if (togglePw && pwInput) {
-        togglePw.addEventListener('click', function() {
-          const type = pwInput.getAttribute('type') === 'password' ? 'text' : 'password';
-          pwInput.setAttribute('type', type);
-          this.querySelector('i').classList.toggle('fa-eye');
-          this.querySelector('i').classList.toggle('fa-eye-slash');
+        togglePw.addEventListener("click", function () {
+          const type =
+            pwInput.getAttribute("type") === "password" ? "text" : "password";
+          pwInput.setAttribute("type", type);
+          this.querySelector("i").classList.toggle("fa-eye");
+          this.querySelector("i").classList.toggle("fa-eye-slash");
         });
       }
 
       // ------- mostrar/ocultar senha (cadastro) -------
-      const togglePwSignup = document.getElementById('togglePwSignup');
-      const pwSignupInput = document.getElementById('signupPassword');
+      const togglePwSignup = document.getElementById("togglePwSignup");
+      const pwSignupInput = document.getElementById("signupPassword");
       if (togglePwSignup && pwSignupInput) {
-        togglePwSignup.addEventListener('click', function() {
-          const type = pwSignupInput.getAttribute('type') === 'password' ? 'text' : 'password';
-          pwSignupInput.setAttribute('type', type);
-          this.querySelector('i').classList.toggle('fa-eye');
-          this.querySelector('i').classList.toggle('fa-eye-slash');
+        togglePwSignup.addEventListener("click", function () {
+          const type =
+            pwSignupInput.getAttribute("type") === "password"
+              ? "text"
+              : "password";
+          pwSignupInput.setAttribute("type", type);
+          this.querySelector("i").classList.toggle("fa-eye");
+          this.querySelector("i").classList.toggle("fa-eye-slash");
         });
       }
-
-      // ------- funções de API (mantidas) -------
-      async function verificarToken() {
-        fetch("https://api-pap.vercel.app/papapi/verificar-token", {
-          method: "GET",
-          credentials: "include",
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              console.log("Token válido");
-              window.location.href = "/app/";
-            } else {
-              console.error("Token inválido");
-            }
-          })
-          .catch((error) => {
-            console.error("Erro ao verificar token:", error);
-          });
-      }
-      verificarToken();
 
       function loginuser() {
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
         const rememberMe = document.getElementById("rememberMe").checked;
         console.log(
-          `Tentativa de login com Email: ${email}, password: ${password}, Remember Me: ${rememberMe}`
+          `Tentativa de login com Email: ${email}, password: ${password}, Remember Me: ${rememberMe}`,
         );
-        fetch("/papapi/loginuser/", {
+        fetch(`${urlapi}/papapi/loginuser/`, {
           credentials: "include",
           method: "POST",
           headers: {
@@ -551,7 +602,17 @@
           .then((data) => {
             console.log("Resposta do servidor:", data);
             if (data.success) {
-              window.location.href = "/app/";
+              if (CONFIG.ambiente === "dev") {
+                console.log(
+                  "Login bem-sucedido! Redirecionando para /app/ (dev)",
+                );
+                window.location.href = "/public/index.html";
+              } else {
+                console.log(
+                  "Login bem-sucedido! Redirecionando para /app/ (prod)",
+                );
+                window.location.href = "/app/";
+              }
               console.log("Login bem-sucedido! Redirecionando para /app...");
             } else {
               console.error("Falha no Login:", data.message);
@@ -576,9 +637,9 @@
         }
 
         console.log(
-          `Tentativa de cadastro com Nome: ${fullname}, Email: ${email}, password: ${password}`
+          `Tentativa de cadastro com Nome: ${fullname}, Email: ${email}, password: ${password}`,
         );
-        fetch("https://api-pap.vercel.app/papapi/cadastraruser/", {
+        fetch(`${urlapi}/papapi/cadastraruser/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -595,7 +656,7 @@
             if (data.success) {
               alert("Cadastro realizado com sucesso!");
               // opcional: mudar para aba de login
-              switchTab('login');
+              switchTab("login");
             } else {
               console.error("Falha no cadastro:", data.message);
               alert("Falha no cadastro: " + data.message);
