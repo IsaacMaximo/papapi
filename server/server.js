@@ -65,6 +65,12 @@ app.post("/papapi/loginuser", loginUser);
 app.post("/papapi/logout", logoutUser);
 app.post("/papapi/refresh-token", refreshToken);
 
+app.get("/papapi/getambiente", (req, res) => {
+  res.json({
+    success: true,
+    node_env: process.env.NODE_ENV,
+  });
+});
 
 app.get("/papapi/verificar-token", autenticar, (req, res) => {
   res.json({

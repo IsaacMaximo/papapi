@@ -553,7 +553,9 @@
       <div class="navbar-links">
         <a href="#"><i class="fas fa-home"></i> Início</a>
         <a href="#"><i class="fas fa-history"></i> Histórico</a>
-        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
+        <a href="#" onclick="logout()"
+          ><i class="fas fa-sign-out-alt"></i> Sair</a
+        >
       </div>
       <div class="navbar-user">
         <span style="font-size: 0.9rem; color: #3c4e68; font-weight: 500"
@@ -615,8 +617,12 @@
         <a href="#"><i class="fas fa-file-alt"></i> Termos</a>
       </div>
       <div class="footer-social">
-        <a href="https://github.com/IsaacMaximo"><i class="fab fa-github"></i></a>
-        <a href="mailto:Isaac.08maximo@gmail.com"><i class="fab fa-google"></i></a>
+        <a href="https://github.com/IsaacMaximo"
+          ><i class="fab fa-github"></i
+        ></a>
+        <a href="mailto:Isaac.08maximo@gmail.com"
+          ><i class="fab fa-google"></i
+        ></a>
         <a href="#"><i class="fab fa-twitter"></i></a>
       </div>
       <div class="footer-copy">
@@ -626,6 +632,24 @@
     </footer>
 
     <script>
+      let ambiente;
+      function getambiente() {
+        fetch("https://api-pap.vercel.app/papapi/getambiente", {
+          method: "GET",
+          credentials: "include",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("data:", data);
+            ambiente = data.node_env;
+            console.log("Ambiente:", data.node_env);
+          })
+          .catch((error) => {
+            console.error("Erro ao obter ambiente:", error);
+          });
+      }
+      getambiente();
+
       function verificarToken() {
         fetch("https://api-pap.vercel.app/papapi/verificar-token", {
           method: "GET",
