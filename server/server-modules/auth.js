@@ -511,7 +511,7 @@ async function recuperarsenha(req, res) {
       success: false,
       message: "Usuário não encontrado",
     });
-  }
+  }//adicionar verificacao de caps ou sla P =! p
 
   const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = new Date(Date.now() + 600000);
@@ -534,7 +534,7 @@ async function recuperarsenha(req, res) {
       <h1 style="font-size:28px;color:#1a2634;text-align:center;">
           Poup<span style="color:#3b82f6;">In</span>
       </h1>
-      <h2 style="font-size:22px;color:#0f172a;text-align:center;">🔐 Recuperação de Senha</h2>
+      <h2 style="font-size:22px;color:#0f172a;text-align:center;">Recuperação de Senha</h2>
       <p style="color:#475569;text-align:center;font-size:15px;">Use o código abaixo para redefinir sua senha:</p>
       <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:16px;padding:28px;text-align:center;margin:20px 0;">
           <div style="font-size:42px;font-weight:700;letter-spacing:10px;color:#0f172a;font-family:'Courier New',monospace;background:#fff;padding:12px 20px;border-radius:12px;display:inline-block;">
@@ -542,7 +542,7 @@ async function recuperarsenha(req, res) {
           </div>
           <p style="color:#64748b;margin-top:16px;font-size:13px;">
               ⏱️ Válido por 10 minutos<br>
-              <span style="font-size:12px;color:#94a3b8;">Expira em: ${expiresAt.toLocaleString("pt-BR")}</span>
+              <span style="font-size:12px;color:#94a3b8;">Expira em: ${expiresAt.toLocaleString("pt-pt")}</span>
           </p>
       </div>
       <p style="text-align:center;color:#94a3b8;font-size:13px;">Se você não solicitou, ignore este email.</p>
@@ -557,7 +557,8 @@ async function recuperarsenha(req, res) {
     html: html_msg,
   };
 
-  enviaremail(paraquem, conteudodamensgem);
+  await enviaremail(paraquem, conteudodamensgem);
+
 
   console.log(`Código de recuperação para ${email}: ${resetCode}`);
 
@@ -595,7 +596,6 @@ async function verificarCodigo(req, res) {
 async function redefinirSenhaComCodigo(req, res) {
   const { email, code, newPassword } = req.body;
 
-  // Validação básica
   if (!email || !code || !newPassword) {
     return res.status(400).json({
       success: false,
