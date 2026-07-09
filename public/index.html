@@ -2426,11 +2426,11 @@
         const title = document.getElementById("popupTitle");
         const content = document.getElementById("popupContent");
 
-        title.textContent = `🔍 ${termo} · ${loja}`;
+        title.textContent = `${termo} · ${loja}`;
 
         content.innerHTML = `
-    <div style="margin-bottom: 1rem;">
-      <div style="max-height: 400px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
+    <div style="margin-bottom: -1rem;">
+      <div style="max-height: 305px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
         ${produtosHTML}
       </div>
       ${dados.products.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${dados.products.length} produtos</div>` : ""}
