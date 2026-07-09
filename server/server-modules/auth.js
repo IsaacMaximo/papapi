@@ -136,11 +136,13 @@ const autenticar = async (req, res, next) => {
       }
 
       console.log(`✅ Token válido para: ${decoded.email}`);
+      console.log(`decoded.userid: ${decoded.userId}`);
+      console.log(`userid: ${userId}`);
       console.log("decoded todo", decoded)
       req.user = {
         ...decoded,
-        userIdString: decoded.userId,
-        userId: userId,
+        userIdString: userId,
+        userId: decoded.userId,
       };
       req.token = token;
       next();
