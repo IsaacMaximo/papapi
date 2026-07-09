@@ -2315,20 +2315,7 @@
               <span style="margin: 0 0.3rem;">·</span>
               <i class="far fa-clock"></i> ${dataHora}
             </div>
-            <div style="display: flex; gap: 0.5rem; margin-top: 0.3rem; flex-wrap: wrap;">
-              ${produtosPreview
-                .map(
-                  (p) => `
-                <span style="font-size: 0.7rem; background: rgba(43,58,103,0.06); padding: 0.1rem 0.5rem; border-radius: 10px; color: #4a5a72;">
-                  ${p.name.substring(0, 25)}${p.name.length > 25 ? "..." : ""}
-                </span>
-              `,
-                )
-                .join("")}
-              ${item.products.length > 3 ? `<span style="font-size: 0.7rem; color: #7b8aa3;">+${item.products.length - 3} mais</span>` : ""}
-            </div>
           </div>
-          <div class="item-preco">${item.products.length} produtos</div>
         </div>
         <div class="item-acoes">
           <button class="btn-item primary" onclick="repetirBusca('${termo}')">
@@ -2362,10 +2349,10 @@
 
       function getCorLoja(loja) {
         const cores = {
-          Continente: "linear-gradient(135deg, #0066b3, #0088cc)",
-          "Pingo Doce": "linear-gradient(135deg, #e31e24, #cc0000)",
-          Auchan: "linear-gradient(135deg, #004b87, #0066a0)",
-          Lidl: "linear-gradient(135deg, #0050aa, #0066cc)",
+          Continente: "#2b3a67",
+          "Pingo Doce": "#2b3a67",
+          Auchan: "#2b3a67",
+          Lidl: "#2b3a67",
         };
         return cores[loja] || "linear-gradient(135deg, #2b3a67, #1d2b4a)";
       }
@@ -2506,20 +2493,7 @@
               <span style="margin: 0 0.3rem;">·</span>
               <i class="far fa-clock"></i> ${dataHora}
             </div>
-            <div style="display: flex; gap: 0.5rem; margin-top: 0.3rem; flex-wrap: wrap;">
-              ${produtosPreview
-                .map(
-                  (p) => `
-                <span style="font-size: 0.7rem; background: rgba(43,58,103,0.06); padding: 0.1rem 0.5rem; border-radius: 10px; color: #4a5a72;">
-                  ${p.name.substring(0, 25)}${p.name.length > 25 ? "..." : ""}
-                </span>
-              `,
-                )
-                .join("")}
-              ${item.products.length > 3 ? `<span style="font-size: 0.7rem; color: #7b8aa3;">+${item.products.length - 3} mais</span>` : ""}
-            </div>
           </div>
-          <div class="item-preco">${item.products.length} produtos</div>
         </div>
         <div class="item-acoes">
           <button class="btn-item primary" onclick="repetirBusca('${termo}')">
