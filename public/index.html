@@ -1460,6 +1460,45 @@
       .historico-vazio span {
         font-size: 0.9rem;
       }
+      /* Adicione ao seu CSS */
+      .popup-content .produto-detalhe {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.8rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: background 0.2s;
+      }
+
+      .popup-content .produto-detalhe:hover {
+        background: rgba(43, 58, 103, 0.03);
+      }
+
+      .popup-content .produto-detalhe:last-child {
+        border-bottom: none;
+      }
+
+      .popup-content .produto-nome {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #0b1a30;
+      }
+
+      .popup-content .produto-preco {
+        font-weight: 700;
+        color: #1d2b4a;
+        font-size: 1rem;
+        white-space: nowrap;
+      }
+
+      .popup-content .produto-imagem {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        border-radius: 8px;
+        background: #f8fafc;
+        flex-shrink: 0;
+      }
 
       /* Responsivo */
       @media (max-width: 768px) {
@@ -2145,7 +2184,6 @@
           };
         }
       }
-      
 
       async function preencherpaguser() {
         try {
@@ -2356,8 +2394,165 @@
       }
 
       function verDetalhesHistorico(index) {
-        // Abre um popup ou modal com os detalhes da pesquisa
-        abrirpopup(`Detalhes da Pesquisa #${index + 1}`);
+        // Busca os dados do histórico novamente (ou usa uma variável global)
+        // Vamos armazenar os dados globalmente
+        if (!window.historicoData) {
+          alert("Dados do histórico não disponíveis. Recarregue a página.");
+          return;
+        }
+
+        const dados = window.historicoData.dados[index];
+        if (!dados) {
+          alert("Item não encontrado");
+          return;
+        }
+
+        const loja = identificarLoja(dados.search.url);
+        const termo = dados.search.term;
+        const total = dados.products.length;
+        const dataHora = formatarData(dados.timestamp);
+
+        // Monta o HTML dos produtos
+        let produtosHTML = "";
+        dados.products.forEach((produto, i) => {
+          produtosHTML += `
+      <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
+        <span style="font-weight: 600; color: #7b8aa3; min-width: 30px;">#${i + 1}</span>
+        <img src="${produto.image || "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22%3E%3Crect fill=%22%23f0f2f5%22 width=%2250%22 height=%2250%22/%3E%3Ctext x=%2225%22 y=%2225%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2210%22%3Eimg%3C/text%3E%3C/svg%3E"}" 
+             style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #f8fafc; flex-shrink: 0;">
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-weight: 500; font-size: 0.9rem; color: #0b1a30; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            ${produto.name}
+          </div>
+          <a href="${produto.urldoproduto}" target="_blank" style="font-size: 0.75rem; color: #2b3a67; text-decoration: none; border-bottom: 1px dotted rgba(43,58,103,0.3);">
+            <i class="fas fa-external-link-alt"></i> Ver na loja
+          </a>
+        </div>
+        <div style="font-weight: 700; color: #1d2b4a; font-size: 1rem; white-space: nowrap;">
+          ${produto.price}
+        </div>
+      </div>
+    `;
+        });
+
+        // Abre o popup com os detalhes
+        const overlay = document.getElementById("popupOverlay");
+        const title = document.getElementById("popupTitle");
+        const content = document.getElementById("popupContent");
+
+        title.textContent = `🔍 ${termo} · ${loja}`;
+
+        content.innerHTML = `
+    <div style="margin-bottom: 1rem;">
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; background: rgba(43,58,103,0.05); padding: 0.8rem 1rem; border-radius: 12px; margin-bottom: 1rem;">
+        <span><strong>🛒 Produtos:</strong> ${total}</span>
+        <span><strong>🏪 Loja:</strong> ${loja}</span>
+        <span><strong>📅 Data:</strong> ${dataHora}</span>
+      </div>
+      <div style="max-height: 400px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
+        ${produtosHTML}
+      </div>
+      ${dados.products.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${dados.products.length} produtos</div>` : ""}
+    </div>
+  `;
+
+        // Esconde o botão de confirmar e mostra o de fechar
+        document.getElementById("confirmarPopupDIV").style.display = "none";
+        document.getElementById("fecharPopupDIV").style.display = "inline-flex";
+
+        // Mostra o popup
+        overlay.style.display = "flex";
+        overlay.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      // Modifique a função carregarHistorico para armazenar os dados globalmente
+      function carregarHistorico(data) {
+        // Armazena os dados globalmente para uso posterior
+        window.historicoData = data;
+
+        const lista = document.getElementById("listaHistorico");
+
+        if (!data || !data.success || !data.dados || data.dados.length === 0) {
+          lista.innerHTML = `
+      <div class="historico-vazio">
+        <i class="fas fa-inbox"></i>
+        <p>Nenhuma pesquisa registrada</p>
+        <span>Suas pesquisas aparecerão aqui</span>
+      </div>
+    `;
+          return;
+        }
+
+        let html = "";
+
+        data.dados.forEach((item, index) => {
+          const loja = identificarLoja(item.search.url);
+          const termo = item.search.term;
+          const totalProdutos = item.summary.total_products;
+          const dataHora = formatarData(item.timestamp);
+          const produtosPreview = item.products.slice(0, 3);
+
+          html += `
+      <div class="historico-item" data-id="${index}" data-termo="${termo}" data-loja="${loja}" data-data="${item.timestamp}">
+        <div class="item-info">
+          <div class="item-icon" style="background: ${getCorLoja(loja)};">
+            <i class="fas fa-store"></i>
+          </div>
+          <div class="item-detalhes">
+            <div class="item-produto"><strong>${termo}</strong> · ${totalProdutos} produtos</div>
+            <div class="item-loja">
+              <i class="fas fa-store"></i> ${loja}
+              <span style="margin: 0 0.3rem;">·</span>
+              <i class="far fa-clock"></i> ${dataHora}
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.3rem; flex-wrap: wrap;">
+              ${produtosPreview
+                .map(
+                  (p) => `
+                <span style="font-size: 0.7rem; background: rgba(43,58,103,0.06); padding: 0.1rem 0.5rem; border-radius: 10px; color: #4a5a72;">
+                  ${p.name.substring(0, 25)}${p.name.length > 25 ? "..." : ""}
+                </span>
+              `,
+                )
+                .join("")}
+              ${item.products.length > 3 ? `<span style="font-size: 0.7rem; color: #7b8aa3;">+${item.products.length - 3} mais</span>` : ""}
+            </div>
+          </div>
+          <div class="item-preco">${item.products.length} produtos</div>
+        </div>
+        <div class="item-acoes">
+          <button class="btn-item primary" onclick="repetirBusca('${termo}')">
+            <i class="fas fa-redo"></i> Repetir
+          </button>
+          <button class="btn-item" onclick="verDetalhesHistorico(${index})" style="background: rgba(43,58,103,0.08);">
+            <i class="fas fa-eye"></i> Ver
+          </button>
+          <button class="btn-item danger" onclick="removerHistorico(${index})">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    `;
+        });
+
+        lista.innerHTML = html;
+        document.querySelector(".historico-titulo h2").textContent =
+          `Histórico de Pesquisas (${data.dados.length})`;
+      }
+
+      // Função auxiliar para garantir que o popup tenha o botão de fechar correto
+      // Adicione isso ao seu código existente
+      function fecharpopup() {
+        const overlay = document.getElementById("popupOverlay");
+        overlay.style.display = "none";
+        overlay.classList.remove("active");
+        document.body.style.overflow = "";
+
+        // Restaura os botões do popup
+        document.getElementById("confirmarPopupDIV").style.display =
+          "inline-flex";
+        document.getElementById("fecharPopupDIV").style.display = "inline-flex";
       }
 
       function mostrarErroHistorico() {
