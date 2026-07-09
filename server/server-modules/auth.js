@@ -109,8 +109,9 @@ const autenticar = async (req, res, next) => {
 
       const db = client.db("PoupIn");
       const collection = db.collection("users");
-      const userId = normalizeUserId(decoded.userId);
-      const usuario = await collection.findOne({ _id: userId });
+
+      const userIdNormalizado = normalizeUserId(decoded.userId);
+      const usuario = await collection.findOne({ _id: userIdNormalizado });
 
       if (!usuario) {
         console.log("❌ Usuário não encontrado para o token");
@@ -136,14 +137,12 @@ const autenticar = async (req, res, next) => {
       }
 
       console.log(`✅ Token válido para: ${decoded.email}`);
-      console.log(`decoded.userid: ${decoded.userId}`);
-      console.log(`userid: ${userId}`);
-      console.log("decoded todo", decoded)
       req.user = {
         ...decoded,
-        userIdString: userId,
-        userId: decoded.userId,
+        userId: userIdNormalizado,
+        userIdString: decoded.userId,
       };
+
       req.token = token;
       next();
     } catch (error) {
@@ -516,7 +515,7 @@ async function recuperarsenha(req, res) {
       success: false,
       message: "Usuário não encontrado",
     });
-  }//adicionar verificacao de caps ou sla P =! p
+  } //adicionar verificacao de caps ou sla P =! p
 
   const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = new Date(Date.now() + 600000);
@@ -563,7 +562,6 @@ async function recuperarsenha(req, res) {
   };
 
   await enviaremail(paraquem, conteudodamensgem);
-
 
   console.log(`Código de recuperação para ${email}: ${resetCode}`);
 
