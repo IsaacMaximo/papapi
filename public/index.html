@@ -925,329 +925,6 @@
         background: rgba(0, 0, 0, 0.1);
       }
 
-      /* ===== BOTÃO FLUTUANTE ===== */
-      .btn-historico {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background: linear-gradient(135deg, #1d2b4a, #2b3a67);
-        color: white;
-        border: none;
-        border-radius: 50px;
-        padding: 14px 22px;
-        font-family: "Inter", Arial, sans-serif;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 8px 30px rgba(27, 45, 75, 0.35);
-        transition: all 0.3s ease;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .btn-historico:hover {
-        transform: translateY(-3px) scale(1.04);
-        box-shadow: 0 12px 40px rgba(27, 45, 75, 0.45);
-      }
-
-      .btn-historico .badge {
-        background: #ef4444;
-        color: white;
-        border-radius: 50%;
-        padding: 2px 10px;
-        font-size: 12px;
-        font-weight: 700;
-        min-width: 22px;
-        text-align: center;
-      }
-
-      /* ===== DIV FLUTUANTE ===== */
-      .historico-flutuante {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.9);
-        width: 92%;
-        max-width: 750px;
-        max-height: 85vh;
-        background: rgba(255, 255, 255, 0.97);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-radius: 28px;
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-        z-index: 1001;
-        display: none;
-        opacity: 0;
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-      }
-
-      .historico-flutuante.ativo {
-        display: flex;
-        flex-direction: column;
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-      }
-
-      /* ===== HEADER ===== */
-      .historico-header {
-        background: #1d2b4a;
-        color: white;
-        padding: 20px 25px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 2px solid rgba(59, 130, 246, 0.3);
-        flex-shrink: 0;
-      }
-
-      .historico-header h2 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .historico-header h2 i {
-        color: #cbdaec;
-      }
-
-      .btn-fechar {
-        background: rgba(255, 255, 255, 0.08);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 38px;
-        height: 38px;
-        font-size: 18px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .btn-fechar:hover {
-        background: rgba(239, 68, 68, 0.7);
-        transform: rotate(90deg);
-      }
-
-      /* ===== BODY ===== */
-      .historico-body {
-        padding: 20px;
-        overflow-y: auto;
-        flex: 1;
-        max-height: 60vh;
-      }
-
-      .historico-body::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .historico-body::-webkit-scrollbar-track {
-        background: #f1f5f9;
-        border-radius: 10px;
-      }
-
-      .historico-body::-webkit-scrollbar-thumb {
-        background: #2b3a67;
-        border-radius: 10px;
-      }
-
-      /* ===== LISTA DE PRODUTOS ===== */
-      .lista-produtos {
-        display: grid;
-        gap: 12px;
-      }
-
-      .produto-item {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 14px 16px;
-        display: flex;
-        gap: 14px;
-        transition: all 0.25s ease;
-        cursor: pointer;
-        align-items: center;
-      }
-
-      .produto-item:hover {
-        background: #f1f5f9;
-        border-color: #2b3a67;
-        transform: translateX(4px);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-      }
-
-      .produto-item img {
-        width: 64px;
-        height: 64px;
-        object-fit: cover;
-        border-radius: 10px;
-        flex-shrink: 0;
-        background: #e2e8f0;
-      }
-
-      .produto-info {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-width: 0;
-        gap: 4px;
-      }
-
-      .produto-info h3 {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 600;
-        color: #0b1a30;
-        line-height: 1.3;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-
-      .produto-info .preco {
-        font-size: 17px;
-        font-weight: 700;
-        color: #1d2b4a;
-      }
-
-      .produto-info .url {
-        font-size: 12px;
-        color: #64748b;
-        text-decoration: none;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .produto-info .url:hover {
-        color: #2b3a67;
-        text-decoration: underline;
-      }
-
-      /* ===== MENSAGEM VAZIA ===== */
-      .mensagem-vazia {
-        text-align: center;
-        padding: 50px 20px;
-        color: #94a3b8;
-      }
-
-      .mensagem-vazia .icone {
-        font-size: 52px;
-        margin-bottom: 12px;
-      }
-
-      .mensagem-vazia p {
-        font-size: 16px;
-        font-weight: 500;
-      }
-
-      /* ===== OVERLAY ===== */
-      .overlay-historico {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        z-index: 1000;
-        display: none;
-      }
-
-      .overlay-historico.ativo {
-        display: block;
-      }
-
-      /* ===== RESPONSIVO ===== */
-      @media (max-width: 640px) {
-        .historico-flutuante {
-          width: 96%;
-          max-height: 90vh;
-          border-radius: 20px;
-        }
-
-        .historico-flutuante.ativo {
-          transform: translate(-50%, -50%) scale(1);
-        }
-
-        .produto-item {
-          padding: 12px;
-          gap: 12px;
-          flex-direction: row;
-          align-items: center;
-        }
-
-        .produto-item img {
-          width: 52px;
-          height: 52px;
-        }
-
-        .produto-info h3 {
-          font-size: 13px;
-        }
-
-        .produto-info .preco {
-          font-size: 15px;
-        }
-
-        .btn-historico {
-          bottom: 20px;
-          right: 20px;
-          padding: 12px 18px;
-          font-size: 13px;
-          gap: 8px;
-        }
-
-        .btn-historico .badge {
-          font-size: 10px;
-          padding: 1px 8px;
-          min-width: 18px;
-        }
-
-        .historico-header {
-          padding: 16px 18px;
-        }
-
-        .historico-header h2 {
-          font-size: 17px;
-        }
-
-        .historico-body {
-          padding: 14px;
-          max-height: 50vh;
-        }
-      }
-
-      @media (max-width: 400px) {
-        .produto-item {
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-        }
-
-        .produto-item img {
-          width: 70px;
-          height: 70px;
-        }
-
-        .produto-info .url {
-          font-size: 11px;
-        }
-      }
       /* Responsivo */
       @media (max-width: 440px) {
         .popup-header {
@@ -1352,6 +1029,53 @@
       </div>
     </div>
 
+    <div id="historicoContainer" style="display: none">
+      <div class="historico-header">
+        <div class="historico-titulo">
+          <i class="fas fa-history"></i>
+          <h2>Histórico de Pesquisas</h2>
+        </div>
+        <button onclick="limparHistorico()" class="btn-limpar-historico">
+          <i class="fas fa-trash-alt"></i> Limpar Histórico
+        </button>
+      </div>
+
+      <div class="historico-filtros">
+        <div class="filtro-periodo">
+          <button class="filtro-btn active" onclick="filtrarHistorico('hoje')">
+            Hoje
+          </button>
+          <button class="filtro-btn" onclick="filtrarHistorico('semana')">
+            Última Semana
+          </button>
+          <button class="filtro-btn" onclick="filtrarHistorico('mes')">
+            Último Mês
+          </button>
+          <button class="filtro-btn" onclick="filtrarHistorico('todos')">
+            Todos
+          </button>
+        </div>
+        <div class="historico-busca">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            id="buscaHistorico"
+            placeholder="Buscar no histórico..."
+            oninput="buscarHistorico()"
+          />
+        </div>
+      </div>
+
+      <div id="listaHistorico" class="historico-lista">
+        <!-- Os itens serão inseridos dinamicamente via JS -->
+        <div class="historico-vazio">
+          <i class="fas fa-inbox"></i>
+          <p>Nenhuma pesquisa registrada</p>
+          <span>Suas pesquisas aparecerão aqui</span>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== MAIN CONTENT ===== -->
     <div class="main-content">
       <div class="page-header">
@@ -1443,25 +1167,355 @@
       <div id="results"></div>
     </div>
 
-    <button id="btnHistorico" class="btn-historico">
-      <i class="fas fa-history"></i> Histórico
-      <span id="contadorHistorico" class="badge">0</span>
-    </button>
+    <!-- ===== ABA HISTÓRICO ===== -->
 
-    <div id="divHistorico" class="historico-flutuante">
-      <div class="historico-header">
-        <h2><i class="fas fa-history"></i> Meu Histórico</h2>
-        <button id="btnFecharHistorico" class="btn-fechar">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="historico-body">
-        <div id="listaHistorico" class="lista-produtos"></div>
-      </div>
-    </div>
+    <style>
+      /* ===== ESTILOS HISTÓRICO ===== */
+      #historicoContainer {
+        padding: 1.5rem 0;
+        max-width: 1100px;
+        margin: 0 auto;
+        width: 100%;
+      }
 
-    <!-- OVERLAY -->
-    <div id="overlayHistorico" class="overlay-historico"></div>
+      .historico-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(43, 58, 103, 0.1);
+      }
+
+      .historico-titulo {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .historico-titulo i {
+        font-size: 2rem;
+        color: #2b3a67;
+      }
+
+      .historico-titulo h2 {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: #0b1a30;
+        letter-spacing: -0.02em;
+      }
+
+      .btn-limpar-historico {
+        background: rgba(220, 60, 60, 0.1);
+        border: 1px solid rgba(220, 60, 60, 0.2);
+        padding: 0.6rem 1.2rem;
+        border-radius: 40px;
+        color: #b13e3e;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: "Inter", sans-serif;
+      }
+
+      .btn-limpar-historico:hover {
+        background: rgba(220, 60, 60, 0.2);
+        transform: scale(1.02);
+      }
+
+      .historico-filtros {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(4px);
+        padding: 0.8rem 1.5rem;
+        border-radius: 60px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+      }
+
+      .filtro-periodo {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+
+      .filtro-btn {
+        background: transparent;
+        border: none;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        font-size: 0.8rem;
+        color: #4a5a72;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .filtro-btn:hover {
+        background: rgba(43, 58, 103, 0.08);
+      }
+
+      .filtro-btn.active {
+        background: linear-gradient(135deg, #1d2b4a, #2b3a67);
+        color: white;
+        box-shadow: 0 4px 12px rgba(27, 45, 75, 0.2);
+      }
+
+      .historico-busca {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: rgba(255, 255, 255, 0.6);
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        border: 1px solid rgba(200, 210, 225, 0.4);
+        min-width: 200px;
+      }
+
+      .historico-busca i {
+        color: #7b8aa3;
+        font-size: 0.9rem;
+      }
+
+      .historico-busca input {
+        border: none;
+        background: transparent;
+        padding: 0.5rem 0;
+        font-family: "Inter", sans-serif;
+        font-size: 0.9rem;
+        outline: none;
+        color: #0b1a30;
+        width: 100%;
+      }
+
+      .historico-busca input::placeholder {
+        color: #99a9be;
+      }
+
+      .historico-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .historico-item {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(4px);
+        border-radius: 16px;
+        padding: 1rem 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      }
+
+      .historico-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 20, 40, 0.08);
+        border-color: rgba(43, 58, 103, 0.15);
+      }
+
+      .item-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .item-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #e8edf5, #dce3ef);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2b3a67;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+
+      .item-detalhes {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+
+      .item-produto {
+        font-weight: 600;
+        color: #0b1a30;
+        font-size: 1rem;
+      }
+
+      .item-loja {
+        font-size: 0.8rem;
+        color: #4a5a72;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .item-loja i {
+        font-size: 0.7rem;
+        color: #7b8aa3;
+      }
+
+      .item-preco {
+        font-weight: 700;
+        color: #1d2b4a;
+        font-size: 1.1rem;
+        padding: 0.2rem 0.8rem;
+        background: rgba(43, 58, 103, 0.08);
+        border-radius: 20px;
+        white-space: nowrap;
+      }
+
+      .item-data {
+        font-size: 0.75rem;
+        color: #7b8aa3;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
+      }
+
+      .item-acoes {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .btn-item {
+        background: transparent;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #4a5a72;
+        font-family: "Inter", sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+
+      .btn-item:hover {
+        background: rgba(43, 58, 103, 0.08);
+      }
+
+      .btn-item.primary {
+        background: linear-gradient(135deg, #1d2b4a, #2b3a67);
+        color: white;
+      }
+
+      .btn-item.primary:hover {
+        transform: scale(1.03);
+        box-shadow: 0 4px 12px rgba(27, 45, 75, 0.25);
+      }
+
+      .btn-item.danger {
+        color: #b13e3e;
+      }
+
+      .btn-item.danger:hover {
+        background: rgba(220, 60, 60, 0.1);
+      }
+
+      .historico-vazio {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #7b8aa3;
+      }
+
+      .historico-vazio i {
+        font-size: 3rem;
+        color: #c8d4e2;
+        margin-bottom: 1rem;
+        display: block;
+      }
+
+      .historico-vazio p {
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: #4a5a72;
+        margin-bottom: 0.3rem;
+      }
+
+      .historico-vazio span {
+        font-size: 0.9rem;
+      }
+
+      /* Responsivo */
+      @media (max-width: 768px) {
+        .historico-header {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.8rem;
+        }
+
+        .historico-filtros {
+          flex-direction: column;
+          align-items: stretch;
+          border-radius: 28px;
+          padding: 1rem;
+          gap: 0.8rem;
+        }
+
+        .filtro-periodo {
+          justify-content: center;
+        }
+
+        .historico-item {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .item-info {
+          min-width: unset;
+        }
+
+        .item-acoes {
+          justify-content: flex-end;
+          border-top: 1px solid rgba(0, 0, 0, 0.05);
+          padding-top: 0.8rem;
+        }
+
+        .item-preco {
+          align-self: flex-start;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .historico-titulo h2 {
+          font-size: 1.4rem;
+        }
+
+        .filtro-btn {
+          font-size: 0.7rem;
+          padding: 0.3rem 0.7rem;
+        }
+
+        .historico-busca {
+          min-width: unset;
+        }
+      }
+    </style>
 
     <footer class="footer">
       <div class="footer-brand">
@@ -2135,72 +2189,6 @@
           console.error("Erro ao preencher perfil:", error);
         }
       }
-
-      // ===== CONTROLE DA DIV HISTÓRICO =====
-      const btnHistorico = document.getElementById("btnHistorico");
-      const btnFechar = document.getElementById("btnFecharHistorico");
-      const divHistorico = document.getElementById("divHistorico");
-      const overlay = document.getElementById("overlayHistorico");
-      const listaHistorico = document.getElementById("listaHistorico");
-      const contadorBadge = document.getElementById("contadorHistorico");
-
-      function abrirHistorico() {
-        divHistorico.classList.add("ativo");
-        overlay.classList.add("ativo");
-        document.body.style.overflow = "hidden";
-      }
-      abrirHistorico();
-      function fecharHistorico() {
-        divHistorico.classList.remove("ativo");
-        overlay.classList.remove("ativo");
-        document.body.style.overflow = "";
-      }
-
-      btnHistorico.addEventListener("click", abrirHistorico);
-      btnFechar.addEventListener("click", fecharHistorico);
-      overlay.addEventListener("click", fecharHistorico);
-
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") fecharHistorico();
-      });
-
-      // ===== PREENCHER HISTÓRICO =====
-      function preencherHistorico(produtos) {
-        listaHistorico.innerHTML = "";
-
-        if (!produtos || produtos.length === 0) {
-          listaHistorico.innerHTML = `
-      <div class="mensagem-vazia">
-        <div class="icone"></div>
-        <p>Nenhum produto no histórico</p>
-        <p style="font-size:14px;color:#b0c0d0;">Faça uma pesquisa para começar</p>
-      </div>
-    `;
-          contadorBadge.textContent = "0";
-          return;
-        }
-
-        contadorBadge.textContent = produtos.length;
-
-        produtos.forEach((produto) => {
-          const div = document.createElement("div");
-          div.className = "produto-item";
-
-          div.innerHTML = `
-      <img src="${produto.image || ""}" 
-           alt="${produto.name || "Produto"}" 
-           onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 fill=%22%23e2e8f0%22/%3E%3Ctext x=%2232%22 y=%2238%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2230%22%3E📦%3C/text%3E%3C/svg%3E'">
-      <div class="produto-info">
-        <h3>${produto.name || "Sem nome"}</h3>
-        <div class="preco">${produto.price || "Preço indisponível"}</div>
-        ${produto.urldoproduto ? `<a href="${produto.urldoproduto}" target="_blank" class="url">🔗 Ver produto</a>` : ""}
-      </div>
-    `;
-
-          listaHistorico.appendChild(div);
-        });
-      }
-
       async function pegarhistorico() {
         try {
           const response = await fetch(`${urlapi}/papapi/pegarhistorico`, {
@@ -2215,16 +2203,226 @@
           const data = await response.json();
           console.log("historico:", data);
 
-          if (data.success && data.dados) {
-            preencherHistorico(data.dados);
-          } else {
-            preencherHistorico([]);
-          }
+          // Carrega os dados no visual do histórico
+          carregarHistorico(data);
 
+          // Abre a aba de histórico
           abrirHistorico();
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
-          preencherHistorico([]);
+          mostrarErroHistorico();
+        }
+      }
+
+      function carregarHistorico(data) {
+        const lista = document.getElementById("listaHistorico");
+
+        // Verifica se tem dados
+        if (!data || !data.success || !data.dados || data.dados.length === 0) {
+          lista.innerHTML = `
+      <div class="historico-vazio">
+        <i class="fas fa-inbox"></i>
+        <p>Nenhuma pesquisa registrada</p>
+        <span>Suas pesquisas aparecerão aqui</span>
+      </div>
+    `;
+          return;
+        }
+
+        // Processa os dados para exibição
+        let html = "";
+
+        data.dados.forEach((item, index) => {
+          // Pega a loja pela URL
+          const loja = identificarLoja(item.search.url);
+          const termo = item.search.term;
+          const totalProdutos = item.summary.total_products;
+          const dataHora = formatarData(item.timestamp);
+
+          // Pega os primeiros 3 produtos como preview
+          const produtosPreview = item.products.slice(0, 3);
+
+          html += `
+      <div class="historico-item" data-id="${index}" data-termo="${termo}" data-loja="${loja}" data-data="${item.timestamp}">
+        <div class="item-info">
+          <div class="item-icon" style="background: ${getCorLoja(loja)};">
+            <i class="fas fa-store"></i>
+          </div>
+          <div class="item-detalhes">
+            <div class="item-produto"><strong>${termo}</strong> · ${totalProdutos} produtos</div>
+            <div class="item-loja">
+              <i class="fas fa-store"></i> ${loja}
+              <span style="margin: 0 0.3rem;">·</span>
+              <i class="far fa-clock"></i> ${dataHora}
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.3rem; flex-wrap: wrap;">
+              ${produtosPreview
+                .map(
+                  (p) => `
+                <span style="font-size: 0.7rem; background: rgba(43,58,103,0.06); padding: 0.1rem 0.5rem; border-radius: 10px; color: #4a5a72;">
+                  ${p.name.substring(0, 25)}${p.name.length > 25 ? "..." : ""}
+                </span>
+              `,
+                )
+                .join("")}
+              ${item.products.length > 3 ? `<span style="font-size: 0.7rem; color: #7b8aa3;">+${item.products.length - 3} mais</span>` : ""}
+            </div>
+          </div>
+          <div class="item-preco">${item.products.length} produtos</div>
+        </div>
+        <div class="item-acoes">
+          <button class="btn-item primary" onclick="repetirBusca('${termo}')">
+            <i class="fas fa-redo"></i> Repetir
+          </button>
+          <button class="btn-item" onclick="verDetalhesHistorico(${index})">
+            <i class="fas fa-eye"></i> Ver
+          </button>
+          <button class="btn-item danger" onclick="removerHistorico(${index})">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    `;
+        });
+
+        lista.innerHTML = html;
+
+        // Atualiza contador
+        document.querySelector(".historico-titulo h2").textContent =
+          `Histórico de Pesquisas (${data.dados.length})`;
+      }
+
+      function identificarLoja(url) {
+        if (url.includes("continente")) return "Continente";
+        if (url.includes("pingodoce")) return "Pingo Doce";
+        if (url.includes("auchan")) return "Auchan";
+        if (url.includes("lidl")) return "Lidl";
+        return "Desconhecida";
+      }
+
+      function getCorLoja(loja) {
+        const cores = {
+          Continente: "linear-gradient(135deg, #0066b3, #0088cc)",
+          "Pingo Doce": "linear-gradient(135deg, #e31e24, #cc0000)",
+          Auchan: "linear-gradient(135deg, #004b87, #0066a0)",
+          Lidl: "linear-gradient(135deg, #0050aa, #0066cc)",
+        };
+        return cores[loja] || "linear-gradient(135deg, #2b3a67, #1d2b4a)";
+      }
+
+      function formatarData(timestamp) {
+        const date = new Date(timestamp);
+        const hoje = new Date();
+        const diff = hoje - date;
+
+        // Se for hoje
+        if (diff < 24 * 60 * 60 * 1000) {
+          return `Hoje ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+        }
+        // Se for ontem
+        if (diff < 48 * 60 * 60 * 1000) {
+          return `Ontem ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+        }
+
+        return date.toLocaleString("pt-PT", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      function verDetalhesHistorico(index) {
+        // Abre um popup ou modal com os detalhes da pesquisa
+        abrirpopup(`Detalhes da Pesquisa #${index + 1}`);
+      }
+
+      function mostrarErroHistorico() {
+        const lista = document.getElementById("listaHistorico");
+        lista.innerHTML = `
+    <div class="historico-vazio" style="color: #b13e3e;">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>Erro ao carregar histórico</p>
+      <span>Tente novamente mais tarde</span>
+    </div>
+  `;
+      }
+
+      // Função para filtrar histórico
+      function filtrarHistorico(periodo) {
+        // Atualiza botões
+        document
+          .querySelectorAll(".filtro-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        if (event) event.target.classList.add("active");
+
+        const items = document.querySelectorAll(".historico-item");
+        const agora = new Date();
+
+        items.forEach((item) => {
+          const dataStr = item.dataset.data;
+          if (!dataStr) {
+            item.style.display = "";
+            return;
+          }
+
+          const dataItem = new Date(dataStr);
+          const diff = agora - dataItem;
+          let mostrar = false;
+
+          switch (periodo) {
+            case "hoje":
+              mostrar = diff < 24 * 60 * 60 * 1000;
+              break;
+            case "semana":
+              mostrar = diff < 7 * 24 * 60 * 60 * 1000;
+              break;
+            case "mes":
+              mostrar = diff < 30 * 24 * 60 * 60 * 1000;
+              break;
+            case "todos":
+            default:
+              mostrar = true;
+          }
+
+          item.style.display = mostrar ? "" : "none";
+        });
+      }
+
+      function buscarHistorico() {
+        const termo = document
+          .getElementById("buscaHistorico")
+          .value.toLowerCase()
+          .trim();
+        const items = document.querySelectorAll(".historico-item");
+
+        items.forEach((item) => {
+          const termoItem = (item.dataset.termo || "").toLowerCase();
+          const lojaItem = (item.dataset.loja || "").toLowerCase();
+          const match =
+            termo === "" ||
+            termoItem.includes(termo) ||
+            lojaItem.includes(termo);
+          item.style.display = match ? "" : "none";
+        });
+      }
+
+      function removerHistorico(id) {
+        if (confirm("Remover este item do histórico?")) {
+          // Implementar chamada à API para remover
+          console.log("Remover histórico ID:", id);
+          // Recarrega o histórico
+          pegarhistorico();
+        }
+      }
+
+      function limparHistorico() {
+        if (confirm("Tem certeza que deseja limpar todo o histórico?")) {
+          // Implementar chamada à API para limpar
+          console.log("Limpar todo histórico");
+          // Recarrega o histórico
+          pegarhistorico();
         }
       }
 
