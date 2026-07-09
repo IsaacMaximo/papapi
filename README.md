@@ -50,3 +50,5 @@ tags (ARRAY) - Para busca flexível
   visual
 
   MERCADONA
+  SEGURANCA
+  ANTI FLOOD

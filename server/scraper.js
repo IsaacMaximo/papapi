@@ -15,7 +15,7 @@ async function connectBrowserless() {
     timeout: 5000,
   });
 }
-async function scraper_PingoDoce(pagina, pesquisa) {
+async function scraper_PingoDoce(pesquisa) {
   const browser = await connectBrowserless();
   const page = await browser.newPage();
 
@@ -110,7 +110,7 @@ async function scraper_PingoDoce(pagina, pesquisa) {
     timestamp: new Date().toISOString(),
     search: {
       term: pesquisa,
-      url: pagina,
+      url: urlBusca,
     },
     summary: {
       total_products: products.length,
@@ -120,7 +120,7 @@ async function scraper_PingoDoce(pagina, pesquisa) {
   };
 }
 
-async function scraper_Continente(pagina, pesquisa) {
+async function scraper_Continente(pesquisa) {
   const browser = await connectBrowserless();
   const page = await browser.newPage();
 
@@ -195,7 +195,7 @@ async function scraper_Continente(pagina, pesquisa) {
     timestamp: new Date().toISOString(),
     search: {
       term: pesquisa,
-      url: pagina,
+      url: urlBusca,
     },
     summary: {
       total_products: products.length,
@@ -205,7 +205,7 @@ async function scraper_Continente(pagina, pesquisa) {
   };
 }
 
-async function scraper_Auchan(pagina, pesquisa) {
+async function scraper_Auchan(pesquisa) {
   const browser = await connectBrowserless();
   const page = await browser.newPage();
 
@@ -279,7 +279,7 @@ async function scraper_Auchan(pagina, pesquisa) {
     timestamp: new Date().toISOString(),
     search: {
       term: pesquisa,
-      url: pagina,
+      url: urlBusca,
     },
     summary: {
       total_products: products.length,
@@ -289,7 +289,7 @@ async function scraper_Auchan(pagina, pesquisa) {
   };
 }
 
-async function scraper_lidl(pagina, pesquisa) {
+async function scraper_lidl(pesquisa) {
   const browser = await connectBrowserless();
   const page = await browser.newPage();
 
@@ -314,7 +314,7 @@ async function scraper_lidl(pagina, pesquisa) {
 
   console.log("Produtos encontrados. Continuando com a extração...");
 
-  await page.waitForSelector("#search-results", { timeout: 10000 });
+  await page.waitForSelector("#search-results");
   console.log("Produtos carregados. Extraindo informações...");
 
   await autoScroll(page);
@@ -362,7 +362,7 @@ async function scraper_lidl(pagina, pesquisa) {
     timestamp: new Date().toISOString(),
     search: {
       term: pesquisa,
-      url: pagina,
+      url: urlBusca,
     },
     summary: {
       total_products: products.length,
@@ -372,11 +372,11 @@ async function scraper_lidl(pagina, pesquisa) {
   };
 }
 
-async function scraper_Intermarche(pagina, pesquisa) {
+async function scraper_Intermarche(pesquisa) {
   const browser = await connectBrowserless();
   const startTime = Date.now();
 
-  await page.goto(pagina);
+  await page.goto();
   const title = await page.title();
   console.log("Título da página:", title);
 
@@ -428,7 +428,7 @@ async function scraper_Intermarche(pagina, pesquisa) {
     timestamp: new Date().toISOString(),
     search: {
       term: pesquisa,
-      url: pagina,
+      url: urlBusca,
     },
     summary: {
       total_products: products.length,

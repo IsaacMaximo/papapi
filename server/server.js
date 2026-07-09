@@ -4,21 +4,8 @@ const PORT = 1919;
 
 require("dotenv").config();
 
-const axios = require("axios");
-const cheerio = require("cheerio");
 
-const crypto = require("crypto");
-const bcrypt = require("bcryptjs");
-const saltRounds = 12;
-const hashSecret = process.env.HASH_SECRET;
 const { connectToDatabase, client } = require("./server-modules/conndb.js");
-
-const jwt = require("jsonwebtoken");
-const jwtSecret = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = "15m";
-
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
-const JWT_REFRESH_EXPIRES_IN = "7d";
 
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
@@ -73,6 +60,68 @@ app.post("/papapi/recuperar-senha", recuperarsenha);
 app.post("/papapi/verificarCodigo", verificarCodigo);
 app.post("/papapi/redefinir-senha-codigo", redefinirSenhaComCodigo);
 
+app.post("/papapi/enviarfeedback", autenticar, async (req, res) => {
+  try {
+    const { avaliacao, comentario } = req.body;
+    const email = req.user.email;
+
+    const db = client.db("PoupIn");
+    const usercollection = db.collection("users");
+    const feedbackcollection = db.collection("users_feedback");
+
+    const existingUser = await usercollection.findOne({ email: email });
+    if (!existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Usuário não encontrado",
+      });
+    }
+
+    await usercollection.updateOne(
+      { email: email },
+      {
+        $set: {
+          feedback: true,
+        },
+      },
+    );
+
+    const userData = {
+      userid: existingUser._id,
+      fullname: existingUser.fullname,
+      email: existingUser.email,
+      avaliacao: avaliacao,
+      comentario: comentario || "",
+      createdAt: new Date(),
+    };
+
+    const result = await feedbackcollection.insertOne(userData);
+    return res.status(201).json({
+      success: true,
+      message: "Feedback enviado com sucesso!",
+      data: {
+        user: {
+          userid: existingUser.userid,
+          fullname: existingUser.fullname,
+          email: existingUser.email,
+        },
+        feedback: {
+          avaliacao: avaliacao,
+          comentario: comentario,
+          createdAt: new Date(),
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao enviar feedback:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro interno ao processar o feedback",
+      error: error.message,
+    });
+  }
+});
+
 app.get("/papapi/getambiente", (req, res) => {
   res.json({
     success: true,
@@ -109,7 +158,6 @@ app.get("/papapi/teste", (req, res) => {
   });
 });
 
-
 app.post("/papapi/teste", autenticar, (req, res) => {
   res.json({
     mensagem: "Requisição POST recebida!",
@@ -125,7 +173,6 @@ const {
   scraper_lidl,
 } = require("./scraper.js");
 
-// Rota para o Pingo Doce
 app.get("/papapi/run-scraper-pingodoce", async (req, res) => {
   try {
     const termoBusca = req.query.produto;
@@ -133,13 +180,11 @@ app.get("/papapi/run-scraper-pingodoce", async (req, res) => {
     if (!termoBusca) {
       return res.status(400).json({
         message: "Parâmetro 'produto' é obrigatório!",
-        exemplo: "http://localhost:1919/run-scraper-pingodoce?produto=leite",
       });
     }
 
     console.log(`Iniciando scraper do Pingo Doce para: ${termoBusca}`);
     const scraperOutput = await scraper_PingoDoce(
-      "https://www.pingodoce.pt/",
       termoBusca,
     );
     res.json({
@@ -161,13 +206,12 @@ app.get("/papapi/run-scraper-continente", async (req, res) => {
     if (!termoBusca) {
       return res.status(400).json({
         message: "Parâmetro 'produto' é obrigatório!",
-        exemplo: "http://localhost:1919/run-scraper-continente?produto=leite",
       });
     }
 
     console.log(`Iniciando scraper do Continente para: ${termoBusca}`);
     const scraperOutput = await scraper_Continente(
-      "https://www.continente.pt/",
+
       termoBusca,
     );
     res.json({
@@ -188,13 +232,11 @@ app.get("/papapi/run-scraper-Auchan", async (req, res) => {
     if (!termoBusca) {
       return res.status(400).json({
         message: "Parâmetro 'produto' é obrigatório!",
-        exemplo: "http://localhost:1919/run-scraper-Auchan?produto=leite",
       });
     }
 
     console.log(`Iniciando scraper do Auchan para: ${termoBusca}`);
     const scraperOutput = await scraper_Auchan(
-      "https://www.auchan.pt/",
       termoBusca,
     );
     res.json({
@@ -215,13 +257,11 @@ app.get("/papapi/run-scraper-Intermarche", async (req, res) => {
     if (!termoBusca) {
       return res.status(400).json({
         message: "Parâmetro 'produto' é obrigatório!",
-        exemplo: "http://localhost:1919/run-scraper-Intermarche?produto=leite",
       });
     }
 
     console.log(`Iniciando scraper do Intermarche para: ${termoBusca}`);
     const scraperOutput = await scraper_Intermarche(
-      "https://www.intermarche.pt/home",
       termoBusca,
     );
     res.json({
@@ -242,13 +282,11 @@ app.get("/papapi/run-scraper-lidl", async (req, res) => {
     if (!termoBusca) {
       return res.status(400).json({
         message: "Parâmetro 'produto' é obrigatório!",
-        exemplo: "http://localhost:1919/run-scraper-lidl?produto=leite",
       });
     }
 
     console.log(`Iniciando scraper do Lidl para: ${termoBusca}`);
     const scraperOutput = await scraper_lidl(
-      "https://www.lidl.pt/",
       termoBusca,
     );
     res.json({

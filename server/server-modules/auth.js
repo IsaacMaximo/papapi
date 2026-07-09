@@ -1,4 +1,3 @@
-// auth.js
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -190,6 +189,7 @@ async function cadastrarUser(req, res) {
       password: hashedPassword,
       createdAt: new Date(),
       updatedAt: new Date(),
+      feedback: false,
     };
 
     const db = client.db("PoupIn");
