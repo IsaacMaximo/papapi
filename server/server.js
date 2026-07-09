@@ -5,20 +5,6 @@ const PORT = 1919;
 require("dotenv").config();
 
 const rateLimit = require("express-rate-limit");
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // 100 requisições por IP
-  message: {
-    success: false,
-    message: "Muitas requisições. Tente novamente mais tarde.",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: (req) => {
-    const trustedIps = ["127.0.0.1", "::1", "192.168.1.1"];
-    return trustedIps.includes(req.ip);
-  },
-});
 
 const { connectToDatabase, client } = require("./server-modules/conndb.js");
 
@@ -60,6 +46,21 @@ app.use(
 app.use(express.json());
 app.set("trust proxy", 1);
 
+const rateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  skipFailedRequests: true,
+  keyGenerator: (req) => {
+    return req.headers["x-real-ip"] || req.ip;
+  },
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Muitas requisições. Tente novamente em 15 minutos.",
+    });
+  },
+});
+
 const {
   cadastrarUser,
   loginUser,
@@ -79,108 +80,89 @@ app.post("/papapi/recuperar-senha", recuperarsenha);
 app.post("/papapi/verificarCodigo", verificarCodigo);
 app.post("/papapi/redefinir-senha-codigo", redefinirSenhaComCodigo);
 
-app.get("/papapi/meu-ip", (req, res) => {
-  const ipReal =
-    req.headers["x-real-ip"] ||
-    req.headers["x-forwarded-for"]?.split(",")[0] ||
-    req.ip ||
-    req.connection.remoteAddress;
+app.post(
+  "/papapi/enviarfeedback",
+  rateLimiter,
+  autenticar,
+  async (req, res) => {
+    try {
+      const { avaliacaoRAW, comentarioRAW } = req.body;
 
-  res.json({
-    success: true,
-    ip: ipReal,
-    headers: {
-      "x-real-ip": req.headers["x-real-ip"] || null,
-      "x-forwarded-for": req.headers["x-forwarded-for"] || null,
-      "x-vercel-forwarded-for": req.headers["x-vercel-forwarded-for"] || null,
-      "x-vercel-proxied-for": req.headers["x-vercel-proxied-for"] || null,
-      "cf-connecting-ip": req.headers["cf-connecting-ip"] || null, // Cloudflare
-    },
+      const comentario = String(comentarioRAW || "").trim();
 
-    reqIp: req.ip,
-    connectionIp: req.connection?.remoteAddress,
-    socketIp: req.socket?.remoteAddress,
-  });
-});
+      avaliacao = Math.floor(Math.abs(Number(avaliacaoRAW))) || 0;
 
-app.post("/papapi/enviarfeedback", autenticar, async (req, res) => {
-  try {
-    const { avaliacaoRAW, comentarioRAW } = req.body;
+      if (avaliacao < 1 || avaliacao > 5) {
+        return res.status(400).json({
+          success: false,
+          message: "Avaliação deve ser entre 1 e 5",
+        });
+      }
 
-    const comentario = String(comentarioRAW || "").trim();
+      console.log("feedback recebido = (", avaliacao, ") --> ", comentario);
+      const email = req.user.email;
 
-    avaliacao = Math.floor(Math.abs(Number(avaliacaoRAW))) || 0;
+      const db = client.db("PoupIn");
+      const usercollection = db.collection("users");
+      const feedbackcollection = db.collection("users_feedback");
 
-    if (avaliacao < 1 || avaliacao > 5) {
-      return res.status(400).json({
+      const existingUser = await usercollection.findOne({ email: email });
+      if (!existingUser) {
+        console.log("user nao encontrado");
+        return res.status(409).json({
+          success: false,
+          message: "Usuário não encontrado",
+        });
+      }
+
+      await usercollection.updateOne(
+        { email: email },
+        {
+          $set: {
+            feedback: true,
+          },
+        },
+      );
+      console.log("feedback true");
+
+      const userData = {
+        userid: existingUser._id,
+        fullname: existingUser.fullname,
+        email: existingUser.email,
+        avaliacao: avaliacao,
+        comentario: comentario || "",
+        createdAt: new Date(),
+      };
+
+      console.log("[!] userdata --->", userData);
+
+      const result = await feedbackcollection.insertOne(userData);
+      return res.status(201).json({
+        success: true,
+        message: "Feedback enviado com sucesso!",
+        data: {
+          user: {
+            userid: existingUser.userid,
+            fullname: existingUser.fullname,
+            email: existingUser.email,
+          },
+          feedback: {
+            avaliacao: avaliacao,
+            comentario: comentario,
+            createdAt: new Date(),
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Erro ao enviar feedback:", error);
+      return res.status(500).json({
         success: false,
-        message: "Avaliação deve ser entre 1 e 5",
+        message: "Erro interno ao processar o feedback",
+        error: error.message,
       });
     }
-
-    console.log("feedback recebido = (", avaliacao, ") --> ", comentario);
-    const email = req.user.email;
-
-    const db = client.db("PoupIn");
-    const usercollection = db.collection("users");
-    const feedbackcollection = db.collection("users_feedback");
-
-    const existingUser = await usercollection.findOne({ email: email });
-    if (!existingUser) {
-      console.log("user nao encontrado");
-      return res.status(409).json({
-        success: false,
-        message: "Usuário não encontrado",
-      });
-    }
-
-    await usercollection.updateOne(
-      { email: email },
-      {
-        $set: {
-          feedback: true,
-        },
-      },
-    );
-    console.log("feedback true");
-
-    const userData = {
-      userid: existingUser._id,
-      fullname: existingUser.fullname,
-      email: existingUser.email,
-      avaliacao: avaliacao,
-      comentario: comentario || "",
-      createdAt: new Date(),
-    };
-
-    console.log("[!] userdata --->", userData);
-
-    const result = await feedbackcollection.insertOne(userData);
-    return res.status(201).json({
-      success: true,
-      message: "Feedback enviado com sucesso!",
-      data: {
-        user: {
-          userid: existingUser.userid,
-          fullname: existingUser.fullname,
-          email: existingUser.email,
-        },
-        feedback: {
-          avaliacao: avaliacao,
-          comentario: comentario,
-          createdAt: new Date(),
-        },
-      },
-    });
-  } catch (error) {
-    console.error("Erro ao enviar feedback:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Erro interno ao processar o feedback",
-      error: error.message,
-    });
-  }
-});
+  },
+);
 
 app.get("/papapi/getambiente", (req, res) => {
   res.json({
@@ -197,7 +179,7 @@ app.get("/papapi/verificar-token", autenticar, (req, res) => {
   });
 });
 
-app.get("/papapi/perfil", autenticar, (req, res) => {
+app.get("/papapi/perfil", rateLimiter, autenticar, (req, res) => {
   const email = req.user.email;
   const fullname = req.user.fullname;
 
@@ -233,121 +215,146 @@ const {
   scraper_lidl,
 } = require("./scraper.js");
 
-app.get("/papapi/run-scraper-pingodoce", async (req, res) => {
-  try {
-    const termoBusca = req.query.produto;
+app.get(
+  "/papapi/run-scraper-pingodoce",
+  rateLimiter,
+  autenticar,
+  async (req, res) => {
+    try {
+      const termoBusca = req.query.produto;
 
-    if (!termoBusca) {
-      return res.status(400).json({
-        message: "Parâmetro 'produto' é obrigatório!",
+      if (!termoBusca) {
+        return res.status(400).json({
+          message: "Parâmetro 'produto' é obrigatório!",
+        });
+      }
+
+      console.log(`Iniciando scraper do Pingo Doce para: ${termoBusca}`);
+      const scraperOutput = await scraper_PingoDoce(termoBusca);
+      res.json({
+        message: "Scraper do Pingo Doce executado com sucesso!",
+        output: scraperOutput,
       });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Erro ao executar scraper", error: error.message });
     }
-
-    console.log(`Iniciando scraper do Pingo Doce para: ${termoBusca}`);
-    const scraperOutput = await scraper_PingoDoce(termoBusca);
-    res.json({
-      message: "Scraper do Pingo Doce executado com sucesso!",
-      output: scraperOutput,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erro ao executar scraper", error: error.message });
-  }
-});
+  },
+);
 
 // Rota para o Continente
-app.get("/papapi/run-scraper-continente", async (req, res) => {
-  try {
-    const termoBusca = req.query.produto;
+app.get(
+  "/papapi/run-scraper-continente",
+  rateLimiter,
+  autenticar,
+  async (req, res) => {
+    try {
+      const termoBusca = req.query.produto;
 
-    if (!termoBusca) {
-      return res.status(400).json({
-        message: "Parâmetro 'produto' é obrigatório!",
+      if (!termoBusca) {
+        return res.status(400).json({
+          message: "Parâmetro 'produto' é obrigatório!",
+        });
+      }
+
+      console.log(`Iniciando scraper do Continente para: ${termoBusca}`);
+      const scraperOutput = await scraper_Continente(termoBusca);
+      res.json({
+        message: "Scraper do Continente executado com sucesso!",
+        output: scraperOutput,
       });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Erro ao executar scraper", error: error.message });
     }
+  },
+);
 
-    console.log(`Iniciando scraper do Continente para: ${termoBusca}`);
-    const scraperOutput = await scraper_Continente(termoBusca);
-    res.json({
-      message: "Scraper do Continente executado com sucesso!",
-      output: scraperOutput,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erro ao executar scraper", error: error.message });
-  }
-});
+app.get(
+  "/papapi/run-scraper-Auchan",
+  rateLimiter,
+  autenticar,
+  async (req, res) => {
+    try {
+      const termoBusca = req.query.produto;
 
-app.get("/papapi/run-scraper-Auchan", async (req, res) => {
-  try {
-    const termoBusca = req.query.produto;
+      if (!termoBusca) {
+        return res.status(400).json({
+          message: "Parâmetro 'produto' é obrigatório!",
+        });
+      }
 
-    if (!termoBusca) {
-      return res.status(400).json({
-        message: "Parâmetro 'produto' é obrigatório!",
+      console.log(`Iniciando scraper do Auchan para: ${termoBusca}`);
+      const scraperOutput = await scraper_Auchan(termoBusca);
+      res.json({
+        message: "Scraper do Auchan executado com sucesso!",
+        output: scraperOutput,
       });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Erro ao executar scraper", error: error.message });
     }
+  },
+);
 
-    console.log(`Iniciando scraper do Auchan para: ${termoBusca}`);
-    const scraperOutput = await scraper_Auchan(termoBusca);
-    res.json({
-      message: "Scraper do Auchan executado com sucesso!",
-      output: scraperOutput,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erro ao executar scraper", error: error.message });
-  }
-});
+app.get(
+  "/papapi/run-scraper-Intermarche",
+  rateLimiter,
+  autenticar,
+  async (req, res) => {
+    try {
+      const termoBusca = req.query.produto;
 
-app.get("/papapi/run-scraper-Intermarche", async (req, res) => {
-  try {
-    const termoBusca = req.query.produto;
+      if (!termoBusca) {
+        return res.status(400).json({
+          message: "Parâmetro 'produto' é obrigatório!",
+        });
+      }
 
-    if (!termoBusca) {
-      return res.status(400).json({
-        message: "Parâmetro 'produto' é obrigatório!",
+      console.log(`Iniciando scraper do Intermarche para: ${termoBusca}`);
+      const scraperOutput = await scraper_Intermarche(termoBusca);
+      res.json({
+        message: "Scraper do Intermarche executado com sucesso!",
+        output: scraperOutput,
       });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Erro ao executar scraper", error: error.message });
     }
+  },
+);
 
-    console.log(`Iniciando scraper do Intermarche para: ${termoBusca}`);
-    const scraperOutput = await scraper_Intermarche(termoBusca);
-    res.json({
-      message: "Scraper do Intermarche executado com sucesso!",
-      output: scraperOutput,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erro ao executar scraper", error: error.message });
-  }
-});
+app.get(
+  "/papapi/run-scraper-lidl",
+  rateLimiter,
+  autenticar,
+  async (req, res) => {
+    try {
+      const termoBusca = req.query.produto;
 
-app.get("/papapi/run-scraper-lidl", async (req, res) => {
-  try {
-    const termoBusca = req.query.produto;
+      if (!termoBusca) {
+        return res.status(400).json({
+          message: "Parâmetro 'produto' é obrigatório!",
+        });
+      }
 
-    if (!termoBusca) {
-      return res.status(400).json({
-        message: "Parâmetro 'produto' é obrigatório!",
+      console.log(`Iniciando scraper do Lidl para: ${termoBusca}`);
+      const scraperOutput = await scraper_lidl(termoBusca);
+      res.json({
+        message: "Scraper do Lidl executado com sucesso!",
+        output: scraperOutput,
       });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Erro ao executar scraper", error: error.message });
     }
-
-    console.log(`Iniciando scraper do Lidl para: ${termoBusca}`);
-    const scraperOutput = await scraper_lidl(termoBusca);
-    res.json({
-      message: "Scraper do Lidl executado com sucesso!",
-      output: scraperOutput,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erro ao executar scraper", error: error.message });
-  }
-});
+  },
+);
 
 app.get("/papapi/", (req, res) => {
   res.send("Servidor Node.js funcionando!");
