@@ -4,7 +4,7 @@ const PORT = 1919;
 
 require("dotenv").config();
 
-const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 
 
 const { connectToDatabase, client } = require("./server-modules/conndb.js");
@@ -281,7 +281,7 @@ app.get(
 
       console.log(`Iniciando scraper do Pingo Doce para: ${termoBusca}`);
       const scraperOutput = await scraper_PingoDoce(termoBusca);
-      enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
 
       res.json({
         message: "Scraper do Pingo Doce executado com sucesso!",
@@ -313,7 +313,9 @@ app.get(
       console.log(`Iniciando scraper do Continente para: ${termoBusca}`);
       const scraperOutput = await scraper_Continente(termoBusca);
       res;
-      enviar_dadosscrapper_bd(req.user.userid, scraperOutput).json({
+      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      
+      res.json({
         message: "Scraper do Continente executado com sucesso!",
         output: scraperOutput,
       });
@@ -342,7 +344,9 @@ app.get(
       console.log(`Iniciando scraper do Auchan para: ${termoBusca}`);
       const scraperOutput = await scraper_Auchan(termoBusca);
       res;
-      enviar_dadosscrapper_bd(req.user.userid, scraperOutput).json({
+      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      
+      res.json({
         message: "Scraper do Auchan executado com sucesso!",
         output: scraperOutput,
       });
@@ -371,7 +375,9 @@ app.get(
       console.log(`Iniciando scraper do Intermarche para: ${termoBusca}`);
       const scraperOutput = await scraper_Intermarche(termoBusca);
       res;
-      enviar_dadosscrapper_bd(req.user.userid, scraperOutput).json({
+      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      
+      res.json({
         message: "Scraper do Intermarche executado com sucesso!",
         output: scraperOutput,
       });
@@ -400,7 +406,9 @@ app.get(
       console.log(`Iniciando scraper do Lidl para: ${termoBusca}`);
       const scraperOutput = await scraper_lidl(termoBusca);
       res;
-      enviar_dadosscrapper_bd(req.user.userid, scraperOutput).json({
+      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      
+      res.json({
         message: "Scraper do Lidl executado com sucesso!",
         output: scraperOutput,
       });
