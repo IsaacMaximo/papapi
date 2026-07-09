@@ -547,7 +547,7 @@ async function recuperarsenha(req, res) {
       </div>
       <p style="text-align:center;color:#94a3b8;font-size:13px;">Se você não solicitou, ignore este email.</p>
       <hr style="border:none;border-top:1px solid #e9edf4;margin:20px 0;">
-      <p style="text-align:center;color:#cbd5e1;font-size:12px;">© 2024 PoupIn</p>
+      <p style="text-align:center;color:#cbd5e1;font-size:12px;">© 2026 PoupIn</p>
   </div>
   `;
 
