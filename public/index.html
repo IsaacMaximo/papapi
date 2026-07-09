@@ -997,7 +997,7 @@
 
       /* ===== HEADER ===== */
       .historico-header {
-        background: linear-gradient(135deg, #0b1a30, #1d2b4a);
+        background: #1d2b4a;
         color: white;
         padding: 20px 25px;
         display: flex;
@@ -1017,7 +1017,7 @@
       }
 
       .historico-header h2 i {
-        color: #60a5fa;
+        color: #cbdaec;
       }
 
       .btn-fechar {
@@ -2149,7 +2149,7 @@
         overlay.classList.add("ativo");
         document.body.style.overflow = "hidden";
       }
-
+      abrirHistorico();
       function fecharHistorico() {
         divHistorico.classList.remove("ativo");
         overlay.classList.remove("ativo");
@@ -2171,7 +2171,7 @@
         if (!produtos || produtos.length === 0) {
           listaHistorico.innerHTML = `
       <div class="mensagem-vazia">
-        <div class="icone">🛒</div>
+        <div class="icone"></div>
         <p>Nenhum produto no histórico</p>
         <p style="font-size:14px;color:#b0c0d0;">Faça uma pesquisa para começar</p>
       </div>
@@ -2215,13 +2215,12 @@
           const data = await response.json();
           console.log("historico:", data);
 
-          if (data.success && data.data) {
-            preencherHistorico(data.data);
+          if (data.success && data.dados) {
+            preencherHistorico(data.dados);
           } else {
             preencherHistorico([]);
           }
 
-          // Abre automaticamente ao clicar no botão
           abrirHistorico();
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
