@@ -1549,12 +1549,10 @@
       </div>
     </footer>
     <script>
-      preencherpaguser();
-
       let ratingValue = 0;
 
       function rateStar(n) {
-        ratingValue = n; // Salva o valor selecionado
+        ratingValue = n;
         const stars = document.querySelectorAll("#starContainer i");
 
         stars.forEach((star, index) => {
@@ -1568,8 +1566,6 @@
           }
         });
       }
-    </script>
-    <script>
       let escolhapopup;
 
       function abrirpopup(tipo) {
@@ -2149,6 +2145,7 @@
           };
         }
       }
+      
 
       async function preencherpaguser() {
         try {
@@ -2189,6 +2186,9 @@
           console.error("Erro ao preencher perfil:", error);
         }
       }
+
+      preencherpaguser();
+
       async function pegarhistorico() {
         try {
           const response = await fetch(`${urlapi}/papapi/pegarhistorico`, {
