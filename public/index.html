@@ -1295,7 +1295,21 @@
           console.log("Comentário:", comentario.value);
         }
 
-        
+        fetch(`${urlapi}/papapi/enviarfeedback/`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            comentario: comentario,
+            avaliacao: ratingValue,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+          });
 
         fecharpopup();
       }
@@ -1684,8 +1698,8 @@
         const existingMsg = document.querySelector(".no-results");
         if (existingMsg) existingMsg.remove();
 
-        const resultadosdiv  = document.getElementById("results")
-        resultadosdiv.innerHTML=``
+        const resultadosdiv = document.getElementById("results");
+        resultadosdiv.innerHTML = ``;
       }
 
       document
@@ -1698,7 +1712,6 @@
         });
 
       document.getElementById("produto").addEventListener("input", function () {
-
         const activeFilter = document.querySelector(".filter-chip.active");
         if (activeFilter) {
           const filterId = activeFilter.id.replace("filter-", "");
