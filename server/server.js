@@ -63,6 +63,7 @@ app.post("/papapi/redefinir-senha-codigo", redefinirSenhaComCodigo);
 app.post("/papapi/enviarfeedback", autenticar, async (req, res) => {
   try {
     const { avaliacao, comentario } = req.body;
+    console.log("feedback recebido = (", avaliacao, ") --> ", comentario)
     const email = req.user.email;
 
     const db = client.db("PoupIn");
@@ -71,6 +72,7 @@ app.post("/papapi/enviarfeedback", autenticar, async (req, res) => {
 
     const existingUser = await usercollection.findOne({ email: email });
     if (!existingUser) {
+      console.log("user nao encontrado");
       return res.status(409).json({
         success: false,
         message: "Usuário não encontrado",
@@ -85,6 +87,7 @@ app.post("/papapi/enviarfeedback", autenticar, async (req, res) => {
         },
       },
     );
+    console.log("feedback true");
 
     const userData = {
       userid: existingUser._id,
@@ -94,6 +97,8 @@ app.post("/papapi/enviarfeedback", autenticar, async (req, res) => {
       comentario: comentario || "",
       createdAt: new Date(),
     };
+
+    console.log("[!] userdata --->", userData);
 
     const result = await feedbackcollection.insertOne(userData);
     return res.status(201).json({

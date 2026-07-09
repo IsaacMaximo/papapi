@@ -1295,7 +1295,7 @@
           console.log("Comentário:", comentario.value);
         }
 
-        fetch(`${urlapi}/papapi/enviarfeedback/`, {
+        fetch(`${urlapi}/papapi/enviarfeedback`, {
           method: "POST",
           credentials: "include",
           headers: {
