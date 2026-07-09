@@ -25,6 +25,52 @@ const allowedOrigins = [
   "https://api-pap.vercel.app/",
   "https://api-pap.vercel.app/papapi",
 ];
+
+async function enviar_dadosscrapper_bd(userId, dadosscrapper) {
+  try {
+    const db = client.db("PoupIn");
+    const usercollection = db.collection("users");
+    const historicocollection = db.collection("users_historico");
+
+    const existingUser = await usercollection.findOne({ userId: userId });
+    if (!existingUser) {
+      console.log("❌ Usuário não encontrado");
+      return;
+    }
+
+    let historico = await historicocollection.findOne({
+      userid: existingUser._id,
+    });
+
+    if (!historico) {
+      const novoHistorico = {
+        userid: existingUser._id,
+        fullname: existingUser.fullname,
+        email: existingUser.email,
+        dados: [],
+        createdAt: new Date(),
+      };
+
+      const result = await historicocollection.insertOne(novoHistorico);
+      historico = result;
+      console.log("✅ Histórico criado!");
+    }
+
+    await historicocollection.updateOne(
+      { userid: existingUser._id },
+      {
+        $set: {
+          dados: dadosscrapper,
+        },
+      },
+    );
+
+    console.log("✅ Dados atualizados com sucesso!");
+  } catch (error) {
+    console.error("❌ Erro em enviar_dadosscrapper_bd:", error);
+  }
+}
+
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -72,13 +118,17 @@ const {
   redefinirSenhaComCodigo,
 } = require("./server-modules/auth.js");
 
-app.post("/papapi/cadastraruser", cadastrarUser);
-app.post("/papapi/loginuser", loginUser);
-app.post("/papapi/logout", logoutUser);
-app.post("/papapi/refresh-token", refreshToken);
-app.post("/papapi/recuperar-senha", recuperarsenha);
-app.post("/papapi/verificarCodigo", verificarCodigo);
-app.post("/papapi/redefinir-senha-codigo", redefinirSenhaComCodigo);
+app.post("/papapi/cadastraruser", rateLimiter, cadastrarUser);
+app.post("/papapi/loginuser", rateLimiter, loginUser);
+app.post("/papapi/logout", rateLimiter, logoutUser);
+app.post("/papapi/refresh-token", rateLimiter, refreshToken);
+app.post("/papapi/recuperar-senha", rateLimiter, recuperarsenha);
+app.post("/papapi/verificarCodigo", rateLimiter, verificarCodigo);
+app.post(
+  "/papapi/redefinir-senha-codigo",
+  rateLimiter,
+  redefinirSenhaComCodigo,
+);
 
 app.post(
   "/papapi/enviarfeedback",
@@ -101,10 +151,6 @@ app.post(
 
       console.log("feedback recebido = (", avaliacao, ") --> ", comentario);
       const email = req.user.email;
-
-      const db = client.db("PoupIn");
-      const usercollection = db.collection("users");
-      const feedbackcollection = db.collection("users_feedback");
 
       const existingUser = await usercollection.findOne({ email: email });
       if (!existingUser) {
@@ -231,6 +277,8 @@ app.get(
 
       console.log(`Iniciando scraper do Pingo Doce para: ${termoBusca}`);
       const scraperOutput = await scraper_PingoDoce(termoBusca);
+      enviar_dadosscrapper_bd(req.user.userid ,scraperOutput)
+
       res.json({
         message: "Scraper do Pingo Doce executado com sucesso!",
         output: scraperOutput,
@@ -260,7 +308,8 @@ app.get(
 
       console.log(`Iniciando scraper do Continente para: ${termoBusca}`);
       const scraperOutput = await scraper_Continente(termoBusca);
-      res.json({
+      res
+      enviar_dadosscrapper_bd(req.user.userid ,scraperOutput).json({
         message: "Scraper do Continente executado com sucesso!",
         output: scraperOutput,
       });
@@ -288,7 +337,8 @@ app.get(
 
       console.log(`Iniciando scraper do Auchan para: ${termoBusca}`);
       const scraperOutput = await scraper_Auchan(termoBusca);
-      res.json({
+      res
+      enviar_dadosscrapper_bd(req.user.userid ,scraperOutput).json({
         message: "Scraper do Auchan executado com sucesso!",
         output: scraperOutput,
       });
@@ -316,7 +366,8 @@ app.get(
 
       console.log(`Iniciando scraper do Intermarche para: ${termoBusca}`);
       const scraperOutput = await scraper_Intermarche(termoBusca);
-      res.json({
+      res
+      enviar_dadosscrapper_bd(req.user.userid ,scraperOutput).json({
         message: "Scraper do Intermarche executado com sucesso!",
         output: scraperOutput,
       });
@@ -344,7 +395,8 @@ app.get(
 
       console.log(`Iniciando scraper do Lidl para: ${termoBusca}`);
       const scraperOutput = await scraper_lidl(termoBusca);
-      res.json({
+      res
+      enviar_dadosscrapper_bd(req.user.userid ,scraperOutput).json({
         message: "Scraper do Lidl executado com sucesso!",
         output: scraperOutput,
       });

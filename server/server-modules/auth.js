@@ -136,6 +136,7 @@ const autenticar = async (req, res, next) => {
       }
 
       console.log(`✅ Token válido para: ${decoded.email}`);
+      console.log("decoded todo", decoded)
       req.user = decoded;
       req.token = token;
       next();
@@ -328,11 +329,9 @@ async function loginUser(req, res) {
         );
       }
 
-      // 🔥 RETORNA O TOKEN TAMBÉM (para clientes API como Yaak)
       return res.json({
         success: true,
         message: "Login realizado com sucesso!",
-        token: accessToken, // 🔥 IMPORTANTE para Yaak/Postman
         user: {
           id: usuario._id,
           fullname: usuario.fullname,
