@@ -2213,6 +2213,28 @@
           mostrarErroHistorico();
         }
       }
+      function abrirHistorico() {
+        // Esconde outras abas
+        document
+          .querySelectorAll(".main-content > div:not(#historicoContainer)")
+          .forEach((el) => {
+            el.style.display = "none";
+          });
+
+        // Mostra o histórico
+        document.getElementById("historicoContainer").style.display = "block";
+        document.getElementById("historicoContainer").style.animation =
+          "fadeIn 0.3s ease";
+      }
+
+      function fecharHistorico() {
+        document.getElementById("historicoContainer").style.display = "none";
+        document
+          .querySelectorAll(".main-content > div:not(#historicoContainer)")
+          .forEach((el) => {
+            el.style.display = "";
+          });
+      }
 
       function carregarHistorico(data) {
         const lista = document.getElementById("listaHistorico");
