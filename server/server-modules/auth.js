@@ -13,37 +13,8 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_REFRESH_EXPIRES_IN = "7d";
 
 const isProduction = process.env.NODE_ENV === "prod";
-const { Resend } = require("resend");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-const emailfrom = process.env.RESEND_EMAIL_FROM;
-
-
-async function enviarHelloWorld() {
-  try {
-    const { data, error } = await resend.emails.send({
-      from: "onboarding@resend.dev" || "onboarding@resend.dev",
-      to: ["isaac.08maximo@gmail.com"],
-      subject: "👋 Hello World!",
-      html: `
-        <h1 style="color: #2b3a67;">Hello World! 🌍</h1>
-        <p>Este é meu primeiro e-mail com o Resend!</p>
-        <p>Funcionou! 🎉</p>
-      `,
-      text: "Hello World! Este é meu primeiro e-mail com o Resend!",
-    });
-
-    if (error) {
-      console.log("❌ Erro:", error);
-    } else {
-      console.log("✅ E-mail enviado com sucesso!");
-      console.log("📧 ID:", data.id);
-    }
-  } catch (error) {
-    console.log("❌ Erro inesperado:", error);
-  }
-}
+const { enviaremail } = require("./email.js");
 
 function normalizeUserId(userId) {
   if (userId instanceof ObjectId) {
@@ -555,13 +526,44 @@ async function recuperarsenha(req, res) {
       },
     },
   );
+  var paraquem = email;
+  var subject_msg = "Codigo de verificação Email";
+  var texto_msg = `Codigo de verificação: ${resetCode}     Esse codigo é vaido por: ${expiresAt}`;
+  var html_msg = `
+  <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;background:#fff;padding:40px;border-radius:20px;border:1px solid #e9edf4;">
+      <h1 style="font-size:28px;color:#1a2634;text-align:center;">
+          Poup<span style="color:#3b82f6;">In</span>
+      </h1>
+      <h2 style="font-size:22px;color:#0f172a;text-align:center;">🔐 Recuperação de Senha</h2>
+      <p style="color:#475569;text-align:center;font-size:15px;">Use o código abaixo para redefinir sua senha:</p>
+      <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:16px;padding:28px;text-align:center;margin:20px 0;">
+          <div style="font-size:42px;font-weight:700;letter-spacing:10px;color:#0f172a;font-family:'Courier New',monospace;background:#fff;padding:12px 20px;border-radius:12px;display:inline-block;">
+              ${resetCode}
+          </div>
+          <p style="color:#64748b;margin-top:16px;font-size:13px;">
+              ⏱️ Válido por 10 minutos<br>
+              <span style="font-size:12px;color:#94a3b8;">Expira em: ${expiresAt.toLocaleString("pt-BR")}</span>
+          </p>
+      </div>
+      <p style="text-align:center;color:#94a3b8;font-size:13px;">Se você não solicitou, ignore este email.</p>
+      <hr style="border:none;border-top:1px solid #e9edf4;margin:20px 0;">
+      <p style="text-align:center;color:#cbd5e1;font-size:12px;">© 2024 PoupIn</p>
+  </div>
+  `;
+
+  var conteudodamensgem = {
+    subject: subject_msg,
+    text: texto_msg,
+    html: html_msg,
+  };
+
+  enviaremail(paraquem, conteudodamensgem);
 
   console.log(`Código de recuperação para ${email}: ${resetCode}`);
 
   res.json({
     success: true,
     message: "Código enviado com sucesso!",
-    code: resetCode, //tirar isso dps
   });
 }
 
@@ -589,8 +591,6 @@ async function verificarCodigo(req, res) {
     message: "Código verificado com sucesso",
   });
 }
-
-// auth.js - CORREÇÕES
 
 async function redefinirSenhaComCodigo(req, res) {
   const { email, code, newPassword } = req.body;
@@ -658,5 +658,4 @@ module.exports = {
   recuperarsenha,
   verificarCodigo,
   redefinirSenhaComCodigo,
-  enviarHelloWorld,
 };
