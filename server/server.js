@@ -39,18 +39,18 @@ async function enviar_dadosscrapper_bd(userId, dadosscrapper) {
     }
 
     let historico = await historicocollection.findOne({
-      userid: userId,
+      userId: userId,
     });
 
     if (!historico) {
       const novoHistorico = {
-        userid: existingUser._id,
+        userId: existingUser._id,
         fullname: existingUser.fullname,
         email: existingUser.email,
         dados: [],
         createdAt: new Date(),
       };
-      console.log("userid:" + userId);
+      console.log("userId:" + userId);
       console.log("existingUser._id,:" + existingUser._id);
       const result = await historicocollection.insertOne(novoHistorico);
       historico = result;
@@ -58,7 +58,7 @@ async function enviar_dadosscrapper_bd(userId, dadosscrapper) {
     }
 
     await historicocollection.updateOne(
-      { userid: existingUser._id },
+      { userId: existingUser._id },
       {
         $push: {
           dados: dadosscrapper,
@@ -154,9 +154,9 @@ app.post(
       }
 
       console.log("feedback recebido = (", avaliacao, ") --> ", comentario);
-      const email = req.user.userid;
+      const email = req.user.userId;
 
-      const existingUser = await usercollection.findOne({ _id: userid });
+      const existingUser = await usercollection.findOne({ _id: userId });
       if (!existingUser) {
         console.log("user nao encontrado");
         return res.status(409).json({
@@ -166,7 +166,7 @@ app.post(
       }
 
       await usercollection.updateOne(
-        { _id: userid },
+        { _id: userId },
         {
           $set: {
             feedback: true,
@@ -176,7 +176,7 @@ app.post(
       console.log("feedback true");
 
       const userData = {
-        userid: existingUser._id,
+        userId: existingUser._id,
         fullname: existingUser.fullname,
         email: existingUser.email,
         avaliacao: avaliacao,
@@ -192,7 +192,7 @@ app.post(
         message: "Feedback enviado com sucesso!",
         data: {
           user: {
-            userid: existingUser.userid,
+            userId: existingUser.userId,
             fullname: existingUser.fullname,
             email: existingUser.email,
           },
@@ -282,7 +282,7 @@ app.get(
       console.log(`Iniciando scraper do Pingo Doce para: ${termoBusca}`);
       const scraperOutput = await scraper_PingoDoce(termoBusca);
       console.log("[ ID ] -->" + req.user.userId);
-      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      await enviar_dadosscrapper_bd(req.user.userId, scraperOutput);
 
       res.json({
         message: "Scraper do Pingo Doce executado com sucesso!",
@@ -314,7 +314,7 @@ app.get(
       console.log(`Iniciando scraper do Continente para: ${termoBusca}`);
       const scraperOutput = await scraper_Continente(termoBusca);
       console.log("[ ID ] -->"+req.user.userId)
-      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      await enviar_dadosscrapper_bd(req.user.userId, scraperOutput);
 
       res.json({
         message: "Scraper do Continente executado com sucesso!",
@@ -345,7 +345,7 @@ app.get(
       console.log(`Iniciando scraper do Auchan para: ${termoBusca}`);
       const scraperOutput = await scraper_Auchan(termoBusca);
       console.log("[ ID ] -->"+req.user.userId)
-      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      await enviar_dadosscrapper_bd(req.user.userId, scraperOutput);
 
       res.json({
         message: "Scraper do Auchan executado com sucesso!",
@@ -376,7 +376,7 @@ app.get(
       console.log(`Iniciando scraper do Intermarche para: ${termoBusca}`);
       const scraperOutput = await scraper_Intermarche(termoBusca);
       console.log("[ ID ] -->"+req.user.userId)
-      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      await enviar_dadosscrapper_bd(req.user.userId, scraperOutput);
 
       res.json({
         message: "Scraper do Intermarche executado com sucesso!",
@@ -407,7 +407,7 @@ app.get(
       console.log(`Iniciando scraper do Lidl para: ${termoBusca}`);
       const scraperOutput = await scraper_lidl(termoBusca);
       console.log("[ ID ] -->"+req.user.userId)
-      await enviar_dadosscrapper_bd(req.user.userid, scraperOutput);
+      await enviar_dadosscrapper_bd(req.user.userId, scraperOutput);
 
       res.json({
         message: "Scraper do Lidl executado com sucesso!",
