@@ -1345,7 +1345,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #2b3a67;
+        color: #dfe6ff;
         font-size: 1.2rem;
         flex-shrink: 0;
       }
@@ -2422,7 +2422,6 @@
     `;
         });
 
-        // Abre o popup com os detalhes
         const overlay = document.getElementById("popupOverlay");
         const title = document.getElementById("popupTitle");
         const content = document.getElementById("popupContent");
@@ -2431,18 +2430,12 @@
 
         content.innerHTML = `
     <div style="margin-bottom: 1rem;">
-      <div style="display: flex; gap: 1rem; flex-wrap: wrap; background: rgba(43,58,103,0.05); padding: 0.8rem 1rem; border-radius: 12px; margin-bottom: 1rem;">
-        <span><strong>🛒 Produtos:</strong> ${total}</span>
-        <span><strong>🏪 Loja:</strong> ${loja}</span>
-        <span><strong>📅 Data:</strong> ${dataHora}</span>
-      </div>
       <div style="max-height: 400px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
         ${produtosHTML}
       </div>
       ${dados.products.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${dados.products.length} produtos</div>` : ""}
     </div>
   `;
-
         // Esconde o botão de confirmar e mostra o de fechar
         document.getElementById("confirmarPopupDIV").style.display = "none";
         document.getElementById("fecharPopupDIV").style.display = "inline-flex";
