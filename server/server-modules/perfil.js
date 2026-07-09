@@ -135,6 +135,7 @@ async function enviarFeedback(req, res) {
 }
 
 async function pegarhistorico(req, res) {
+  const userId = req.user.userId;
   const db = client.db("PoupIn");
   const usercollection = db.collection("users");
   const historicocollection = db.collection("users_historico");
