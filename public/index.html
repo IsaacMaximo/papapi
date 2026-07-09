@@ -1288,33 +1288,36 @@
           return;
         }
 
-        alert("Estrelas selecionadas: " + ratingValue + " de 5");
-
         const comentario = document.querySelector("textarea");
         if (comentario && comentario.value.trim() !== "") {
           console.log("Comentário:", comentario.value);
         }
+        if (!ratingValue) {
+          alert("a avaliação não pode ser vazia");
+        } else {
+          fetch(`${urlapi}/papapi/enviarfeedback`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              comentarioRAW: comentario.value,
+              avaliacaoRAW: ratingValue,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              if (data.success){
+                alert("Obrigado pelo feedback")
+              }
+            });
 
-        fetch(`${urlapi}/papapi/enviarfeedback`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            comentario: comentario,
-            avaliacao: ratingValue,
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log(data);
-          });
-
-        fecharpopup();
+          fecharpopup();
+        }
       }
 
-      // Fechar ao clicar no overlay
       document.addEventListener("DOMContentLoaded", function () {
         const overlay = document.getElementById("popupOverlay");
         overlay.addEventListener("click", function (e) {

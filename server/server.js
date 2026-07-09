@@ -4,8 +4,26 @@ const PORT = 1919;
 
 require("dotenv").config();
 
+const rateLimit = require("express-rate-limit");
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // 100 requisições por IP
+  message: {
+    success: false,
+    message: "Muitas requisições. Tente novamente mais tarde.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    const trustedIps = ["127.0.0.1", "::1", "192.168.1.1"];
+    return trustedIps.includes(req.ip);
+  },
+});
 
 const { connectToDatabase, client } = require("./server-modules/conndb.js");
+
+const helmet = require("helmet");
+app.use(helmet());
 
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
@@ -18,7 +36,7 @@ const allowedOrigins = [
   "http://localhost:5500",
   "http://127.0.0.1:5500",
   "https://api-pap.vercel.app",
-  "https://api-pap.vercel.app",
+  "https://api-pap.vercel.app/",
   "https://api-pap.vercel.app/papapi",
 ];
 app.use(
@@ -40,6 +58,7 @@ app.use(
 );
 
 app.use(express.json());
+app.set("trust proxy", 1);
 
 const {
   cadastrarUser,
@@ -60,10 +79,46 @@ app.post("/papapi/recuperar-senha", recuperarsenha);
 app.post("/papapi/verificarCodigo", verificarCodigo);
 app.post("/papapi/redefinir-senha-codigo", redefinirSenhaComCodigo);
 
+app.get("/papapi/meu-ip", (req, res) => {
+  const ipReal =
+    req.headers["x-real-ip"] ||
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.ip ||
+    req.connection.remoteAddress;
+
+  res.json({
+    success: true,
+    ip: ipReal,
+    headers: {
+      "x-real-ip": req.headers["x-real-ip"] || null,
+      "x-forwarded-for": req.headers["x-forwarded-for"] || null,
+      "x-vercel-forwarded-for": req.headers["x-vercel-forwarded-for"] || null,
+      "x-vercel-proxied-for": req.headers["x-vercel-proxied-for"] || null,
+      "cf-connecting-ip": req.headers["cf-connecting-ip"] || null, // Cloudflare
+    },
+
+    reqIp: req.ip,
+    connectionIp: req.connection?.remoteAddress,
+    socketIp: req.socket?.remoteAddress,
+  });
+});
+
 app.post("/papapi/enviarfeedback", autenticar, async (req, res) => {
   try {
-    const { avaliacao, comentario } = req.body;
-    console.log("feedback recebido = (", avaliacao, ") --> ", comentario)
+    const { avaliacaoRAW, comentarioRAW } = req.body;
+
+    const comentario = String(comentarioRAW || "").trim();
+
+    avaliacao = Math.floor(Math.abs(Number(avaliacaoRAW))) || 0;
+
+    if (avaliacao < 1 || avaliacao > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Avaliação deve ser entre 1 e 5",
+      });
+    }
+
+    console.log("feedback recebido = (", avaliacao, ") --> ", comentario);
     const email = req.user.email;
 
     const db = client.db("PoupIn");
@@ -189,9 +244,7 @@ app.get("/papapi/run-scraper-pingodoce", async (req, res) => {
     }
 
     console.log(`Iniciando scraper do Pingo Doce para: ${termoBusca}`);
-    const scraperOutput = await scraper_PingoDoce(
-      termoBusca,
-    );
+    const scraperOutput = await scraper_PingoDoce(termoBusca);
     res.json({
       message: "Scraper do Pingo Doce executado com sucesso!",
       output: scraperOutput,
@@ -215,10 +268,7 @@ app.get("/papapi/run-scraper-continente", async (req, res) => {
     }
 
     console.log(`Iniciando scraper do Continente para: ${termoBusca}`);
-    const scraperOutput = await scraper_Continente(
-
-      termoBusca,
-    );
+    const scraperOutput = await scraper_Continente(termoBusca);
     res.json({
       message: "Scraper do Continente executado com sucesso!",
       output: scraperOutput,
@@ -241,9 +291,7 @@ app.get("/papapi/run-scraper-Auchan", async (req, res) => {
     }
 
     console.log(`Iniciando scraper do Auchan para: ${termoBusca}`);
-    const scraperOutput = await scraper_Auchan(
-      termoBusca,
-    );
+    const scraperOutput = await scraper_Auchan(termoBusca);
     res.json({
       message: "Scraper do Auchan executado com sucesso!",
       output: scraperOutput,
@@ -266,9 +314,7 @@ app.get("/papapi/run-scraper-Intermarche", async (req, res) => {
     }
 
     console.log(`Iniciando scraper do Intermarche para: ${termoBusca}`);
-    const scraperOutput = await scraper_Intermarche(
-      termoBusca,
-    );
+    const scraperOutput = await scraper_Intermarche(termoBusca);
     res.json({
       message: "Scraper do Intermarche executado com sucesso!",
       output: scraperOutput,
@@ -291,9 +337,7 @@ app.get("/papapi/run-scraper-lidl", async (req, res) => {
     }
 
     console.log(`Iniciando scraper do Lidl para: ${termoBusca}`);
-    const scraperOutput = await scraper_lidl(
-      termoBusca,
-    );
+    const scraperOutput = await scraper_lidl(termoBusca);
     res.json({
       message: "Scraper do Lidl executado com sucesso!",
       output: scraperOutput,
