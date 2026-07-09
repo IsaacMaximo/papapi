@@ -50,8 +50,6 @@ async function enviar_dadosscrapper_bd(userId, dadosscrapper) {
         dados: [],
         createdAt: new Date(),
       };
-      console.log("userId:" + userId);
-      console.log("existingUser._id,:" + existingUser._id);
       const result = await historicocollection.insertOne(novoHistorico);
       historico = result;
       console.log("✅ Histórico criado!");
@@ -134,85 +132,15 @@ app.post(
   redefinirSenhaComCodigo,
 );
 
-app.post(
-  "/papapi/enviarfeedback",
-  rateLimiter,
-  autenticar,
-  async (req, res) => {
-    try {
-      const { avaliacaoRAW, comentarioRAW } = req.body;
+const {
+  perfilUsuario,
+  enviarFeedback,
+  pegarhistorico,
+} = require("./server-modules/perfil.js");
 
-      const comentario = String(comentarioRAW || "").trim();
-
-      avaliacao = Math.floor(Math.abs(Number(avaliacaoRAW))) || 0;
-
-      if (avaliacao < 1 || avaliacao > 5) {
-        return res.status(400).json({
-          success: false,
-          message: "Avaliação deve ser entre 1 e 5",
-        });
-      }
-
-      console.log("feedback recebido = (", avaliacao, ") --> ", comentario);
-      const email = req.user.userId;
-
-      const existingUser = await usercollection.findOne({ _id: userId });
-      if (!existingUser) {
-        console.log("user nao encontrado");
-        return res.status(409).json({
-          success: false,
-          message: "Usuário não encontrado",
-        });
-      }
-
-      await usercollection.updateOne(
-        { _id: userId },
-        {
-          $set: {
-            feedback: true,
-          },
-        },
-      );
-      console.log("feedback true");
-
-      const userData = {
-        userId: existingUser._id,
-        fullname: existingUser.fullname,
-        email: existingUser.email,
-        avaliacao: avaliacao,
-        comentario: comentario || "",
-        createdAt: new Date(),
-      };
-
-      console.log("[!] userdata --->", userData);
-
-      const result = await feedbackcollection.insertOne(userData);
-      return res.status(201).json({
-        success: true,
-        message: "Feedback enviado com sucesso!",
-        data: {
-          user: {
-            userId: existingUser.userId,
-            fullname: existingUser.fullname,
-            email: existingUser.email,
-          },
-          feedback: {
-            avaliacao: avaliacao,
-            comentario: comentario,
-            createdAt: new Date(),
-          },
-        },
-      });
-    } catch (error) {
-      console.error("Erro ao enviar feedback:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Erro interno ao processar o feedback",
-        error: error.message,
-      });
-    }
-  },
-);
+app.post("/papapi/perfil", rateLimiter, autenticar, perfilUsuario);
+app.post("/papapi/enviarfeedback", rateLimiter, autenticar, enviarFeedback);
+app.post("/papapi/pegarhistorico", rateLimiter, autenticar, pegarhistorico);
 
 app.get("/papapi/getambiente", (req, res) => {
   res.json({
@@ -313,7 +241,7 @@ app.get(
 
       console.log(`Iniciando scraper do Continente para: ${termoBusca}`);
       const scraperOutput = await scraper_Continente(termoBusca);
-      console.log("[ ID ] -->"+req.user.userId)
+      console.log("[ ID ] -->" + req.user.userId);
       await enviar_dadosscrapper_bd(req.user.userId, scraperOutput);
 
       res.json({
@@ -344,7 +272,7 @@ app.get(
 
       console.log(`Iniciando scraper do Auchan para: ${termoBusca}`);
       const scraperOutput = await scraper_Auchan(termoBusca);
-      console.log("[ ID ] -->"+req.user.userId)
+      console.log("[ ID ] -->" + req.user.userId);
       await enviar_dadosscrapper_bd(req.user.userId, scraperOutput);
 
       res.json({
@@ -375,7 +303,7 @@ app.get(
 
       console.log(`Iniciando scraper do Intermarche para: ${termoBusca}`);
       const scraperOutput = await scraper_Intermarche(termoBusca);
-      console.log("[ ID ] -->"+req.user.userId)
+      console.log("[ ID ] -->" + req.user.userId);
       await enviar_dadosscrapper_bd(req.user.userId, scraperOutput);
 
       res.json({
@@ -406,7 +334,7 @@ app.get(
 
       console.log(`Iniciando scraper do Lidl para: ${termoBusca}`);
       const scraperOutput = await scraper_lidl(termoBusca);
-      console.log("[ ID ] -->"+req.user.userId)
+      console.log("[ ID ] -->" + req.user.userId);
       await enviar_dadosscrapper_bd(req.user.userId, scraperOutput);
 
       res.json({

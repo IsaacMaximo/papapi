@@ -1150,6 +1150,8 @@
       </div>
     </footer>
     <script>
+      preencherpaguser();
+
       let ratingValue = 0;
 
       function rateStar(n) {
@@ -1309,8 +1311,8 @@
             .then((response) => response.json())
             .then((data) => {
               console.log(data);
-              if (data.success){
-                alert("Obrigado pelo feedback")
+              if (data.success) {
+                alert("Obrigado pelo feedback");
               }
             });
 
@@ -1789,7 +1791,23 @@
         }
       }
 
-      preencherpaguser();
+      async function pegarhistorico() {
+        try {
+          const response = await fetch(`${urlapi}/papapi/pegarhistorico`, {
+            method: "POST",
+            credentials: "include",
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log("historico:", data);
+        } catch (error) {
+          console.error("Erro ao buscar dados:", error);
+        }
+      }
 
       async function logout() {
         try {
