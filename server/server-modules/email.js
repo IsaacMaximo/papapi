@@ -34,3 +34,6 @@ async function enviaremail(to, conteudo) {
   }
 }
 
+module.exports = {
+  enviaremail,
+};
