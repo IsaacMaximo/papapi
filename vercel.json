@@ -23,6 +23,10 @@
       "dest": "public/visual/$1"
     },
     {
+      "src": "/assets/(.*)",
+      "dest": "assets/js/$1"
+    },
+    {
       "src": "/",
       "dest": "public/login.html"
     },
