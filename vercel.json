@@ -23,7 +23,7 @@
       "dest": "public/visual/$1"
     },
     {
-      "src": "/js/(.*)",
+      "src": "/assets/js/(.*)",
       "dest": "assets/js/$1"
     },
     {
