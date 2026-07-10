@@ -1804,43 +1804,36 @@
           .then((response) => response.json())
           .then((data) => {
             if (!data.success) {
-              if (CONFIG.ambiente === "dev") {
-                console.log(
-                  "Token inválido ou ausente. Redirecionando para /login.html (dev)",
-                );
-                //window.location.href = "/public/login.html";
+              // ✅ IMPORTANTE: Verificar se já está na página de login
+              const isLoginPage =
+                window.location.pathname === "/" ||
+                window.location.pathname === "/login.html" ||
+                window.location.pathname === "/public/login.html";
+
+              if (!isLoginPage) {
+                console.log("Token inválido. Redirecionando para login...");
+                window.location.href = "/";
               } else {
                 console.log(
-                  "Token inválido ou ausente. Redirecionando para /login.html (prod)",
+                  "Já está na página de login. Sem redirecionamento.",
                 );
-                fetch(`${urlapi}/papapi/refresh-token`, {
-                  method: "POST",
-                  credentials: "include",
-                })
-                  .then((response) => response.json())
-                  .then((data) => {
-                    console.log("resultado refresh:" + data);
-                  });
-                window.location.href = "/";
               }
-            }
-            if (data.success) {
-              console.log("Token válido. Acesso permitido.");
+            } else {
+              const isLoginPage =
+                window.location.pathname === "/" ||
+                window.location.pathname === "/login.html" ||
+                window.location.pathname === "/public/login.html";
+
+              if (isLoginPage) {
+                console.log("Token válido. Redirecionando para o app...");
+                window.location.href = "/app/";
+              } else {
+                console.log("Token válido. Acesso permitido.");
+              }
             }
           })
           .catch((error) => {
             console.error("Erro ao verificar token:", error);
-            if (CONFIG.ambiente === "dev") {
-              console.log(
-                "Erro ao verificar token. Redirecionando para /login.html (dev)",
-              );
-              window.location.href = "/login.html";
-            } else {
-              console.log(
-                "Erro ao verificar token. Redirecionando para /login.html (prod)",
-              );
-              window.location.href = "/";
-            }
           });
       }
       verificarToken();
