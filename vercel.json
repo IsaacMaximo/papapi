@@ -26,6 +26,10 @@
     {
       "src": "/(.*)",
       "dest": "public/$1"
+    },
+    {
+      "src": "/app/(.*)",
+      "dest": "public/index.html"
     }
   ]
 }
