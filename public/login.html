@@ -148,7 +148,6 @@
           </form>
         </div>
 
-        <!-- PAINEL DE RECUPERAR SENHA -->
         <div id="tab-forgot" class="tab-panel">
           <div class="brand-icon">
             <i class="fas fa-key"></i>
@@ -177,6 +176,43 @@
               <a href="#" class="switch-tab-link" data-tab="login"
                 ><i class="fas fa-arrow-left"></i> Voltar ao login</a
               >
+            </p>
+          </form>
+        </div>
+
+        <div id="tab-verify-code" class="tab-panel">
+          <div class="brand-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h2>Verificação em duas etapas</h2>
+          <p class="subhead">
+            Digite o código de 6 dígitos enviado para seu e-mail
+          </p>
+
+          <form id="verifyCodeForm" autocomplete="off">
+            <div class="input-group">
+              <i class="fas fa-key"></i>
+              <input
+                type="text"
+                id="verificationCode"
+                placeholder="Código de 6 dígitos"
+                maxlength="6"
+                required
+              />
+            </div>
+
+            <button
+              type="button"
+              onclick="verificarCodigoAcesso()"
+              class="login-btn"
+            >
+              <i class="fas fa-check-circle"></i> Verificar Código
+            </button>
+
+            <p class="switch-cta">
+              <a href="#" onclick="voltarLogin()">
+                <i class="fas fa-arrow-left"></i> Voltar ao login
+              </a>
             </p>
           </form>
         </div>
@@ -556,6 +592,7 @@
         login: document.getElementById("tab-login"),
         signup: document.getElementById("tab-signup"),
         forgot: document.getElementById("tab-forgot"),
+        verifyCode: document.getElementById("tab-verify-code"),
       };
 
       function switchTab(tabId) {
@@ -615,6 +652,8 @@
         const rememberMe = document.getElementById("rememberMe").checked;
 
         console.log(`Tentativa de login com Email: ${email}`);
+
+        LoadingOverlay.show("Verificando user");
         fetch(`${urlapi}/papapi/loginuser/`, {
           credentials: "include",
           method: "POST",
@@ -629,23 +668,77 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Resposta do servidor:", data);
             if (data.success) {
-              const redirectPath =
-                CONFIG.ambiente === "prod" ? "/app/" : "/public/index.html";
-              console.log(
-                "Login bem-sucedido! Redirecionando para",
-                redirectPath,
+              document
+                .getElementById("tab-verify-code")
+                .querySelector("form").dataset.email = email.trim();
+              switchTab("verifyCode");
+              document.getElementById("verificationCode").value = "";
+
+              ToastNotification.success(
+                "Código de verificação enviado para seu email!",
               );
-              window.location.href = redirectPath;
             } else {
               console.error("Falha no Login:", data.message);
-              alert("Falha no Login: " + data.message);
+              ToastNotification.error("Falha no Login: " + data.message);
             }
+            LoadingOverlay.hide();
           })
           .catch((error) => {
             console.error("Erro:", error);
-            alert("ERRO: ", error);
+            ToastNotification.error("ERRO: " + error);
+            LoadingOverlay.hide();
+          });
+      }
+
+      function verificarCodigoAcesso() {
+        const form = document.querySelector("#tab-verify-code form");
+        const email = form.dataset.email;
+        const code = document.getElementById("verificationCode").value;
+
+        if (!code || code.length !== 6) {
+          ToastNotification.info(
+            "Por favor, digite o código de 6 dígitos enviado para seu e-mail.",
+          );
+          return;
+        }
+
+        const btn = document.querySelector("#tab-verify-code .login-btn");
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+        btn.disabled = true;
+
+        fetch(`${urlapi}/papapi/recebercodeLogin`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            code: code,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Resposta da verificação:", data);
+            if (data.success) {
+              const redirectPath =
+                CONFIG.ambiente === "prod" ? "/app/" : "/public/index.html";
+              window.location.href = redirectPath;
+            } else {
+              ToastNotification.error(
+                data.message || "Código inválido ou expirado.",
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Erro ao verificar código:", error);
+            ToastNotification.error("Erro ao conectar ao servidor.");
+          })
+          .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
           });
       }
 
@@ -656,7 +749,12 @@
         const confirm = document.getElementById("confirmPassword").value;
 
         if (password !== confirm) {
-          alert("As senhas não coincidem.");
+          ToastNotification.error("As senhas não coincidem.");
+          return;
+        }
+
+        if (password.length < 6) {
+          ToastNotification.warning("A senha deve ter pelo menos 6 caracteres");
           return;
         }
 
@@ -678,29 +776,27 @@
           .then((data) => {
             console.log("Resposta do servidor:", data);
             if (data.success) {
-              alert("Cadastro realizado com sucesso!");
+              ToastNotification.success("Cadastro realizado com sucesso!");
               switchTab("login");
             } else {
               console.error("Falha no cadastro:", data.message);
-              alert("Falha no cadastro: " + data.message);
+              ToastNotification.error("Falha no cadastro: " + data.message);
             }
           })
           .catch((error) => {
             console.error("Erro:", error);
-            alert("Ocorreu um erro ao tentar cadastrar.");
+            ToastNotification.error("Ocorreu um erro ao tentar cadastrar.");
           });
       }
 
-      // Função atualizada de recuperação (envia email)
       function recuperarSenha() {
         const email = document.getElementById("forgotEmail").value;
 
         if (!email.trim()) {
-          alert("Por favor, digite seu e-mail.");
+          ToastNotification.warning("Por favor, digite seu e-mail.");
           return;
         }
 
-        // Mostra loading
         const btn = document.querySelector("#tab-forgot .login-btn");
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
@@ -718,15 +814,18 @@
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
-              // Mostra campo para digitar o código
               mostrarCampoCodigo(email, data.code);
             } else {
-              alert("❌ " + (data.message || "Falha ao recuperar senha"));
+              ToastNotification.error(
+                data.message || "Falha ao recuperar senha",
+              );
             }
           })
           .catch((error) => {
             console.error("Erro:", error);
-            alert("❌ Ocorreu um erro ao tentar recuperar a senha.");
+            ToastNotification.error(
+              "Ocorreu um erro ao tentar recuperar a senha.",
+            );
           })
           .finally(() => {
             btn.innerHTML = originalText;
@@ -738,35 +837,33 @@
         const panel = document.getElementById("tab-forgot");
         const form = panel.querySelector("form");
 
-        // Salva o email para uso posterior
         form.dataset.email = email;
         form.dataset.code = code;
 
-        // Modifica o formulário
         form.innerHTML = `
-    <div class="input-group">
-      <i class="fas fa-key"></i>
-      <input type="text" id="resetCode" placeholder="Digite o código enviado" maxlength="6" required />
-    </div>
-    <div class="input-group">
-      <i class="fas fa-lock"></i>
-      <input type="password" id="newPassword" placeholder="Nova senha" required />
-    </div>
-    <div class="input-group">
-      <i class="fas fa-check-circle"></i>
-      <input type="password" id="confirmNewPassword" placeholder="Confirmar nova senha" required />
-    </div>
+          <div class="input-group">
+            <i class="fas fa-key"></i>
+            <input type="text" id="resetCode" placeholder="Digite o código enviado" maxlength="6" required />
+          </div>
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="newPassword" placeholder="Nova senha" required />
+          </div>
+          <div class="input-group">
+            <i class="fas fa-check-circle"></i>
+            <input type="password" id="confirmNewPassword" placeholder="Confirmar nova senha" required />
+          </div>
 
-    <button type="button" onclick="confirmarCodigo()" class="login-btn">
-      <i class="fas fa-check"></i> Redefinir Senha
-    </button>
+          <button type="button" onclick="confirmarCodigo()" class="login-btn">
+            <i class="fas fa-check"></i> Redefinir Senha
+          </button>
 
-    <p class="switch-cta">
-      <a href="#" onclick="voltarRecuperacao()">
-        <i class="fas fa-arrow-left"></i> Voltar
-      </a>
-    </p>
-  `;
+          <p class="switch-cta">
+            <a href="#" onclick="voltarRecuperacao()">
+              <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+          </p>
+        `;
       }
 
       function confirmarCodigo() {
@@ -778,17 +875,19 @@
           document.getElementById("confirmNewPassword").value;
 
         if (!code || code.length !== 6) {
-          alert("Digite o código de 6 dígitos enviado para seu email");
+          ToastNotification.warning(
+            "Digite o código de 6 dígitos enviado para seu email",
+          );
           return;
         }
 
         if (newPassword.length < 6) {
-          alert("A senha deve ter pelo menos 6 caracteres");
+          ToastNotification.info("A senha deve ter pelo menos 6 caracteres");
           return;
         }
 
         if (newPassword !== confirmPassword) {
-          alert("As senhas não coincidem");
+          ToastNotification.error("As senhas não coincidem");
           return;
         }
 
@@ -811,19 +910,19 @@
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
-              alert("✅ Senha redefinida com sucesso!");
-              // Volta para o login
+              ToastNotification.success("Senha redefinida com sucesso!");
               switchTab("login");
-              // Limpa campos
               document.getElementById("email").value = "";
               document.getElementById("password").value = "";
             } else {
-              alert("❌ " + (data.message || "Erro ao redefinir senha"));
+              ToastNotification.error(
+                data.message || "Erro ao redefinir senha",
+              );
             }
           })
           .catch((error) => {
             console.error("Erro:", error);
-            alert("❌ Erro ao conectar ao servidor");
+            ToastNotification.error("Erro ao conectar ao servidor");
           })
           .finally(() => {
             btn.innerHTML = originalText;
@@ -832,9 +931,51 @@
       }
 
       function voltarRecuperacao() {
-
         location.reload();
       }
+
+      function voltarLogin() {
+        switchTab("login");
+
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("verificationCode").value = "";
+
+        const form = document.querySelector("#tab-verify-code form");
+        if (form) delete form.dataset.email;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("loginForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            loginuser();
+          });
+
+        document
+          .getElementById("signupForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            cadastraruser();
+          });
+
+        document
+          .getElementById("forgotForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            recuperarSenha();
+          });
+
+        document
+          .getElementById("verifyCodeForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            verificarCodigoAcesso();
+          });
+      });
     </script>
+    <script src="assets/js/loading.js"></script>
+    <script src="assets/js/toast.js"></script>
   </body>
 </html>

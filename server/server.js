@@ -112,6 +112,7 @@ const rateLimiter = rateLimit({
 const {
   cadastrarUser,
   loginUser,
+  recebercodeLogin,
   logoutUser,
   refreshToken,
   autenticar,
@@ -122,6 +123,7 @@ const {
 
 app.post("/papapi/cadastraruser", rateLimiter, cadastrarUser);
 app.post("/papapi/loginuser", rateLimiter, loginUser);
+app.post("/papapi/recebercodeLogin", rateLimiter, recebercodeLogin);
 app.post("/papapi/logout", rateLimiter, logoutUser);
 app.post("/papapi/refresh-token", rateLimiter, refreshToken);
 app.post("/papapi/recuperar-senha", rateLimiter, recuperarsenha);

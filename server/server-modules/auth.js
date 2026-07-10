@@ -30,6 +30,13 @@ function normalizeUserId(userId) {
 
   return userId;
 }
+function normalizeEmail(email) {
+  if (!email) return email;
+
+  let normalized = email.trim().toLowerCase();
+
+  return normalized;
+}
 
 // ========== FUNÇÕES DE HASH ==========
 async function hashPassword(passparahash) {
@@ -175,12 +182,20 @@ const autenticar = async (req, res, next) => {
 
 async function cadastrarUser(req, res) {
   try {
-    const { fullname, email, password } = req.body;
+    let { fullname, email, password } = req.body;
+    email = normalizeEmail(email);
 
     if (!fullname || !email || !password) {
       return res.status(400).json({
         success: false,
         message: "Todos os campos são obrigatórios: fullname, email, password",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "A senha deve ter pelo menos 6 caracteres",
       });
     }
 
@@ -235,7 +250,8 @@ async function cadastrarUser(req, res) {
 
 async function loginUser(req, res) {
   try {
-    const { email, password, rememberMe } = req.body;
+    let { email, password, rememberMe } = req.body;
+    email = normalizeEmail(email);
 
     if (!email || !password) {
       return res.status(400).json({
@@ -265,85 +281,54 @@ async function loginUser(req, res) {
     const senhaValida = await verificarPassword(password, hashArmazenado);
 
     if (senhaValida) {
-      console.log(`✅ Login bem-sucedido: ${email}`);
-
-      const payload = {
-        userId: usuario._id,
-        email: usuario.email,
-        fullname: usuario.fullname,
-        version:
-          typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0,
-      };
-      const accessToken = jwt.sign(payload, jwtSecret, {
-        expiresIn: JWT_EXPIRES_IN,
-      });
-
-      const cookieOptions = {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
-        maxAge: 15 * 60 * 1000,
-        path: "/",
-      };
-
-      res.cookie("token", accessToken, cookieOptions);
-
-      if (rememberMe) {
-        console.log(`✅ Usuário optou por "Lembrar de mim": ${email}`);
-        const payloadRefresh = {
-          userId: usuario._id,
-          email: usuario.email,
-          version:
-            typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0,
-        };
-        const refreshToken = jwt.sign(payloadRefresh, JWT_REFRESH_SECRET, {
-          expiresIn: JWT_REFRESH_EXPIRES_IN,
-        });
-
-        const refreshOptions = {
-          httpOnly: true,
-          secure: isProduction,
-          sameSite: isProduction ? "none" : "lax",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-          path: "/api/refresh",
-        };
-
-        if (isProduction) {
-          refreshOptions.domain = ".vercel.app";
-        }
-
-        res.cookie("refreshToken", refreshToken, refreshOptions);
-
-        await collection.updateOne(
-          { _id: usuario._id },
-          {
-            $set: {
-              refreshToken: refreshToken,
-              lastLogin: new Date(),
-            },
+      const LoginCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 600000);
+      await collection.updateOne(
+        { email: email },
+        {
+          $set: {
+            LoginCode: LoginCode,
+            LoginCodeExpires: expiresAt,
           },
-        );
-      } else {
-        console.log(`ℹ️ Usuário NÃO optou por "Lembrar de mim": ${email}`);
-        await collection.updateOne(
-          { _id: usuario._id },
-          {
-            $unset: { refreshToken: "" },
-            $set: { lastLogin: new Date() },
-          },
-        );
-      }
-
-      return res.json({
-        success: true,
-        message: "Login realizado com sucesso!",
-        user: {
-          id: usuario._id,
-          fullname: usuario.fullname,
-          email: usuario.email,
-          createdAt: usuario.createdAt,
         },
-        expiresIn: 15 * 60,
+      );
+
+      var paraquem = email;
+      var subject_msg = "Codigo de verificação Email";
+      var texto_msg = `Codigo de verificação: ${LoginCode}     Esse codigo é vaido por: ${expiresAt}`;
+      var html_msg = `
+        <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;background:#fff;padding:40px;border-radius:20px;border:1px solid #e9edf4;">
+            <h1 style="font-size:28px;color:#1a2634;text-align:center;">
+                Poup<span style="color:#3b82f6;">In</span>
+            </h1>
+            <h2 style="font-size:22px;color:#0f172a;text-align:center;">Iniciar conta</h2>
+            <p style="color:#475569;text-align:center;font-size:15px;">Use o código abaixo para fazer o login na conta:</p>
+            <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:16px;padding:28px;text-align:center;margin:20px 0;">
+                <div style="font-size:42px;font-weight:700;letter-spacing:10px;color:#0f172a;font-family:'Courier New',monospace;background:#fff;padding:12px 20px;border-radius:12px;display:inline-block;">
+                    ${LoginCode}
+                </div>
+                <p style="color:#64748b;margin-top:16px;font-size:13px;">
+                    ⏱️ Válido por 10 minutos<br>
+                    <span style="font-size:12px;color:#94a3b8;">Expira em: ${expiresAt.toLocaleString("pt-pt")}</span>
+                </p>
+            </div>
+            <p style="text-align:center;color:#94a3b8;font-size:13px;">Se você não solicitou, ignore este email.</p>
+            <hr style="border:none;border-top:1px solid #e9edf4;margin:20px 0;">
+            <p style="text-align:center;color:#cbd5e1;font-size:12px;">© 2026 PoupIn</p>
+        </div>
+        `;
+
+      var conteudodamensgem = {
+        subject: subject_msg,
+        text: texto_msg,
+        html: html_msg,
+      };
+
+      await enviaremail(paraquem, conteudodamensgem);
+
+      res.json({
+        success: true,
+        message: "codigo enviado na bd",
       });
     } else {
       console.log(`❌ Senha incorreta para: ${email}`);
@@ -357,6 +342,127 @@ async function loginUser(req, res) {
     return res.status(500).json({
       success: false,
       message: "Erro ao fazer login",
+      error: error.message,
+    });
+  }
+}
+
+async function recebercodeLogin(req, res) {
+  let { email, code } = req.body;
+  email = normalizeEmail(email);
+
+  const db = client.db("PoupIn");
+  const collection = db.collection("users");
+
+  console.log("email do user: " + email);
+  console.log("code enviado pelo user: " + code);
+
+  const usuario = await collection.findOne({
+    email: email,
+    LoginCode: code,
+    LoginCodeExpires: { $gt: new Date() },
+  });
+
+  if (!usuario) {
+    return res.status(400).json({
+      success: false,
+      message: "Código inválido ou expirado",
+    });
+  }
+
+  try {
+    await collection.updateOne(
+      { _id: usuario._id },
+      {
+        $unset: { LoginCode: "", LoginCodeExpires: "" },
+        $set: { lastLogin: new Date() },
+      },
+    );
+
+    const payload = {
+      userId: usuario._id,
+      email: usuario.email,
+      fullname: usuario.fullname,
+      version:
+        typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0,
+    };
+
+    const accessToken = jwt.sign(payload, jwtSecret, {
+      expiresIn: JWT_EXPIRES_IN,
+    });
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 15 * 60 * 1000,
+      path: "/",
+    };
+
+    res.cookie("token", accessToken, cookieOptions);
+
+    const rememberMe = req.body.rememberMe || false;
+
+    if (rememberMe) {
+      console.log(`✅ Usuário optou por "Lembrar de mim": ${email}`);
+      const payloadRefresh = {
+        userId: usuario._id,
+        email: usuario.email,
+        version:
+          typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0,
+      };
+      const refreshToken = jwt.sign(payloadRefresh, JWT_REFRESH_SECRET, {
+        expiresIn: JWT_REFRESH_EXPIRES_IN,
+      });
+
+      const refreshOptions = {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: "/api/refresh",
+      };
+
+      if (isProduction) {
+        refreshOptions.domain = ".vercel.app";
+      }
+
+      res.cookie("refreshToken", refreshToken, refreshOptions);
+
+      await collection.updateOne(
+        { _id: usuario._id },
+        {
+          $set: {
+            refreshToken: refreshToken,
+          },
+        },
+      );
+    } else {
+      console.log(`Usuário NÃO optou por "Lembrar de mim": ${email}`);
+      await collection.updateOne(
+        { _id: usuario._id },
+        {
+          $unset: { refreshToken: "" },
+        },
+      );
+    }
+
+    return res.json({
+      success: true,
+      message: "Login realizado com sucesso!",
+      user: {
+        id: usuario._id,
+        fullname: usuario.fullname,
+        email: usuario.email,
+        createdAt: usuario.createdAt,
+      },
+      expiresIn: 15 * 60,
+    });
+  } catch (error) {
+    console.error("❌ Erro ao gerar token:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao processar login",
       error: error.message,
     });
   }
@@ -504,7 +610,8 @@ async function refreshToken(req, res) {
 }
 
 async function recuperarsenha(req, res) {
-  const { email } = req.body;
+  let { email } = req.body;
+  email = normalizeEmail(email);
 
   const db = client.db("PoupIn");
   const collection = db.collection("users");
@@ -526,7 +633,6 @@ async function recuperarsenha(req, res) {
       $set: {
         resetCode: resetCode,
         resetCodeExpires: expiresAt,
-        resetEmail: email,
       },
     },
   );
@@ -572,7 +678,8 @@ async function recuperarsenha(req, res) {
 }
 
 async function verificarCodigo(req, res) {
-  const { email, code } = req.body;
+  let { email, code } = req.body;
+  email = normalizeEmail(email);
 
   const db = client.db("PoupIn");
   const collection = db.collection("users");
@@ -597,7 +704,8 @@ async function verificarCodigo(req, res) {
 }
 
 async function redefinirSenhaComCodigo(req, res) {
-  const { email, code, newPassword } = req.body;
+  let { email, code, newPassword } = req.body;
+  email = normalizeEmail(email);
 
   if (!email || !code || !newPassword) {
     return res.status(400).json({
@@ -641,7 +749,6 @@ async function redefinirSenhaComCodigo(req, res) {
       $unset: {
         resetCode: "",
         resetCodeExpires: "",
-        resetEmail: "",
       },
     },
   );
@@ -655,6 +762,7 @@ async function redefinirSenhaComCodigo(req, res) {
 module.exports = {
   cadastrarUser,
   loginUser,
+  recebercodeLogin,
   logoutUser,
   refreshToken,
   autenticar,
