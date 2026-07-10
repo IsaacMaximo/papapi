@@ -576,7 +576,7 @@
             }
             if (data.success) {
               const redirectPath =
-                CONFIG.ambiente === "prod" ? "/index.html" : "/app/";
+                CONFIG.ambiente === "prod" ? "/app/" : "/index.html";
               console.log("Token válido. Redirecionando para", redirectPath);
               window.location.href = redirectPath;
             }
