@@ -55,11 +55,21 @@ async function enviar_dadosscrapper_bd(userId, dadosscrapper) {
       console.log("✅ Histórico criado!");
     }
 
+    const normalizedDados = {
+      ...dadosscrapper,
+      search: dadosscrapper.search || { url: "", term: "" },
+      summary: dadosscrapper.summary || { total_products: 0 },
+      products: Array.isArray(dadosscrapper.products)
+        ? dadosscrapper.products
+        : [],
+      timestamp: dadosscrapper.timestamp || new Date().toISOString(),
+    };
+
     await historicocollection.updateOne(
       { userId: existingUser._id },
       {
         $push: {
-          dados: dadosscrapper,
+          dados: normalizedDados,
         },
       },
     );
