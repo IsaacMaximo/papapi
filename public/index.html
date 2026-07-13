@@ -1030,7 +1030,6 @@
         background: rgba(0, 0, 0, 0.1);
       }
 
-      /* ===== HISTÓRICO ===== */
       #historicoContainer {
         padding: 0;
         max-width: 1100px;
@@ -2598,9 +2597,7 @@
           .catch(() => alert("Erro ao enviar feedback. Tente novamente."));
       }
 
-      // ===== AUTENTICAÇÃO =====
       function verificarToken() {
-        
         fetch(`${urlapi}/papapi/verificar-token`, {
           method: "GET",
           credentials: "include",
@@ -2615,17 +2612,15 @@
               } else {
                 console.log("Token inválido. Redirecionando para / (prod)");
                 ToastNotification.info(
-                "Login invalido, redirecionando para tela de login..."
-              );
+                  "Login invalido, redirecionando para tela de login...",
+                );
 
                 window.location.href = "/";
               }
             }
             if (data.success) {
               console.log("Token válido. Acesso permitido.");
-              ToastNotification.success(
-                "Login bem sucedido",
-              );
+              ToastNotification.success("Login bem sucedido");
             }
           })
           .catch((error) => {
@@ -2638,9 +2633,7 @@
               console.log(
                 "Erro ao verificar token. Redirecionando para / (prod)",
               );
-              ToastNotification.error(
-                "erro interno",
-              );
+              ToastNotification.error("erro interno");
               window.location.href = "/";
             }
           });
@@ -2659,9 +2652,7 @@
           return await response.json();
         } catch (error) {
           console.error("Erro:", error);
-                        ToastNotification.error(
-                "erro interno",
-              );
+          ToastNotification.error("erro interno");
           return { success: false, message: error.message };
         }
       }
@@ -2680,9 +2671,7 @@
 
             updateMobileUser(user.fullname);
           } else {
-                          ToastNotification.error(
-                "erro ao buscar informacoes do usuario",
-              );
+            ToastNotification.error("erro ao buscar informacoes do usuario");
             document.getElementById("userFullName").textContent = "Visitante";
             document.getElementById("userAvatar").textContent = "?";
             updateMobileUser("Visitante");
@@ -2694,7 +2683,6 @@
       }
       preencherpaguser();
 
-      // ===== FUNÇÕES DO SCRAPER =====
       function enableButtons() {
         document
           .querySelectorAll(".search-section button")
@@ -2702,9 +2690,7 @@
       }
 
       function displayResults(loja, data) {
-                      ToastNotification.success(
-                `resultados carregados de ${loja}`,
-              );
+        ToastNotification.success(`resultados carregados de ${loja}`);
         const resultsDiv = document.getElementById("results");
         let html = `<div class="store-section" data-store="${loja}">
           <div class="store-header">
@@ -2827,6 +2813,7 @@
                   parseFloat(a.dataset.price || 0) -
                   parseFloat(b.dataset.price || 0),
               );
+              ToastNotification.success("filtro aplicado com sucesso");
               break;
             case "maior-preco":
               sortedProducts.sort(
@@ -2834,22 +2821,28 @@
                   parseFloat(b.dataset.price || 0) -
                   parseFloat(a.dataset.price || 0),
               );
+              ToastNotification.success("filtro aplicado com sucesso");
               break;
             case "az":
               sortedProducts.sort((a, b) =>
                 (a.dataset.name || "").localeCompare(b.dataset.name || ""),
               );
+              ToastNotification.success("filtro aplicado com sucesso");
               break;
             case "za":
               sortedProducts.sort((a, b) =>
                 (b.dataset.name || "").localeCompare(a.dataset.name || ""),
               );
+              ToastNotification.success("filtro aplicado com sucesso");
               break;
             case "todos":
               sortedProducts = [...filteredCards];
+              ToastNotification.success("filtro aplicado com sucesso");
               break;
             default:
+              ToastNotification.success("filtro aplicado com sucesso");
               return;
+            
           }
 
           allCards.forEach((card) => {
@@ -2914,9 +2907,7 @@
           `;
           resultsDiv.appendChild(noResultsMsg);
         }
-                      ToastNotification.success(
-                "filtro aplicado com sucesso",
-              );
+        
       }
 
       function limparFiltros() {
@@ -2939,11 +2930,9 @@
 
         document.querySelector(".no-results")?.remove();
         document.getElementById("results").innerHTML = "";
-        ToastNotification.success(
-                "filtros removidos com sucesso",)
+        ToastNotification.success("filtros removidos com sucesso");
       }
 
-      // ===== EVENTOS DO INPUT =====
       document
         .getElementById("produto")
         .addEventListener("keypress", function (e) {
@@ -2973,7 +2962,7 @@
           console.log("historico:", data);
           carregarHistorico(data);
           abrirHistorico();
-          LoadingOverlay.hide()
+          LoadingOverlay.hide();
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           mostrarErroHistorico();
@@ -2998,7 +2987,6 @@
           .forEach((el) => {
             el.style.display = "";
           });
-        // Se não houver resultados, mostra mensagem
         const resultsDiv = document.getElementById("results");
         if (resultsDiv.children.length === 0) {
           resultsDiv.innerHTML =
@@ -3267,7 +3255,6 @@
         }
       }
 
-      // ===== LOGOUT =====
       async function logout() {
         try {
           const response = await fetch(`${urlapi}/papapi/logout`, {
