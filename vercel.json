@@ -27,7 +27,7 @@
       "dest": "public/visual/$1"
     },
     {
-      "src": "/public/assets/js/(.*)",
+      "src": "/assets/js/(.*)",
       "dest": "public/assets/js/$1"
     },
     {

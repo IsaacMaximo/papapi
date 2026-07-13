@@ -2384,906 +2384,928 @@
       </div>
     </footer>
 
-    <script src="assets/js/toast.js"></script>
-    <script src="assets/js/loading.js"></script>
-    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let ratingValue = 0;
-            let escolhapopup;
+      // ===== VARIÁVEIS GLOBAIS =====
+      let ratingValue = 0;
+      let escolhapopup;
 
-            const getConfig = () => {
-                const host = window.location.hostname;
-                const environments = {
-                    localhost: { ambiente: "dev", urlapi: "http://localhost:1919" },
-                    "127.0.0.1": { ambiente: "dev", urlapi: "http://localhost:1919" },
-                };
-                return (
-                    environments[host] || {
-                        ambiente: "prod",
-                        urlapi: "https://api-pap.vercel.app",
-                    }
+      const getConfig = () => {
+        const host = window.location.hostname;
+        const environments = {
+          localhost: { ambiente: "dev", urlapi: "http://localhost:1919" },
+          "127.0.0.1": { ambiente: "dev", urlapi: "http://localhost:1919" },
+        };
+        return (
+          environments[host] || {
+            ambiente: "prod",
+            urlapi: "https://api-pap.vercel.app",
+          }
+        );
+      };
+
+      const CONFIG = getConfig();
+      const { ambiente, urlapi } = CONFIG;
+      const lojas = ["continente", "pingodoce", "auchan", "lidl"];
+
+      console.log(`🌍 Ambiente: ${ambiente}`);
+      console.log(`🔗 API URL: ${urlapi}`);
+
+      // ===== FUNÇÕES DO MOBILE MENU =====
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobileMenu");
+        const hamburger = document.querySelector(".hamburger-btn");
+        const isOpen = menu.classList.contains("open");
+
+        if (isOpen) {
+          menu.classList.remove("open");
+          hamburger.classList.remove("active");
+          document.body.style.overflow = "";
+        } else {
+          menu.classList.add("open");
+          hamburger.classList.add("active");
+          document.body.style.overflow = "hidden";
+        }
+      }
+
+      function closeMobileMenuOutside(event) {
+        const menuContent = document.getElementById("mobileMenuContent");
+        if (!menuContent.contains(event.target)) {
+          const menu = document.getElementById("mobileMenu");
+          if (menu.classList.contains("open")) {
+            toggleMobileMenu();
+          }
+        }
+      }
+
+      function updateMobileUser(fullname) {
+        const mobileName = document.getElementById("mobileUserName");
+        const mobileAvatar = document.getElementById("mobileUserAvatar");
+        if (mobileName) mobileName.textContent = fullname || "Visitante";
+        if (mobileAvatar)
+          mobileAvatar.textContent = (fullname || "?").charAt(0).toUpperCase();
+      }
+
+      // ===== FUNÇÕES DO POPUP =====
+      function rateStar(n) {
+        ratingValue = n;
+        const stars = document.querySelectorAll("#starContainer i");
+        stars.forEach((star, index) => {
+          if (index < n) {
+            star.className = "fas fa-star";
+            star.style.color = "rgb(37, 52, 91)";
+          } else {
+            star.className = "fas fa-star";
+            star.style.color = "#ddd";
+          }
+        });
+      }
+
+      function abrirpopup(tipo) {
+        const overlay = document.getElementById("popupOverlay");
+        const title = document.getElementById("popupTitle");
+        const content = document.getElementById("popupContent");
+
+        const conteudos = {
+          FeedBack: {
+            titulo: "Avalie o projeto",
+            html: `
+              <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+                <div style="text-align: center; margin-bottom: 25px;">
+                  <p style="color: #555; margin-bottom: 10px;">Como você avalia nosso serviço?</p>
+                  <div style="display: flex; justify-content: center; gap: 15px; font-size: 45px;" id="starContainer">
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(1)"></i>
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(2)"></i>
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(3)"></i>
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(4)"></i>
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(5)"></i>
+                  </div>
+                  <p style="color: #999; font-size: 12px; margin-top: 5px;">Clique na estrela para avaliar</p>
+                </div>
+                <div style="margin-bottom: 20px;">
+                  <label style="display: block; font-weight: bold; color: #2b3a67; margin-bottom: 5px;">
+                    <i class="fas fa-comment"></i> Comentário
+                  </label>
+                  <textarea rows="4" placeholder="Digite seu comentário aqui..."
+                            style="width: 100%; height: 70px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+                </div>
+              </div>
+            `,
+          },
+          Sobre: {
+            titulo: "Sobre",
+            html: `
+              <h3><i class="fas fa-handshake" style="color: #2b3a67; margin-right: 0.5rem;"></i> Sobre o projeto </h3>
+              <p>Esse projeto foi realizado para ser apresentado como Prova de Aptidão Profissional (PAP). Nele utilizo algumas ferramentas, <strong>NODE.JS</strong> - servidor, <strong>HTML & CSS</strong> - parte visual, <strong>Browserless</strong> - WebScrappler, <strong>MongoDB</strong> - base de dados, <strong>Vercel</strong> - Deploy do projeto</p>
+              <h3><i class="fas fa-users" style="color: #2b3a67; margin-right: 0.5rem;"></i> ESCOLA </h3>
+              <p><strong>Escola Tecnica e Profissional do Ribatejo</strong></p>
+              <ul>
+                  <li><i class="fas fa-check-circle"></i> Versão 2.0.1</li>
+                  <li><i class="fas fa-check-circle"></i> Atualizado em 2026</li>
+              </ul>
+            `,
+          },
+          Privacidade: {
+            titulo: "Política de Privacidade",
+            html: `
+              <h3><i class="fas fa-database" style="color: #2b3a67; margin-right: 0.5rem;"></i> Coleta de Dados</h3>
+              <p>Coletamos apenas os dados necessários para melhorar sua experiência. Nunca compartilhamos suas informações.</p>
+              <h3><i class="fas fa-lock" style="color: #2b3a67; margin-right: 0.5rem;"></i> Segurança</h3>
+              <p>Utilizamos criptografia de ponta a ponta para proteger seus dados. Seus dados estão seguros conosco.</p>
+              <ul>
+                  <li><i class="fas fa-check-circle"></i> Dados criptografados</li>
+                  <li><i class="fas fa-check-circle"></i> Guardamos apenas o Username e o Email</li>
+                  <li><i class="fas fa-check-circle"></i> Você controla seus dados</li>
+              </ul>
+            `,
+          },
+          Termos: {
+            titulo: "Termos de Uso",
+            html: `
+              <h3><i class="fas fa-file-contract" style="color: #2b3a67; margin-right: 0.5rem;"></i> Termos de Uso</h3>
+              <p>Ao utilizar este serviço, você concorda com todos os termos descritos abaixo. É importante ler atentamente.</p>
+              <h3><i class="fas fa-gavel" style="color: #2b3a67; margin-right: 0.5rem;"></i> Responsabilidades</h3>
+              <p>O usuário é responsável por suas ações dentro da plataforma. Nos reservamos o direito de moderar conteúdo inadequado.</p>
+              <ul>
+                  <li><i class="fas fa-check-circle"></i> Uso responsável</li>
+                  <li><i class="fas fa-check-circle"></i> Proibido conteúdo ofensivo</li>
+                  <li><i class="fas fa-check-circle"></i> Respeito às leis locais</li>
+              </ul>
+            `,
+          },
+        };
+
+        const conteudo = conteudos[tipo] || {
+          titulo: tipo,
+          html: `<p>Conteúdo para "${tipo}" não encontrado.</p>`,
+        };
+
+        ratingValue = 0;
+        escolhapopup = tipo;
+
+        const ConfirmarBtnDIV = document.getElementById("confirmarPopupDIV");
+        if (escolhapopup != "FeedBack") {
+          ConfirmarBtnDIV.style.display = "none";
+        } else {
+          ConfirmarBtnDIV.style.display = "inline-flex";
+        }
+
+        title.textContent = conteudo.titulo;
+        content.innerHTML = conteudo.html;
+
+        overlay.style.display = "flex";
+        overlay.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function fecharpopup() {
+        const overlay = document.getElementById("popupOverlay");
+        overlay.style.display = "none";
+        overlay.classList.remove("active");
+        document.body.style.overflow = "";
+        document.getElementById("confirmarPopupDIV").style.display =
+          "inline-flex";
+        document.getElementById("fecharPopupDIV").style.display = "inline-flex";
+      }
+
+      function confirmarPopup() {
+        if (ratingValue === 0) {
+          alert("Por favor, selecione uma avaliação com estrelas!");
+          return;
+        }
+
+        const comentario = document.querySelector("textarea");
+        if (!ratingValue) {
+          alert("A avaliação não pode ser vazia");
+          return;
+        }
+
+        fetch(`${urlapi}/papapi/enviarfeedback`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            comentarioRAW: comentario ? comentario.value : "",
+            avaliacaoRAW: ratingValue,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert("Obrigado pelo feedback!");
+              fecharpopup();
+            }
+          })
+          .catch(() => alert("Erro ao enviar feedback. Tente novamente."));
+      }
+
+      // ===== AUTENTICAÇÃO =====
+      function verificarToken() {
+        
+        fetch(`${urlapi}/papapi/verificar-token`, {
+          method: "GET",
+          credentials: "include",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (!data.success) {
+              if (CONFIG.ambiente === "dev") {
+                console.log(
+                  "Token inválido. Redirecionando para /login.html (dev)",
                 );
-            };
+              } else {
+                console.log("Token inválido. Redirecionando para / (prod)");
+                ToastNotification.info(
+                "Login invalido, redirecionando para tela de login..."
+              );
 
-            const CONFIG = getConfig();
-            const { ambiente, urlapi } = CONFIG;
-            const lojas = ["continente", "pingodoce", "auchan", "lidl"];
-
-            console.log(`🌍 Ambiente: ${ambiente}`);
-            console.log(`🔗 API URL: ${urlapi}`);
-
-            // ===== FUNÇÕES DO MOBILE MENU =====
-            function toggleMobileMenu() {
-                const menu = document.getElementById("mobileMenu");
-                const hamburger = document.querySelector(".hamburger-btn");
-                const isOpen = menu.classList.contains("open");
-
-                if (isOpen) {
-                    menu.classList.remove("open");
-                    hamburger.classList.remove("active");
-                    document.body.style.overflow = "";
-                } else {
-                    menu.classList.add("open");
-                    hamburger.classList.add("active");
-                    document.body.style.overflow = "hidden";
-                }
+                window.location.href = "/";
+              }
             }
-
-            function closeMobileMenuOutside(event) {
-                const menuContent = document.getElementById("mobileMenuContent");
-                if (!menuContent.contains(event.target)) {
-                    const menu = document.getElementById("mobileMenu");
-                    if (menu.classList.contains("open")) {
-                        toggleMobileMenu();
-                    }
-                }
+            if (data.success) {
+              console.log("Token válido. Acesso permitido.");
+              ToastNotification.success(
+                "Login bem sucedido",
+              );
             }
-
-            function updateMobileUser(fullname) {
-                const mobileName = document.getElementById("mobileUserName");
-                const mobileAvatar = document.getElementById("mobileUserAvatar");
-                if (mobileName) mobileName.textContent = fullname || "Visitante";
-                if (mobileAvatar)
-                    mobileAvatar.textContent = (fullname || "?").charAt(0).toUpperCase();
+          })
+          .catch((error) => {
+            console.error("Erro ao verificar token:", error);
+            if (CONFIG.ambiente === "dev") {
+              console.log(
+                "Erro ao verificar token. Redirecionando para /login.html (dev)",
+              );
+            } else {
+              console.log(
+                "Erro ao verificar token. Redirecionando para / (prod)",
+              );
+              ToastNotification.error(
+                "erro interno",
+              );
+              window.location.href = "/";
             }
+          });
+      }
+      verificarToken();
 
-            // ===== FUNÇÕES DO POPUP =====
-            function rateStar(n) {
-                ratingValue = n;
-                const stars = document.querySelectorAll("#starContainer i");
-                stars.forEach((star, index) => {
-                    if (index < n) {
-                        star.className = "fas fa-star";
-                        star.style.color = "rgb(37, 52, 91)";
-                    } else {
-                        star.className = "fas fa-star";
-                        star.style.color = "#ddd";
-                    }
-                });
-            }
+      // ===== PERFIL DO USUÁRIO =====
+      async function perfiluser() {
+        try {
+          const response = await fetch(`${urlapi}/papapi/perfil`, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return await response.json();
+        } catch (error) {
+          console.error("Erro:", error);
+                        ToastNotification.error(
+                "erro interno",
+              );
+          return { success: false, message: error.message };
+        }
+      }
 
-            function abrirpopup(tipo) {
-                const overlay = document.getElementById("popupOverlay");
-                const title = document.getElementById("popupTitle");
-                const content = document.getElementById("popupContent");
+      async function preencherpaguser() {
+        try {
+          const data = await perfiluser();
+          if (data && data.success) {
+            const user = data.user;
+            const nameElement = document.getElementById("userFullName");
+            if (nameElement) nameElement.textContent = user.fullname;
 
-                const conteudos = {
-                    FeedBack: {
-                        titulo: "Avalie o projeto",
-                        html: `
-                            <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-                                <div style="text-align: center; margin-bottom: 25px;">
-                                    <p style="color: #555; margin-bottom: 10px;">Como você avalia nosso serviço?</p>
-                                    <div style="display: flex; justify-content: center; gap: 15px; font-size: 45px;" id="starContainer">
-                                        <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(1)"></i>
-                                        <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(2)"></i>
-                                        <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(3)"></i>
-                                        <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(4)"></i>
-                                        <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(5)"></i>
-                                    </div>
-                                    <p style="color: #999; font-size: 12px; margin-top: 5px;">Clique na estrela para avaliar</p>
-                                </div>
-                                <div style="margin-bottom: 20px;">
-                                    <label style="display: block; font-weight: bold; color: #2b3a67; margin-bottom: 5px;">
-                                        <i class="fas fa-comment"></i> Comentário
-                                    </label>
-                                    <textarea rows="4" placeholder="Digite seu comentário aqui..."
-                                              style="width: 100%; height: 70px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
-                                </div>
-                            </div>
-                        `,
-                    },
-                    Sobre: {
-                        titulo: "Sobre",
-                        html: `
-                            <h3><i class="fas fa-handshake" style="color: #2b3a67; margin-right: 0.5rem;"></i> Sobre o projeto </h3>
-                            <p>Esse projeto foi realizado para ser apresentado como Prova de Aptidão Profissional (PAP). Nele utilizo algumas ferramentas, <strong>NODE.JS</strong> - servidor, <strong>HTML & CSS</strong> - parte visual, <strong>Browserless</strong> - WebScrappler, <strong>MongoDB</strong> - base de dados, <strong>Vercel</strong> - Deploy do projeto</p>
-                            <h3><i class="fas fa-users" style="color: #2b3a67; margin-right: 0.5rem;"></i> ESCOLA </h3>
-                            <p><strong>Escola Tecnica e Profissional do Ribatejo</strong></p>
-                            <ul>
-                                <li><i class="fas fa-check-circle"></i> Versão 2.0.1</li>
-                                <li><i class="fas fa-check-circle"></i> Atualizado em 2026</li>
-                            </ul>
-                        `,
-                    },
-                    Privacidade: {
-                        titulo: "Política de Privacidade",
-                        html: `
-                            <h3><i class="fas fa-database" style="color: #2b3a67; margin-right: 0.5rem;"></i> Coleta de Dados</h3>
-                            <p>Coletamos apenas os dados necessários para melhorar sua experiência. Nunca compartilhamos suas informações.</p>
-                            <h3><i class="fas fa-lock" style="color: #2b3a67; margin-right: 0.5rem;"></i> Segurança</h3>
-                            <p>Utilizamos criptografia de ponta a ponta para proteger seus dados. Seus dados estão seguros conosco.</p>
-                            <ul>
-                                <li><i class="fas fa-check-circle"></i> Dados criptografados</li>
-                                <li><i class="fas fa-check-circle"></i> Guardamos apenas o Username e o Email</li>
-                                <li><i class="fas fa-check-circle"></i> Você controla seus dados</li>
-                            </ul>
-                        `,
-                    },
-                    Termos: {
-                        titulo: "Termos de Uso",
-                        html: `
-                            <h3><i class="fas fa-file-contract" style="color: #2b3a67; margin-right: 0.5rem;"></i> Termos de Uso</h3>
-                            <p>Ao utilizar este serviço, você concorda com todos os termos descritos abaixo. É importante ler atentamente.</p>
-                            <h3><i class="fas fa-gavel" style="color: #2b3a67; margin-right: 0.5rem;"></i> Responsabilidades</h3>
-                            <p>O usuário é responsável por suas ações dentro da plataforma. Nos reservamos o direito de moderar conteúdo inadequado.</p>
-                            <ul>
-                                <li><i class="fas fa-check-circle"></i> Uso responsável</li>
-                                <li><i class="fas fa-check-circle"></i> Proibido conteúdo ofensivo</li>
-                                <li><i class="fas fa-check-circle"></i> Respeito às leis locais</li>
-                            </ul>
-                        `,
-                    },
-                };
+            const avatarDiv = document.getElementById("userAvatar");
+            if (avatarDiv)
+              avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
 
-                const conteudo = conteudos[tipo] || {
-                    titulo: tipo,
-                    html: `<p>Conteúdo para "${tipo}" não encontrado.</p>`,
-                };
+            updateMobileUser(user.fullname);
+          } else {
+                          ToastNotification.error(
+                "erro ao buscar informacoes do usuario",
+              );
+            document.getElementById("userFullName").textContent = "Visitante";
+            document.getElementById("userAvatar").textContent = "?";
+            updateMobileUser("Visitante");
+          }
+        } catch (error) {
+          console.error("Erro ao preencher perfil:", error);
+          updateMobileUser("Visitante");
+        }
+      }
+      preencherpaguser();
 
-                ratingValue = 0;
-                escolhapopup = tipo;
+      // ===== FUNÇÕES DO SCRAPER =====
+      function enableButtons() {
+        document
+          .querySelectorAll(".search-section button")
+          .forEach((button) => (button.disabled = false));
+      }
 
-                const ConfirmarBtnDIV = document.getElementById("confirmarPopupDIV");
-                if (escolhapopup != "FeedBack") {
-                    ConfirmarBtnDIV.style.display = "none";
-                } else {
-                    ConfirmarBtnDIV.style.display = "inline-flex";
-                }
+      function displayResults(loja, data) {
+                      ToastNotification.success(
+                `resultados carregados de ${loja}`,
+              );
+        const resultsDiv = document.getElementById("results");
+        let html = `<div class="store-section" data-store="${loja}">
+          <div class="store-header">
+            <i class="fas fa-tag"></i> ${loja.toUpperCase()}
+            <span class="store-count">${data.output && data.output.products ? data.output.products.length : 0} produtos</span>
+          </div>`;
 
-                title.textContent = conteudo.titulo;
-                content.innerHTML = conteudo.html;
+        if (
+          data.output &&
+          data.output.products &&
+          data.output.products.length > 0
+        ) {
+          html += `<div class="store-info"><i class="fas fa-clock"></i> Atualizado: ${new Date().toLocaleString("pt-PT")}</div>
+            <div class="products-grid">`;
 
-                overlay.style.display = "flex";
-                overlay.classList.add("active");
-                document.body.style.overflow = "hidden";
-            }
+          data.output.products.forEach((product) => {
+            const productName = String(product.name || "Produto");
+            const productPriceText = String(product.price || "");
+            const productPriceValue =
+              parseFloat(
+                productPriceText.replace(/[^0-9.,]/g, "").replace(",", "."),
+              ) || 0;
+            const productImage = product.image || "placeholder.jpg";
+            const productUrl = product.urldoproduto || "#";
 
-            function fecharpopup() {
-                const overlay = document.getElementById("popupOverlay");
-                overlay.style.display = "none";
-                overlay.classList.remove("active");
-                document.body.style.overflow = "";
-                document.getElementById("confirmarPopupDIV").style.display =
-                    "inline-flex";
-                document.getElementById("fecharPopupDIV").style.display = "inline-flex";
-            }
+            html += `<div class="product-card" data-price="${productPriceValue}" data-name="${productName}">
+              <img src="${productImage}" alt="${productName}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f2f5%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2212%22%3Eimagem%3C/text%3E%3C/svg%3E'">
+              <div class="product-info">
+                <div class="product-name">${productName}</div>
+                <div class="product-price">${productPriceText}</div>
+                <a href="${productUrl}" target="_blank" class="product-link"><i class="fas fa-external-link-alt"></i> Ver Produto</a>
+              </div>
+            </div>`;
+          });
+          html += `</div>`;
+        } else {
+          html += `<div class="error-message"><i class="fas fa-search-minus"></i> Nenhum produto encontrado</div>`;
+        }
+        html += `</div>`;
+        resultsDiv.innerHTML += html;
+      }
 
-            function confirmarPopup() {
-                if (ratingValue === 0) {
-                    alert("Por favor, selecione uma avaliação com estrelas!");
-                    return;
-                }
+      function runScraper(LOJA) {
+        const buttons = document.querySelectorAll(".search-section button");
+        buttons.forEach((btn) => (btn.disabled = true));
+        document.body.style.cursor = "wait";
+        document.getElementById("results").innerHTML =
+          '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
 
-                const comentario = document.querySelector("textarea");
-                if (!ratingValue) {
-                    alert("A avaliação não pode ser vazia");
-                    return;
-                }
+        const search = document.getElementById("produto");
+        fetch(`${urlapi}/papapi/run-scraper-${LOJA}?produto=${search.value}`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("results").innerHTML = "";
+            displayResults(LOJA, data);
+            document.body.style.cursor = "default";
+            enableButtons();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("results").innerHTML =
+              '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar dados</div>';
+            document.body.style.cursor = "default";
+            enableButtons();
+          });
+      }
 
-                fetch(`${urlapi}/papapi/enviarfeedback`, {
-                    method: "POST",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        comentarioRAW: comentario ? comentario.value : "",
-                        avaliacaoRAW: ratingValue,
-                    }),
-                })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        alert("Obrigado pelo feedback!");
-                        fecharpopup();
-                    }
-                })
-                .catch(() => alert("Erro ao enviar feedback. Tente novamente."));
-            }
+      async function runScraperTodos() {
+        const buttons = document.querySelectorAll(".search-section button");
+        buttons.forEach((btn) => (btn.disabled = true));
+        document.body.style.cursor = "wait";
+        document.getElementById("results").innerHTML =
+          '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando todas as lojas...</div>';
 
-            // ===== AUTENTICAÇÃO =====
-            function verificarToken() {
-                fetch(`${urlapi}/papapi/verificar-token`, {
-                    method: "GET",
-                    credentials: "include",
-                })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (!data.success) {
-                        if (CONFIG.ambiente === "dev") {
-                            console.log("Token inválido. Redirecionando para /login.html (dev)");
-                        } else {
-                            console.log("Token inválido. Redirecionando para / (prod)");
-                            ToastNotification.info("Login inválido, redirecionando para tela de login...");
-                            window.location.href = "/";
-                        }
-                    }
-                    if (data.success) {
-                        console.log("Token válido. Acesso permitido.");
-                        ToastNotification.success("Login bem sucedido");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Erro ao verificar token:", error);
-                    if (CONFIG.ambiente === "dev") {
-                        console.log("Erro ao verificar token. Redirecionando para /login.html (dev)");
-                    } else {
-                        console.log("Erro ao verificar token. Redirecionando para / (prod)");
-                        ToastNotification.error("Erro interno");
-                        window.location.href = "/";
-                    }
-                });
-            }
+        const search = document.getElementById("produto");
+        try {
+          document.getElementById("results").innerHTML = "";
+          for (const loja of lojas) {
+            const response = await fetch(
+              `${urlapi}/papapi/run-scraper-${loja}?produto=${search.value}`,
+            );
+            const data = await response.json();
+            displayResults(loja, data);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          document.getElementById("results").innerHTML +=
+            '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar dados</div>';
+        } finally {
+          buttons.forEach((btn) => (btn.disabled = false));
+          document.body.style.cursor = "default";
+        }
+      }
 
-            // ===== PERFIL DO USUÁRIO =====
-            async function perfiluser() {
-                try {
-                    const response = await fetch(`${urlapi}/papapi/perfil`, {
-                        method: "GET",
-                        credentials: "include",
-                        headers: { "Content-Type": "application/json" },
-                    });
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    return await response.json();
-                } catch (error) {
-                    console.error("Erro:", error);
-                    ToastNotification.error("Erro interno");
-                    return { success: false, message: error.message };
-                }
-            }
+      // ===== FILTROS =====
+      async function apicarfiltro(filtro) {
+        const filterButtons = document.querySelectorAll(".filter-chip");
+        filterButtons.forEach((btn) => btn.classList.remove("active"));
 
-            async function preencherpaguser() {
-                try {
-                    const data = await perfiluser();
-                    if (data && data.success) {
-                        const user = data.user;
-                        const nameElement = document.getElementById("userFullName");
-                        if (nameElement) nameElement.textContent = user.fullname;
+        const activeButton = document.getElementById(`filter-${filtro}`);
+        if (activeButton) activeButton.classList.add("active");
 
-                        const avatarDiv = document.getElementById("userAvatar");
-                        if (avatarDiv)
-                            avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
+        const resultsDiv = document.getElementById("results");
+        const storeSections = resultsDiv.querySelectorAll(".store-section");
 
-                        updateMobileUser(user.fullname);
-                    } else {
-                        ToastNotification.error("Erro ao buscar informações do usuário");
-                        document.getElementById("userFullName").textContent = "Visitante";
-                        document.getElementById("userAvatar").textContent = "?";
-                        updateMobileUser("Visitante");
-                    }
-                } catch (error) {
-                    console.error("Erro ao preencher perfil:", error);
-                    updateMobileUser("Visitante");
-                }
-            }
+        storeSections.forEach((section) => {
+          const productsGrid = section.querySelector(".products-grid");
+          if (!productsGrid) return;
 
-            // ===== FUNÇÕES DO SCRAPER =====
-            function enableButtons() {
-                document
-                    .querySelectorAll(".search-section button")
-                    .forEach((button) => (button.disabled = false));
-            }
+          const allCards = Array.from(
+            productsGrid.querySelectorAll(".product-card"),
+          );
 
-            function displayResults(loja, data) {
-                ToastNotification.success(`Resultados carregados de ${loja}`);
-                const resultsDiv = document.getElementById("results");
-                let html = `<div class="store-section" data-store="${loja}">
-                    <div class="store-header">
-                        <i class="fas fa-tag"></i> ${loja.toUpperCase()}
-                        <span class="store-count">${data.output && data.output.products ? data.output.products.length : 0} produtos</span>
-                    </div>`;
+          let sortedProducts = [...allCards];
 
-                if (
-                    data.output &&
-                    data.output.products &&
-                    data.output.products.length > 0
-                ) {
-                    html += `<div class="store-info"><i class="fas fa-clock"></i> Atualizado: ${new Date().toLocaleString("pt-PT")}</div>
-                        <div class="products-grid">`;
+          switch (filtro) {
+            case "menor-preco":
+              sortedProducts.sort(
+                (a, b) =>
+                  parseFloat(a.dataset.price || 0) -
+                  parseFloat(b.dataset.price || 0),
+              );
+              break;
+            case "maior-preco":
+              sortedProducts.sort(
+                (a, b) =>
+                  parseFloat(b.dataset.price || 0) -
+                  parseFloat(a.dataset.price || 0),
+              );
+              break;
+            case "az":
+              sortedProducts.sort((a, b) =>
+                (a.dataset.name || "").localeCompare(b.dataset.name || ""),
+              );
+              break;
+            case "za":
+              sortedProducts.sort((a, b) =>
+                (b.dataset.name || "").localeCompare(a.dataset.name || ""),
+              );
+              break;
+            case "todos":
+              sortedProducts = [...filteredCards];
+              break;
+            default:
+              return;
+          }
 
-                    data.output.products.forEach((product) => {
-                        const productName = String(product.name || "Produto");
-                        const productPriceText = String(product.price || "");
-                        const productPriceValue =
-                            parseFloat(
-                                productPriceText.replace(/[^0-9.,]/g, "").replace(",", ".")
-                            ) || 0;
-                        const productImage = product.image || "placeholder.jpg";
-                        const productUrl = product.urldoproduto || "#";
+          allCards.forEach((card) => {
+            card.style.display = "";
+          });
 
-                        html += `<div class="product-card" data-price="${productPriceValue}" data-name="${productName}">
-                            <img src="${productImage}" alt="${productName}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f2f5%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2212%22%3Eimagem%3C/text%3E%3C/svg%3E'">
-                            <div class="product-info">
-                                <div class="product-name">${productName}</div>
-                                <div class="product-price">${productPriceText}</div>
-                                <a href="${productUrl}" target="_blank" class="product-link"><i class="fas fa-external-link-alt"></i> Ver Produto</a>
-                            </div>
-                        </div>`;
-                    });
-                    html += `</div>`;
-                } else {
-                    html += `<div class="error-message"><i class="fas fa-search-minus"></i> Nenhum produto encontrado</div>`;
-                }
-                html += `</div>`;
-                resultsDiv.innerHTML += html;
-            }
-
-            function runScraper(LOJA) {
-                const buttons = document.querySelectorAll(".search-section button");
-                buttons.forEach((btn) => (btn.disabled = true));
-                document.body.style.cursor = "wait";
-                document.getElementById("results").innerHTML =
-                    '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
-
-                const search = document.getElementById("produto");
-                fetch(`${urlapi}/papapi/run-scraper-${LOJA}?produto=${search.value}`)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        document.getElementById("results").innerHTML = "";
-                        displayResults(LOJA, data);
-                        document.body.style.cursor = "default";
-                        enableButtons();
-                    })
-                    .catch((error) => {
-                        console.error("Error:", error);
-                        document.getElementById("results").innerHTML =
-                            '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar dados</div>';
-                        document.body.style.cursor = "default";
-                        enableButtons();
-                    });
-            }
-
-            async function runScraperTodos() {
-                const buttons = document.querySelectorAll(".search-section button");
-                buttons.forEach((btn) => (btn.disabled = true));
-                document.body.style.cursor = "wait";
-                document.getElementById("results").innerHTML =
-                    '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando todas as lojas...</div>';
-
-                const search = document.getElementById("produto");
-                try {
-                    document.getElementById("results").innerHTML = "";
-                    for (const loja of lojas) {
-                        const response = await fetch(
-                            `${urlapi}/papapi/run-scraper-${loja}?produto=${search.value}`
-                        );
-                        const data = await response.json();
-                        displayResults(loja, data);
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    document.getElementById("results").innerHTML +=
-                        '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Erro ao buscar dados</div>';
-                } finally {
-                    buttons.forEach((btn) => (btn.disabled = false));
-                    document.body.style.cursor = "default";
-                }
-            }
-
-            // ===== FILTROS =====
-            async function apicarfiltro(filtro) {
-                const filterButtons = document.querySelectorAll(".filter-chip");
-                filterButtons.forEach((btn) => btn.classList.remove("active"));
-
-                const activeButton = document.getElementById(`filter-${filtro}`);
-                if (activeButton) activeButton.classList.add("active");
-
-                const resultsDiv = document.getElementById("results");
-                const storeSections = resultsDiv.querySelectorAll(".store-section");
-
-                storeSections.forEach((section) => {
-                    const productsGrid = section.querySelector(".products-grid");
-                    if (!productsGrid) return;
-
-                    const allCards = Array.from(
-                        productsGrid.querySelectorAll(".product-card")
-                    );
-
-                    let sortedProducts = [...allCards];
-
-                    switch (filtro) {
-                        case "menor-preco":
-                            sortedProducts.sort(
-                                (a, b) =>
-                                    parseFloat(a.dataset.price || 0) -
-                                    parseFloat(b.dataset.price || 0)
-                            );
-                            break;
-                        case "maior-preco":
-                            sortedProducts.sort(
-                                (a, b) =>
-                                    parseFloat(b.dataset.price || 0) -
-                                    parseFloat(a.dataset.price || 0)
-                            );
-                            break;
-                        case "az":
-                            sortedProducts.sort((a, b) =>
-                                (a.dataset.name || "").localeCompare(b.dataset.name || "")
-                            );
-                            break;
-                        case "za":
-                            sortedProducts.sort((a, b) =>
-                                (b.dataset.name || "").localeCompare(a.dataset.name || "")
-                            );
-                            break;
-                        case "todos":
-                            sortedProducts = [...allCards];
-                            break;
-                        default:
-                            return;
-                    }
-
-                    allCards.forEach((card) => {
-                        card.style.display = "";
-                    });
-
-                    if (filtro !== "todos") {
-                        switch (filtro) {
-                            case "menor-preco":
-                                sortedProducts.sort(
-                                    (a, b) =>
-                                        parseFloat(a.dataset.price || 0) -
-                                        parseFloat(b.dataset.price || 0)
-                                );
-                                break;
-                            case "maior-preco":
-                                sortedProducts.sort(
-                                    (a, b) =>
-                                        parseFloat(b.dataset.price || 0) -
-                                        parseFloat(a.dataset.price || 0)
-                                );
-                                break;
-                            case "az":
-                                sortedProducts.sort((a, b) =>
-                                    (a.dataset.name || "").localeCompare(b.dataset.name || "")
-                                );
-                                break;
-                            case "za":
-                                sortedProducts.sort((a, b) =>
-                                    (b.dataset.name || "").localeCompare(a.dataset.name || "")
-                                );
-                                break;
-                        }
-                        sortedProducts.forEach((card) => productsGrid.appendChild(card));
-                    }
-
-                    const countSpan = section.querySelector(".store-count");
-                    if (countSpan) {
-                        const total = allCards.length;
-                        countSpan.textContent = `${total} produtos`;
-                    }
-
-                    section.style.display = "";
-                });
-
-                const visibleSections = document.querySelectorAll(
-                    ".store-section:not([style*='display: none'])"
+          if (filtro !== "todos") {
+            switch (filtro) {
+              case "menor-preco":
+                sortedProducts.sort(
+                  (a, b) =>
+                    parseFloat(a.dataset.price || 0) -
+                    parseFloat(b.dataset.price || 0),
                 );
-                const existingMsg = document.querySelector(".no-results");
-                if (existingMsg) existingMsg.remove();
-
-                if (
-                    visibleSections.length === 0 &&
-                    document.querySelector(".store-section")
-                ) {
-                    const resultsDiv = document.getElementById("results");
-                    const searchTerm = document.getElementById("produto").value;
-                    const noResultsMsg = document.createElement("div");
-                    noResultsMsg.className = "no-results";
-                    noResultsMsg.innerHTML = `
-                        <i class="fas fa-search"></i>
-                        Nenhum produto encontrado para "<strong>${searchTerm || "esta busca"}</strong>"
-                    `;
-                    resultsDiv.appendChild(noResultsMsg);
-                }
-                ToastNotification.success("Filtro aplicado com sucesso");
-            }
-
-            function limparFiltros() {
-                const searchInput = document.getElementById("produto");
-                if (searchInput) searchInput.value = "";
-
-                document
-                    .querySelectorAll(".filter-chip")
-                    .forEach((btn) => btn.classList.remove("active"));
-                const todosBtn = document.getElementById("filter-todos");
-                if (todosBtn) todosBtn.classList.add("active");
-
-                document.querySelectorAll(".store-section").forEach((section) => {
-                    const cards = section.querySelectorAll(".product-card");
-                    cards.forEach((card) => (card.style.display = ""));
-                    const countSpan = section.querySelector(".store-count");
-                    if (countSpan) countSpan.textContent = `${cards.length} produtos`;
-                    section.style.display = "";
-                });
-
-                document.querySelector(".no-results")?.remove();
-                document.getElementById("results").innerHTML = "";
-                ToastNotification.success("Filtros removidos com sucesso");
-            }
-
-            // ===== EVENTOS DO INPUT =====
-            document
-                .getElementById("produto")
-                .addEventListener("keypress", function (e) {
-                    if (e.key === "Enter") {
-                        e.preventDefault();
-                        runScraperTodos();
-                    }
-                });
-
-            document.getElementById("produto").addEventListener("input", function () {
-                const activeFilter = document.querySelector(".filter-chip.active");
-                apicarfiltro(
-                    activeFilter ? activeFilter.id.replace("filter-", "") : "todos"
+                break;
+              case "maior-preco":
+                sortedProducts.sort(
+                  (a, b) =>
+                    parseFloat(b.dataset.price || 0) -
+                    parseFloat(a.dataset.price || 0),
                 );
-            });
-
-            // ===== HISTÓRICO =====
-            async function pegarhistorico() {
-                try {
-                    LoadingOverlay.show("Retornando histórico de produtos...");
-                    const response = await fetch(`${urlapi}/papapi/pegarhistorico`, {
-                        method: "POST",
-                        credentials: "include",
-                    });
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const data = await response.json();
-                    console.log("historico:", data);
-                    carregarHistorico(data);
-                    abrirHistorico();
-                    LoadingOverlay.hide();
-                } catch (error) {
-                    console.error("Erro ao buscar dados:", error);
-                    LoadingOverlay.hide();
-                    mostrarErroHistorico();
-                }
+                break;
+              case "az":
+                sortedProducts.sort((a, b) =>
+                  (a.dataset.name || "").localeCompare(b.dataset.name || ""),
+                );
+                break;
+              case "za":
+                sortedProducts.sort((a, b) =>
+                  (b.dataset.name || "").localeCompare(a.dataset.name || ""),
+                );
+                break;
             }
+            sortedProducts.forEach((card) => productsGrid.appendChild(card));
+          }
 
-            function abrirHistorico() {
-                document
-                    .querySelectorAll(".main-content > div:not(#historicoContainer)")
-                    .forEach((el) => {
-                        el.style.display = "none";
-                    });
-                document.getElementById("historicoContainer").style.display = "block";
-                document.getElementById("historicoContainer").style.animation =
-                    "fadeIn 0.3s ease";
-            }
+          const countSpan = section.querySelector(".store-count");
+          if (countSpan) {
+            const total = allCards.length;
+            countSpan.textContent = `${total} produtos`;
+          }
 
-            function fecharHistorico() {
-                document.getElementById("historicoContainer").style.display = "none";
-                document
-                    .querySelectorAll(".main-content > div:not(#historicoContainer)")
-                    .forEach((el) => {
-                        el.style.display = "";
-                    });
-                const resultsDiv = document.getElementById("results");
-                if (resultsDiv.children.length === 0) {
-                    resultsDiv.innerHTML =
-                        '<div style="text-align:center;padding:2rem;color:#7b8aa3;"><i class="fas fa-search" style="font-size:2rem;display:block;margin-bottom:1rem;"></i>Faça uma pesquisa para ver os resultados</div>';
-                }
-            }
+          section.style.display = "";
+        });
 
-            function carregarHistorico(data) {
-                window.historicoData = data;
-                const lista = document.getElementById("listaHistorico");
+        const visibleSections = document.querySelectorAll(
+          ".store-section:not([style*='display: none'])",
+        );
+        const existingMsg = document.querySelector(".no-results");
+        if (existingMsg) existingMsg.remove();
 
-                if (!data || !data.success || !data.dados || data.dados.length === 0) {
-                    lista.innerHTML = `
-                        <div class="historico-vazio">
-                            <i class="fas fa-inbox"></i>
-                            <p>Nenhuma pesquisa registrada</p>
-                            <span>Suas pesquisas aparecerão aqui</span>
-                        </div>
-                    `;
-                    return;
-                }
+        if (
+          visibleSections.length === 0 &&
+          document.querySelector(".store-section")
+        ) {
+          const resultsDiv = document.getElementById("results");
+          const noResultsMsg = document.createElement("div");
+          noResultsMsg.className = "no-results";
+          noResultsMsg.innerHTML = `
+            <i class="fas fa-search"></i>
+            Nenhum produto encontrado para "<strong>${searchTerm || "esta busca"}</strong>"
+          `;
+          resultsDiv.appendChild(noResultsMsg);
+        }
+                      ToastNotification.success(
+                "filtro aplicado com sucesso",
+              );
+      }
 
-                let html = "";
-                data.dados.forEach((item, index) => {
-                    const loja = identificarLoja(item.search?.url || "");
-                    const termo = item.search?.term || item.message || "Pesquisa";
-                    const totalProdutos =
-                        item.summary?.total_products ??
-                        (Array.isArray(item.products) ? item.products.length : 0);
-                    const dataHora = formatarData(item.timestamp);
-                    const resultadoTexto = item.success
-                        ? `${totalProdutos} produtos`
-                        : item.message || "Sem resultados";
+      function limparFiltros() {
+        const searchInput = document.getElementById("produto");
+        if (searchInput) searchInput.value = "";
 
-                    html += `
-                        <div class="historico-item" data-id="${index}" data-termo="${termo}" data-loja="${loja}" data-data="${item.timestamp}">
-                            <div class="item-info">
-                                <div class="item-icon" style="background: ${getCorLoja(loja)};">
-                                    <i class="fas fa-store"></i>
-                                </div>
-                                <div class="item-detalhes">
-                                    <div class="item-produto"><strong>${termo}</strong> · ${resultadoTexto}</div>
-                                    <div class="item-loja">
-                                        <i class="fas fa-store"></i> ${loja || "Desconhecida"}
-                                        <span style="margin: 0 0.3rem;">·</span>
-                                        <i class="far fa-clock"></i> ${dataHora}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item-acoes">
-                                <button class="btn-item primary" onclick="repetirBusca('${termo}')">
-                                    <i class="fas fa-redo"></i> Repetir
-                                </button>
-                                <button class="btn-item" onclick="verDetalhesHistorico(${index})">
-                                    <i class="fas fa-eye"></i> Ver
-                                </button>
-                                <button class="btn-item danger" onclick="removerHistorico(${index})">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
+        document
+          .querySelectorAll(".filter-chip")
+          .forEach((btn) => btn.classList.remove("active"));
+        const todosBtn = document.getElementById("filter-todos");
+        if (todosBtn) todosBtn.classList.add("active");
 
-                lista.innerHTML = html;
-                document.querySelector(".historico-titulo h2").textContent =
-                    `Histórico de Pesquisas (${data.dados.length})`;
-            }
+        document.querySelectorAll(".store-section").forEach((section) => {
+          const cards = section.querySelectorAll(".product-card");
+          cards.forEach((card) => (card.style.display = ""));
+          const countSpan = section.querySelector(".store-count");
+          if (countSpan) countSpan.textContent = `${cards.length} produtos`;
+          section.style.display = "";
+        });
 
-            function identificarLoja(url) {
-                if (url.includes("continente")) return "Continente";
-                if (url.includes("pingodoce")) return "Pingo Doce";
-                if (url.includes("auchan")) return "Auchan";
-                if (url.includes("lidl")) return "Lidl";
-                return "Desconhecida";
-            }
+        document.querySelector(".no-results")?.remove();
+        document.getElementById("results").innerHTML = "";
+        ToastNotification.success(
+                "filtros removidos com sucesso",)
+      }
 
-            function getCorLoja(loja) {
-                const cores = {
-                    Continente: "#2b3a67",
-                    "Pingo Doce": "#2b3a67",
-                    Auchan: "#2b3a67",
-                    Lidl: "#2b3a67",
-                };
-                return cores[loja] || "linear-gradient(135deg, #2b3a67, #1d2b4a)";
-            }
+      // ===== EVENTOS DO INPUT =====
+      document
+        .getElementById("produto")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            runScraperTodos();
+          }
+        });
 
-            function formatarData(timestamp) {
-                const date = new Date(timestamp);
-                const hoje = new Date();
-                const diff = hoje - date;
+      document.getElementById("produto").addEventListener("input", function () {
+        const activeFilter = document.querySelector(".filter-chip.active");
+        apicarfiltro(
+          activeFilter ? activeFilter.id.replace("filter-", "") : "todos",
+        );
+      });
 
-                if (diff < 24 * 60 * 60 * 1000) {
-                    return `Hoje ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-                }
-                if (diff < 48 * 60 * 60 * 1000) {
-                    return `Ontem ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-                }
-                return date.toLocaleString("pt-PT", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                });
-            }
+      // ===== HISTÓRICO =====
+      async function pegarhistorico() {
+        try {
+          LoadingOverlay.show("Retornando historico de produtos...");
+          const response = await fetch(`${urlapi}/papapi/pegarhistorico`, {
+            method: "POST",
+            credentials: "include",
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          console.log("historico:", data);
+          carregarHistorico(data);
+          abrirHistorico();
+          LoadingOverlay.hide()
+        } catch (error) {
+          console.error("Erro ao buscar dados:", error);
+          mostrarErroHistorico();
+        }
+      }
 
-            function verDetalhesHistorico(index) {
-                if (!window.historicoData) {
-                    alert("Dados do histórico não disponíveis. Recarregue a página.");
-                    return;
-                }
+      function abrirHistorico() {
+        document
+          .querySelectorAll(".main-content > div:not(#historicoContainer)")
+          .forEach((el) => {
+            el.style.display = "none";
+          });
+        document.getElementById("historicoContainer").style.display = "block";
+        document.getElementById("historicoContainer").style.animation =
+          "fadeIn 0.3s ease";
+      }
 
-                const dados = window.historicoData.dados[index];
-                if (!dados) {
-                    alert("Item não encontrado");
-                    return;
-                }
+      function fecharHistorico() {
+        document.getElementById("historicoContainer").style.display = "none";
+        document
+          .querySelectorAll(".main-content > div:not(#historicoContainer)")
+          .forEach((el) => {
+            el.style.display = "";
+          });
+        // Se não houver resultados, mostra mensagem
+        const resultsDiv = document.getElementById("results");
+        if (resultsDiv.children.length === 0) {
+          resultsDiv.innerHTML =
+            '<div style="text-align:center;padding:2rem;color:#7b8aa3;"><i class="fas fa-search" style="font-size:2rem;display:block;margin-bottom:1rem;"></i>Faça uma pesquisa para ver os resultados</div>';
+        }
+      }
 
-                const loja = identificarLoja(dados.search?.url || "");
-                const termo = dados.search?.term || dados.message || "Pesquisa";
-                const produtos = Array.isArray(dados.products) ? dados.products : [];
+      function carregarHistorico(data) {
+        window.historicoData = data;
+        const lista = document.getElementById("listaHistorico");
 
-                let produtosHTML = "";
-                if (produtos.length === 0) {
-                    produtosHTML = `
-                        <div style="padding: 1rem; color: #7b8aa3; text-align: center;">
-                            ${dados.success === false ? dados.message || "Nenhum produto encontrado." : "Nenhum produto salvo neste registro."}
-                        </div>
-                    `;
-                } else {
-                    produtos.forEach((produto, i) => {
-                        produtosHTML += `
-                            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
-                                <span style="font-weight: 600; color: #7b8aa3; min-width: 30px;">#${i + 1}</span>
-                                <img src="${produto.image || "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22%3E%3Crect fill=%22%23f0f2f5%22 width=%2250%22 height=%2250%22/%3E%3Ctext x=%2225%22 y=%2225%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2210%22%3Eimg%3C/text%3E%3C/svg%3E"}"
-                                  style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #f8fafc; flex-shrink: 0;">
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="font-weight: 500; font-size: 0.9rem; color: #0b1a30; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        ${produto.name}
-                                    </div>
-                                    <a href="${produto.urldoproduto}" target="_blank" style="font-size: 0.75rem; color: #2b3a67; text-decoration: none; border-bottom: 1px dotted rgba(43,58,103,0.3);">
-                                        <i class="fas fa-external-link-alt"></i> Ver na loja
-                                    </a>
-                                </div>
-                                <div style="font-weight: 700; color: #1d2b4a; font-size: 1rem; white-space: nowrap;">
-                                    ${produto.price}
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
+        if (!data || !data.success || !data.dados || data.dados.length === 0) {
+          lista.innerHTML = `
+            <div class="historico-vazio">
+              <i class="fas fa-inbox"></i>
+              <p>Nenhuma pesquisa registrada</p>
+              <span>Suas pesquisas aparecerão aqui</span>
+            </div>
+          `;
+          return;
+        }
 
-                const overlay = document.getElementById("popupOverlay");
-                const title = document.getElementById("popupTitle");
-                const content = document.getElementById("popupContent");
+        let html = "";
+        data.dados.forEach((item, index) => {
+          const loja = identificarLoja(item.search?.url || "");
+          const termo = item.search?.term || item.message || "Pesquisa";
+          const totalProdutos =
+            item.summary?.total_products ??
+            (Array.isArray(item.products) ? item.products.length : 0);
+          const dataHora = formatarData(item.timestamp);
+          const resultadoTexto = item.success
+            ? `${totalProdutos} produtos`
+            : item.message || "Sem resultados";
 
-                title.textContent = `${termo} · ${loja}`;
-                content.innerHTML = `
-                    <div style="margin-bottom: -1rem;">
-                        <div style="max-height: 305px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
-                            ${produtosHTML}
-                        </div>
-                        ${produtos.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${produtos.length} produtos</div>` : ""}
-                    </div>
-                `;
-                document.getElementById("confirmarPopupDIV").style.display = "none";
-                document.getElementById("fecharPopupDIV").style.display = "inline-flex";
+          html += `
+            <div class="historico-item" data-id="${index}" data-termo="${termo}" data-loja="${loja}" data-data="${item.timestamp}">
+              <div class="item-info">
+                <div class="item-icon" style="background: ${getCorLoja(loja)};">
+                  <i class="fas fa-store"></i>
+                </div>
+                <div class="item-detalhes">
+                  <div class="item-produto"><strong>${termo}</strong> · ${resultadoTexto}</div>
+                  <div class="item-loja">
+                    <i class="fas fa-store"></i> ${loja || "Desconhecida"}
+                    <span style="margin: 0 0.3rem;">·</span>
+                    <i class="far fa-clock"></i> ${dataHora}
+                  </div>
+                </div>
+              </div>
+              <div class="item-acoes">
+                <button class="btn-item primary" onclick="repetirBusca('${termo}')">
+                  <i class="fas fa-redo"></i> Repetir
+                </button>
+                <button class="btn-item" onclick="verDetalhesHistorico(${index})">
+                  <i class="fas fa-eye"></i> Ver
+                </button>
+                <button class="btn-item danger" onclick="removerHistorico(${index})">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        });
 
-                overlay.style.display = "flex";
-                overlay.classList.add("active");
-                document.body.style.overflow = "hidden";
-            }
+        lista.innerHTML = html;
+        document.querySelector(".historico-titulo h2").textContent =
+          `Histórico de Pesquisas (${data.dados.length})`;
+      }
 
-            function mostrarErroHistorico() {
-                document.getElementById("listaHistorico").innerHTML = `
-                    <div class="historico-vazio" style="color: #b13e3e;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Erro ao carregar histórico</p>
-                        <span>Tente novamente mais tarde</span>
-                    </div>
-                `;
-            }
+      function identificarLoja(url) {
+        if (url.includes("continente")) return "Continente";
+        if (url.includes("pingodoce")) return "Pingo Doce";
+        if (url.includes("auchan")) return "Auchan";
+        if (url.includes("lidl")) return "Lidl";
+        return "Desconhecida";
+      }
 
-            function filtrarHistorico(periodo) {
-                const btn = event
-                    ? event.target
-                    : document.querySelector(`.filtro-btn[onclick*="${periodo}"]`);
-                if (btn) {
-                    document
-                        .querySelectorAll(".filtro-btn")
-                        .forEach((b) => b.classList.remove("active"));
-                    btn.classList.add("active");
-                }
+      function getCorLoja(loja) {
+        const cores = {
+          Continente: "#2b3a67",
+          "Pingo Doce": "#2b3a67",
+          Auchan: "#2b3a67",
+          Lidl: "#2b3a67",
+        };
+        return cores[loja] || "linear-gradient(135deg, #2b3a67, #1d2b4a)";
+      }
 
-                const items = document.querySelectorAll(".historico-item");
-                const agora = new Date();
+      function formatarData(timestamp) {
+        const date = new Date(timestamp);
+        const hoje = new Date();
+        const diff = hoje - date;
 
-                items.forEach((item) => {
-                    const dataStr = item.dataset.data;
-                    if (!dataStr) {
-                        item.style.display = "";
-                        return;
-                    }
+        if (diff < 24 * 60 * 60 * 1000) {
+          return `Hoje ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+        }
+        if (diff < 48 * 60 * 60 * 1000) {
+          return `Ontem ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+        }
+        return date.toLocaleString("pt-PT", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
 
-                    const dataItem = new Date(dataStr);
-                    const diff = agora - dataItem;
-                    let mostrar = false;
+      function verDetalhesHistorico(index) {
+        if (!window.historicoData) {
+          alert("Dados do histórico não disponíveis. Recarregue a página.");
+          return;
+        }
 
-                    switch (periodo) {
-                        case "hoje":
-                            mostrar = diff < 24 * 60 * 60 * 1000;
-                            break;
-                        case "semana":
-                            mostrar = diff < 7 * 24 * 60 * 60 * 1000;
-                            break;
-                        case "mes":
-                            mostrar = diff < 30 * 24 * 60 * 60 * 1000;
-                            break;
-                        case "todos":
-                        default:
-                            mostrar = true;
-                    }
+        const dados = window.historicoData.dados[index];
+        if (!dados) {
+          alert("Item não encontrado");
+          return;
+        }
 
-                    item.style.display = mostrar ? "" : "none";
-                });
-            }
+        const loja = identificarLoja(dados.search?.url || "");
+        const termo = dados.search?.term || dados.message || "Pesquisa";
+        const produtos = Array.isArray(dados.products) ? dados.products : [];
 
-            function buscarHistorico() {
-                const termo = document
-                    .getElementById("buscaHistorico")
-                    .value.toLowerCase()
-                    .trim();
-                document.querySelectorAll(".historico-item").forEach((item) => {
-                    const termoItem = (item.dataset.termo || "").toLowerCase();
-                    const lojaItem = (item.dataset.loja || "").toLowerCase();
-                    item.style.display =
-                        termo === "" ||
-                        termoItem.includes(termo) ||
-                        lojaItem.includes(termo)
-                            ? ""
-                            : "none";
-                });
-            }
+        let produtosHTML = "";
+        if (produtos.length === 0) {
+          produtosHTML = `
+            <div style="padding: 1rem; color: #7b8aa3; text-align: center;">
+              ${dados.success === false ? dados.message || "Nenhum produto encontrado." : "Nenhum produto salvo neste registro."}
+            </div>
+          `;
+        } else {
+          produtos.forEach((produto, i) => {
+            produtosHTML += `
+              <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <span style="font-weight: 600; color: #7b8aa3; min-width: 30px;">#${i + 1}</span>
+                <img src="${produto.image || "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22%3E%3Crect fill=%22%23f0f2f5%22 width=%2250%22 height=%2250%22/%3E%3Ctext x=%2225%22 y=%2225%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2210%22%3Eimg%3C/text%3E%3C/svg%3E"}"
+                  style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #f8fafc; flex-shrink: 0;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-weight: 500; font-size: 0.9rem; color: #0b1a30; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    ${produto.name}
+                  </div>
+                  <a href="${produto.urldoproduto}" target="_blank" style="font-size: 0.75rem; color: #2b3a67; text-decoration: none; border-bottom: 1px dotted rgba(43,58,103,0.3);">
+                    <i class="fas fa-external-link-alt"></i> Ver na loja
+                  </a>
+                </div>
+                <div style="font-weight: 700; color: #1d2b4a; font-size: 1rem; white-space: nowrap;">
+                  ${produto.price}
+                </div>
+              </div>
+            `;
+          });
+        }
 
-            function removerHistorico(id) {
-                if (confirm("Remover este item do histórico?")) {
-                    console.log("Remover histórico ID:", id);
-                    pegarhistorico();
-                }
-            }
+        const overlay = document.getElementById("popupOverlay");
+        const title = document.getElementById("popupTitle");
+        const content = document.getElementById("popupContent");
 
-            function limparHistorico() {
-                if (confirm("Tem certeza que deseja limpar todo o histórico?")) {
-                    console.log("Limpar todo histórico");
-                    pegarhistorico();
-                }
-            }
+        title.textContent = `${termo} · ${loja}`;
+        content.innerHTML = `
+          <div style="margin-bottom: -1rem;">
+            <div style="max-height: 305px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
+              ${produtosHTML}
+            </div>
+            ${produtos.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${produtos.length} produtos</div>` : ""}
+          </div>
+        `;
+        document.getElementById("confirmarPopupDIV").style.display = "none";
+        document.getElementById("fecharPopupDIV").style.display = "inline-flex";
 
-            function repetirBusca(termo) {
-                const input = document.getElementById("produto");
-                if (input) {
-                    input.value = termo;
-                    fecharHistorico();
-                    runScraperTodos();
-                }
-            }
+        overlay.style.display = "flex";
+        overlay.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
 
-            // ===== LOGOUT =====
-            async function logout() {
-                try {
-                    const response = await fetch(`${urlapi}/papapi/logout`, {
-                        method: "POST",
-                        credentials: "include",
-                    });
+      function mostrarErroHistorico() {
+        document.getElementById("listaHistorico").innerHTML = `
+          <div class="historico-vazio" style="color: #b13e3e;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Erro ao carregar histórico</p>
+            <span>Tente novamente mais tarde</span>
+          </div>
+        `;
+      }
 
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const data = await response.json();
+      function filtrarHistorico(periodo) {
+        const btn = event
+          ? event.target
+          : document.querySelector(`.filtro-btn[onclick*="${periodo}"]`);
+        if (btn) {
+          document
+            .querySelectorAll(".filtro-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+        }
 
-                    if (data.success) {
-                        window.location.href =
-                            CONFIG.ambiente === "dev" ? "/public/login.html" : "/";
-                    }
-                } catch (error) {
-                    console.error("Erro ao fazer logout:", error);
-                }
-            }
+        const items = document.querySelectorAll(".historico-item");
+        const agora = new Date();
 
-            // ===== EVENTOS GLOBAIS =====
-            document.addEventListener("keydown", function (e) {
-                if (e.key === "Escape") {
-                    const overlayActive = document.getElementById("popupOverlay");
-                    if (overlayActive.style.display === "flex") fecharpopup();
+        items.forEach((item) => {
+          const dataStr = item.dataset.data;
+          if (!dataStr) {
+            item.style.display = "";
+            return;
+          }
 
-                    const menu = document.getElementById("mobileMenu");
-                    if (menu.classList.contains("open")) toggleMobileMenu();
-                }
-            });
+          const dataItem = new Date(dataStr);
+          const diff = agora - dataItem;
+          let mostrar = false;
 
-            // ===== INICIALIZAÇÃO =====
-            verificarToken();
-            preencherpaguser();
+          switch (periodo) {
+            case "hoje":
+              mostrar = diff < 24 * 60 * 60 * 1000;
+              break;
+            case "semana":
+              mostrar = diff < 7 * 24 * 60 * 60 * 1000;
+              break;
+            case "mes":
+              mostrar = diff < 30 * 24 * 60 * 60 * 1000;
+              break;
+            case "todos":
+            default:
+              mostrar = true;
+          }
 
-        }); // Fim do DOMContentLoaded
+          item.style.display = mostrar ? "" : "none";
+        });
+      }
+
+      function buscarHistorico() {
+        const termo = document
+          .getElementById("buscaHistorico")
+          .value.toLowerCase()
+          .trim();
+        document.querySelectorAll(".historico-item").forEach((item) => {
+          const termoItem = (item.dataset.termo || "").toLowerCase();
+          const lojaItem = (item.dataset.loja || "").toLowerCase();
+          item.style.display =
+            termo === "" ||
+            termoItem.includes(termo) ||
+            lojaItem.includes(termo)
+              ? ""
+              : "none";
+        });
+      }
+
+      function removerHistorico(id) {
+        if (confirm("Remover este item do histórico?")) {
+          console.log("Remover histórico ID:", id);
+          pegarhistorico();
+        }
+      }
+
+      function limparHistorico() {
+        if (confirm("Tem certeza que deseja limpar todo o histórico?")) {
+          console.log("Limpar todo histórico");
+          pegarhistorico();
+        }
+      }
+
+      function repetirBusca(termo) {
+        const input = document.getElementById("produto");
+        if (input) {
+          input.value = termo;
+          fecharHistorico();
+          runScraperTodos();
+        }
+      }
+
+      // ===== LOGOUT =====
+      async function logout() {
+        try {
+          const response = await fetch(`${urlapi}/papapi/logout`, {
+            method: "POST",
+            credentials: "include",
+          });
+
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+
+          if (data.success) {
+            window.location.href =
+              CONFIG.ambiente === "dev" ? "/public/login.html" : "/";
+          }
+        } catch (error) {
+          console.error("Erro ao fazer logout:", error);
+        }
+      }
+
+      // ===== EVENTOS GLOBAIS =====
+      document.addEventListener("DOMContentLoaded", function () {
+        const overlay = document.getElementById("popupOverlay");
+        overlay.addEventListener("click", function (e) {
+          if (e.target === overlay) fecharpopup();
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            const overlayActive = document.getElementById("popupOverlay");
+            if (overlayActive.style.display === "flex") fecharpopup();
+
+            const menu = document.getElementById("mobileMenu");
+            if (menu.classList.contains("open")) toggleMobileMenu();
+          }
+        });
+      });
     </script>
-</body>
-</html>
+    <script src="assets/js/loading.js"></script>
+    <script src="assets/js/toast.js"></script>
   </body>
 </html>
