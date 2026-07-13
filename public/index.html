@@ -23,13 +23,6 @@
         padding: 0;
       }
 
-      html,
-      body {
-        overflow-x: hidden;
-        width: 100%;
-        max-width: 100%;
-      }
-
       body {
         font-family: "Inter", Arial, sans-serif;
         background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
@@ -37,8 +30,6 @@
         display: flex;
         flex-direction: column;
         margin: 0;
-        overflow-x: hidden;
-        width: 100%;
       }
 
       .navbar {
@@ -56,8 +47,6 @@
         position: sticky;
         top: 0;
         z-index: 100;
-        max-width: 100%;
-        overflow-x: hidden;
       }
 
       .navbar-brand {
@@ -92,6 +81,7 @@
         display: flex;
         align-items: center;
         gap: 0.4rem;
+        cursor: pointer;
       }
 
       .navbar-links a:hover {
@@ -134,20 +124,15 @@
         border: none;
         color: #0b1a30;
         cursor: pointer;
-        padding: 0.5rem;
+        padding: 0.3rem 0.5rem;
         transition: all 0.3s ease;
         z-index: 101;
-        width: 44px;
-        height: 44px;
-        align-items: center;
-        justify-content: center;
         border-radius: 8px;
-        flex-shrink: 0;
       }
 
       .hamburger-btn i {
         display: inline-block;
-        transform: scale(1.6);
+        transform: scale(1.8);
         transition: all 0.3s ease;
       }
 
@@ -156,7 +141,7 @@
       }
 
       .hamburger-btn:hover i {
-        transform: scale(1.8);
+        transform: scale(2);
       }
 
       .hamburger-btn.active {
@@ -164,10 +149,10 @@
       }
 
       .hamburger-btn.active i {
-        transform: scale(1.6);
+        transform: scale(1.8);
       }
 
-      /* Menu mobile */
+      /* ===== MOBILE MENU ===== */
       .mobile-menu {
         display: none;
         position: fixed;
@@ -180,7 +165,6 @@
         -webkit-backdrop-filter: blur(8px);
         z-index: 999;
         animation: fadeIn 0.3s ease;
-        overflow: hidden;
       }
 
       .mobile-menu.open {
@@ -222,7 +206,6 @@
         gap: 0.8rem;
         animation: slideIn 0.3s ease;
         overflow-y: auto;
-        overflow-x: hidden;
       }
 
       .mobile-menu-header {
@@ -259,7 +242,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
       }
 
       .mobile-close-btn i {
@@ -374,7 +356,6 @@
         max-width: 1200px;
         margin: 0 auto;
         width: 100%;
-        overflow-x: hidden;
       }
 
       .page-header {
@@ -416,8 +397,6 @@
         align-items: center;
         gap: 0.6rem;
         margin-bottom: 1.5rem;
-        max-width: 100%;
-        overflow-x: hidden;
       }
 
       .search-section .search-input-wrap {
@@ -512,8 +491,6 @@
         display: flex;
         flex-direction: column;
         gap: 2rem;
-        max-width: 100%;
-        overflow-x: hidden;
       }
 
       .store-section {
@@ -525,8 +502,6 @@
         border: 1px solid rgba(255, 255, 255, 0.7);
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
         transition: transform 0.2s;
-        max-width: 100%;
-        overflow-x: hidden;
       }
 
       .store-section:hover {
@@ -551,6 +526,13 @@
         font-size: 1.2rem;
       }
 
+      .store-count {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #4a5a72;
+        margin-left: auto;
+      }
+
       .store-info {
         font-size: 0.9rem;
         color: #4a5a72;
@@ -565,8 +547,6 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 1.2rem;
-        max-width: 100%;
-        overflow-x: hidden;
       }
 
       .product-card {
@@ -582,8 +562,6 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
-        max-width: 100%;
-        overflow: hidden;
       }
 
       .product-card:hover {
@@ -612,6 +590,7 @@
         margin-bottom: 0.2rem;
         line-height: 1.3;
         display: -webkit-box;
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
@@ -657,6 +636,20 @@
         font-weight: 500;
       }
 
+      .no-results {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #4a5a72;
+        font-size: 1.1rem;
+      }
+
+      .no-results i {
+        font-size: 2.5rem;
+        color: #c8d4e2;
+        display: block;
+        margin-bottom: 1rem;
+      }
+
       .footer {
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(8px);
@@ -669,8 +662,6 @@
         justify-content: space-between;
         align-items: center;
         gap: 1rem;
-        max-width: 100%;
-        overflow-x: hidden;
       }
 
       .footer-brand {
@@ -748,8 +739,6 @@
         gap: 1rem;
         transition: all 0.3s ease;
         margin-bottom: 2rem;
-        max-width: 100%;
-        overflow-x: hidden;
       }
 
       .search-filtrar .filter-label {
@@ -833,7 +822,7 @@
         color: #b13e3e;
       }
 
-      /* ===== POPUP STYLES ===== */
+      /* ===== POPUP ===== */
       .popup-overlay {
         position: fixed;
         top: 0;
@@ -946,11 +935,9 @@
       .popup-body::-webkit-scrollbar {
         width: 4px;
       }
-
       .popup-body::-webkit-scrollbar-track {
         background: transparent;
       }
-
       .popup-body::-webkit-scrollbar-thumb {
         background: #2b3a67;
         border-radius: 10px;
@@ -1043,13 +1030,12 @@
         background: rgba(0, 0, 0, 0.1);
       }
 
-      /* ===== HISTÓRICO STYLES ===== */
+      /* ===== HISTÓRICO ===== */
       #historicoContainer {
-        padding: 1.5rem 0;
+        padding: 0;
         max-width: 1100px;
         margin: 0 auto;
         width: 100%;
-        overflow-x: hidden;
       }
 
       .historico-header {
@@ -1079,6 +1065,35 @@
         font-size: 1.8rem;
         color: #0b1a30;
         letter-spacing: -0.02em;
+        margin: 0;
+      }
+
+      .historico-header-actions {
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .btn-voltar-home {
+        background: rgba(43, 58, 103, 0.1);
+        border: 1px solid rgba(43, 58, 103, 0.2);
+        padding: 0.6rem 1.2rem;
+        border-radius: 40px;
+        color: #2b3a67;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: "Inter", sans-serif;
+      }
+
+      .btn-voltar-home:hover {
+        background: rgba(43, 58, 103, 0.2);
+        transform: scale(1.02);
       }
 
       .btn-limpar-historico {
@@ -1114,8 +1129,6 @@
         padding: 0.8rem 1.5rem;
         border-radius: 60px;
         border: 1px solid rgba(255, 255, 255, 0.5);
-        max-width: 100%;
-        overflow-x: hidden;
       }
 
       .filtro-periodo {
@@ -1182,8 +1195,6 @@
         display: flex;
         flex-direction: column;
         gap: 0.8rem;
-        max-width: 100%;
-        overflow-x: hidden;
       }
 
       .historico-item {
@@ -1199,8 +1210,6 @@
         gap: 1rem;
         transition: all 0.2s ease;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-        max-width: 100%;
-        overflow: hidden;
       }
 
       .historico-item:hover {
@@ -1215,18 +1224,16 @@
         gap: 1rem;
         flex: 1;
         min-width: 200px;
-        overflow: hidden;
       }
 
       .item-icon {
         width: 44px;
         height: 44px;
         border-radius: 12px;
-        background: linear-gradient(135deg, #e8edf5, #dce3ef);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #dfe6ff;
+        color: white;
         font-size: 1.2rem;
         flex-shrink: 0;
       }
@@ -1235,16 +1242,12 @@
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
-        overflow: hidden;
       }
 
       .item-produto {
         font-weight: 600;
         color: #0b1a30;
         font-size: 1rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
 
       .item-loja {
@@ -1260,29 +1263,11 @@
         color: #7b8aa3;
       }
 
-      .item-preco {
-        font-weight: 700;
-        color: #1d2b4a;
-        font-size: 1.1rem;
-        padding: 0.2rem 0.8rem;
-        background: rgba(43, 58, 103, 0.08);
-        border-radius: 20px;
-        white-space: nowrap;
-      }
-
-      .item-data {
-        font-size: 0.75rem;
-        color: #7b8aa3;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        white-space: nowrap;
-      }
-
       .item-acoes {
         display: flex;
         gap: 0.5rem;
         align-items: center;
+        flex-wrap: wrap;
       }
 
       .btn-item {
@@ -1347,9 +1332,11 @@
       }
 
       /* ===== RESPONSIVE ===== */
-      @media (max-width: 768px) {
+      @media (max-width: 1024px) {
         .hamburger-btn {
-          display: flex;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .navbar-links {
@@ -1359,16 +1346,21 @@
         .navbar-user {
           display: none !important;
         }
+        .footer-links{
+          display: none !important;
+        }
 
         .navbar {
-          padding: 0.6rem 1rem;
+          padding: 1.2rem 1.8rem;
         }
       }
 
       @media (max-width: 768px) {
         .navbar {
-          padding: 0.6rem 0.8rem;
-          gap: 0.4rem;
+          padding: 0.6rem 1rem;
+          flex-direction: row;
+          align-items: center;
+          gap: 0.6rem;
         }
 
         .navbar-brand {
@@ -1391,12 +1383,11 @@
 
         .main-content {
           padding: 1rem;
-          overflow-x: hidden;
         }
 
         .search-section {
-          border-radius: 20px;
-          padding: 0.8rem;
+          border-radius: 28px;
+          padding: 1rem;
           flex-direction: column;
           align-items: stretch;
         }
@@ -1407,16 +1398,15 @@
 
         .search-section .btn-group {
           justify-content: center;
-          flex-wrap: wrap;
         }
 
         .search-section button {
-          font-size: 0.75rem;
-          padding: 0.4rem 0.8rem;
+          font-size: 0.8rem;
+          padding: 0.5rem 1rem;
         }
 
         .products-grid {
-          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
           gap: 0.8rem;
         }
 
@@ -1430,7 +1420,7 @@
         }
 
         .page-header h1 {
-          font-size: 1.4rem;
+          font-size: 1.6rem;
         }
 
         .page-header p {
@@ -1447,7 +1437,6 @@
 
         .search-filtrar .filter-options {
           justify-content: center;
-          flex-wrap: wrap;
         }
 
         .search-filtrar .filter-options .filter-chip {
@@ -1458,21 +1447,16 @@
         .search-filtrar .filter-clear {
           margin-left: 0;
           justify-content: center;
+          font-size: 0.7rem;
         }
 
         .footer {
-          padding: 1rem;
           flex-direction: column;
           text-align: center;
-          gap: 0.8rem;
+          padding: 1rem;
         }
 
         .footer-links {
-          justify-content: center;
-          gap: 1rem;
-        }
-
-        .footer-social {
           justify-content: center;
         }
 
@@ -1480,6 +1464,10 @@
           flex-direction: column;
           align-items: stretch;
           gap: 0.8rem;
+        }
+
+        .historico-header-actions {
+          justify-content: stretch;
         }
 
         .historico-filtros {
@@ -1508,29 +1496,23 @@
           border-top: 1px solid rgba(0, 0, 0, 0.05);
           padding-top: 0.8rem;
         }
-
-        .item-preco {
-          align-self: flex-start;
-        }
       }
 
       @media (max-width: 480px) {
         .hamburger-btn {
-          width: 38px;
-          height: 38px;
-          padding: 0.3rem;
+          padding: 0.2rem 0.3rem;
         }
 
         .hamburger-btn i {
-          transform: scale(1.4);
+          transform: scale(1.5);
         }
 
         .hamburger-btn:hover i {
-          transform: scale(1.6);
+          transform: scale(1.7);
         }
 
         .navbar-brand {
-          font-size: 1rem;
+          font-size: 0.95rem;
         }
 
         .navbar-brand i {
@@ -1569,12 +1551,40 @@
         }
 
         .search-section button {
-          font-size: 0.65rem;
-          padding: 0.3rem 0.6rem;
+          font-size: 0.75rem;
+          padding: 0.4rem 0.8rem;
         }
 
         .search-section .btn-group {
           gap: 0.3rem;
+        }
+
+        .search-filtrar {
+          padding: 0.4rem 0.6rem;
+          gap: 0.4rem;
+          border-radius: 14px;
+        }
+
+        .search-filtrar .filter-label {
+          font-size: 0.7rem;
+        }
+
+        .search-filtrar .filter-options {
+          gap: 0.3rem;
+        }
+
+        .search-filtrar .filter-options .filter-chip {
+          font-size: 0.6rem;
+          padding: 0.2rem 0.6rem;
+          gap: 0.2rem;
+        }
+
+        .search-filtrar .filter-options .filter-chip i {
+          font-size: 0.55rem;
+        }
+
+        .search-filtrar .filter-clear {
+          font-size: 0.6rem;
         }
 
         .mobile-menu-content {
@@ -1646,26 +1656,9 @@
         }
       }
 
-      /* Correção para imagens */
       img {
         max-width: 100%;
         height: auto;
-      }
-
-      /* Garantir que nada ultrapasse */
-      .navbar,
-      .main-content,
-      .footer,
-      #results,
-      .store-section,
-      .products-grid,
-      .search-section,
-      .search-filtrar,
-      #historicoContainer,
-      .historico-lista,
-      .historico-item {
-        max-width: 100%;
-        overflow-x: hidden;
       }
     </style>
   </head>
@@ -1676,7 +1669,7 @@
         <i class="fas fa-handshake"></i> PoupIn
       </a>
 
-      <!-- Menu Hamburguer -->
+      <!-- Botão Hamburguer -->
       <button
         class="hamburger-btn"
         onclick="toggleMobileMenu()"
@@ -1701,9 +1694,8 @@
         <span
           class="user-name"
           style="font-size: 0.9rem; color: #3c4e68; font-weight: 500"
-        >
-          Olá, <span id="userFullName"></span>
-        </span>
+          >Olá, <span id="userFullName"></span
+        ></span>
         <div class="avatar" id="userAvatar">A</div>
       </div>
     </nav>
@@ -1842,9 +1834,14 @@
           <i class="fas fa-history"></i>
           <h2>Histórico de Pesquisas</h2>
         </div>
-        <button onclick="limparHistorico()" class="btn-limpar-historico">
-          <i class="fas fa-trash-alt"></i> Limpar Histórico
-        </button>
+        <div class="historico-header-actions">
+          <button onclick="fecharHistorico()" class="btn-voltar-home">
+            <i class="fas fa-home"></i> Home
+          </button>
+          <button onclick="limparHistorico()" class="btn-limpar-historico">
+            <i class="fas fa-trash-alt"></i> Limpar Histórico
+          </button>
+        </div>
       </div>
 
       <div class="historico-filtros">
@@ -1883,7 +1880,7 @@
     </div>
 
     <!-- ===== MAIN CONTENT ===== -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
       <div class="page-header">
         <h1><i class="fas fa-search"></i> Pesquisar Produtos</h1>
         <p>Compare preços entre as principais cadeias de supermercado</p>
@@ -1919,7 +1916,7 @@
           </div>
         </div>
 
-        <!-- ===== FILTER SECTION ===== -->
+        <!-- FILTER SECTION -->
         <div class="search-filtrar">
           <span class="filter-label">
             <i class="fas fa-sliders-h"></i> Filtrar:
@@ -2008,25 +2005,32 @@
     </footer>
 
     <script>
+      // ===== VARIÁVEIS GLOBAIS =====
       let ratingValue = 0;
-
-      function rateStar(n) {
-        ratingValue = n;
-        const stars = document.querySelectorAll("#starContainer i");
-
-        stars.forEach((star, index) => {
-          if (index < n) {
-            star.className = "fas fa-star-half-stroke";
-            star.style.color = "rgb(37, 52, 91)";
-          } else {
-            star.className = "fas fa-star-half-stroke";
-            star.style.color = "#ddd";
-          }
-        });
-      }
       let escolhapopup;
 
-      // ===== MOBILE MENU FUNCTIONS =====
+      const getConfig = () => {
+        const host = window.location.hostname;
+        const environments = {
+          localhost: { ambiente: "dev", urlapi: "http://localhost:1919" },
+          "127.0.0.1": { ambiente: "dev", urlapi: "http://localhost:1919" },
+        };
+        return (
+          environments[host] || {
+            ambiente: "prod",
+            urlapi: "https://api-pap.vercel.app",
+          }
+        );
+      };
+
+      const CONFIG = getConfig();
+      const { ambiente, urlapi } = CONFIG;
+      const lojas = ["continente", "pingodoce", "auchan", "lidl"];
+
+      console.log(`🌍 Ambiente: ${ambiente}`);
+      console.log(`🔗 API URL: ${urlapi}`);
+
+      // ===== FUNÇÕES DO MOBILE MENU =====
       function toggleMobileMenu() {
         const menu = document.getElementById("mobileMenu");
         const hamburger = document.querySelector(".hamburger-btn");
@@ -2053,7 +2057,6 @@
         }
       }
 
-      // Atualiza info do usuário no menu mobile
       function updateMobileUser(fullname) {
         const mobileName = document.getElementById("mobileUserName");
         const mobileAvatar = document.getElementById("mobileUserAvatar");
@@ -2062,7 +2065,21 @@
           mobileAvatar.textContent = (fullname || "?").charAt(0).toUpperCase();
       }
 
-      // ===== POPUP FUNCTIONS =====
+      // ===== FUNÇÕES DO POPUP =====
+      function rateStar(n) {
+        ratingValue = n;
+        const stars = document.querySelectorAll("#starContainer i");
+        stars.forEach((star, index) => {
+          if (index < n) {
+            star.className = "fas fa-star";
+            star.style.color = "rgb(37, 52, 91)";
+          } else {
+            star.className = "fas fa-star";
+            star.style.color = "#ddd";
+          }
+        });
+      }
+
       function abrirpopup(tipo) {
         const overlay = document.getElementById("popupOverlay");
         const title = document.getElementById("popupTitle");
@@ -2076,11 +2093,11 @@
                 <div style="text-align: center; margin-bottom: 25px;">
                   <p style="color: #555; margin-bottom: 10px;">Como você avalia nosso serviço?</p>
                   <div style="display: flex; justify-content: center; gap: 15px; font-size: 45px;" id="starContainer">
-                    <i class="fas fa-star-half-stroke" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(1)"></i>
-                    <i class="fas fa-star-half-stroke" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(2)"></i>
-                    <i class="fas fa-star-half-stroke" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(3)"></i>
-                    <i class="fas fa-star-half-stroke" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(4)"></i>
-                    <i class="fas fa-star-half-stroke" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(5)"></i>
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(1)"></i>
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(2)"></i>
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(3)"></i>
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(4)"></i>
+                    <i class="fas fa-star" style="color: #ddd; cursor: pointer; transition: 0.3s;" onclick="rateStar(5)"></i>
                   </div>
                   <p style="color: #999; font-size: 12px; margin-top: 5px;">Clique na estrela para avaliar</p>
                 </div>
@@ -2124,7 +2141,7 @@
           Termos: {
             titulo: "Termos de Uso",
             html: `
-              <h3><i class="fas fa-file-contract" style="color: #2b3a67; margin-right: 0.5rem;"></i>TITULO</h3>
+              <h3><i class="fas fa-file-contract" style="color: #2b3a67; margin-right: 0.5rem;"></i> Termos de Uso</h3>
               <p>Ao utilizar este serviço, você concorda com todos os termos descritos abaixo. É importante ler atentamente.</p>
               <h3><i class="fas fa-gavel" style="color: #2b3a67; margin-right: 0.5rem;"></i> Responsabilidades</h3>
               <p>O usuário é responsável por suas ações dentro da plataforma. Nos reservamos o direito de moderar conteúdo inadequado.</p>
@@ -2143,14 +2160,15 @@
         };
 
         ratingValue = 0;
-
         escolhapopup = tipo;
+
         const ConfirmarBtnDIV = document.getElementById("confirmarPopupDIV");
         if (escolhapopup != "FeedBack") {
           ConfirmarBtnDIV.style.display = "none";
         } else {
           ConfirmarBtnDIV.style.display = "inline-flex";
         }
+
         title.textContent = conteudo.titulo;
         content.innerHTML = conteudo.html;
 
@@ -2164,6 +2182,9 @@
         overlay.style.display = "none";
         overlay.classList.remove("active");
         document.body.style.overflow = "";
+        document.getElementById("confirmarPopupDIV").style.display =
+          "inline-flex";
+        document.getElementById("fecharPopupDIV").style.display = "inline-flex";
       }
 
       function confirmarPopup() {
@@ -2174,54 +2195,30 @@
 
         const comentario = document.querySelector("textarea");
         if (!ratingValue) {
-          alert("a avaliação não pode ser vazia");
-        } else {
-          fetch(`${urlapi}/papapi/enviarfeedback`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              comentarioRAW: comentario ? comentario.value : "",
-              avaliacaoRAW: ratingValue,
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log(data);
-              if (data.success) {
-                alert("Obrigado pelo feedback");
-              }
-            });
-
-          fecharpopup();
+          alert("A avaliação não pode ser vazia");
+          return;
         }
+
+        fetch(`${urlapi}/papapi/enviarfeedback`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            comentarioRAW: comentario ? comentario.value : "",
+            avaliacaoRAW: ratingValue,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert("Obrigado pelo feedback!");
+              fecharpopup();
+            }
+          })
+          .catch(() => alert("Erro ao enviar feedback. Tente novamente."));
       }
 
-      // ===== CONFIG =====
-      const getConfig = () => {
-        const host = window.location.hostname;
-        const environments = {
-          localhost: { ambiente: "dev", urlapi: "http://localhost:1919" },
-          "127.0.0.1": { ambiente: "dev", urlapi: "http://localhost:1919" },
-        };
-        if (environments[host]) {
-          return environments[host];
-        }
-        return {
-          ambiente: "prod",
-          urlapi: "https://api-pap.vercel.app",
-        };
-      };
-
-      const CONFIG = getConfig();
-      const { ambiente, urlapi } = CONFIG;
-
-      console.log(`🌍 Ambiente: ${ambiente}`);
-      console.log(`🔗 API URL: ${urlapi}`);
-
-      // ===== AUTH =====
+      // ===== AUTENTICAÇÃO =====
       function verificarToken() {
         fetch(`${urlapi}/papapi/verificar-token`, {
           method: "GET",
@@ -2230,49 +2227,90 @@
           .then((response) => response.json())
           .then((data) => {
             if (!data.success) {
-              const isLoginPage =
-                window.location.pathname === "/" ||
-                window.location.pathname === "/login.html" ||
-                window.location.pathname === "/public/login.html";
-              if (!isLoginPage) {
-                console.log("Token inválido. Redirecionando para login...");
+              if (CONFIG.ambiente === "dev") {
+                console.log(
+                  "Token inválido. Redirecionando para /login.html (dev)",
+                );
+              } else {
+                console.log("Token inválido. Redirecionando para / (prod)");
                 window.location.href = "/";
               }
-            } else {
-              const isLoginPage =
-                window.location.pathname === "/" ||
-                window.location.pathname === "/login.html" ||
-                window.location.pathname === "/public/login.html";
-              if (isLoginPage) {
-                console.log("Token válido. Redirecionando para o app...");
-                window.location.href = "/app/";
-              } else {
-                console.log("Token válido. Acesso permitido.");
-              }
+            }
+            if (data.success) {
+              console.log("Token válido. Acesso permitido.");
             }
           })
           .catch((error) => {
             console.error("Erro ao verificar token:", error);
+            if (CONFIG.ambiente === "dev") {
+              console.log(
+                "Erro ao verificar token. Redirecionando para /login.html (dev)",
+              );
+            } else {
+              console.log(
+                "Erro ao verificar token. Redirecionando para / (prod)",
+              );
+              window.location.href = "/";
+            }
           });
       }
       verificarToken();
 
+      // ===== PERFIL DO USUÁRIO =====
+      async function perfiluser() {
+        try {
+          const response = await fetch(`${urlapi}/papapi/perfil`, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return await response.json();
+        } catch (error) {
+          console.error("Erro:", error);
+          return { success: false, message: error.message };
+        }
+      }
+
+      async function preencherpaguser() {
+        try {
+          const data = await perfiluser();
+          if (data && data.success) {
+            const user = data.user;
+            const nameElement = document.getElementById("userFullName");
+            if (nameElement) nameElement.textContent = user.fullname;
+
+            const avatarDiv = document.getElementById("userAvatar");
+            if (avatarDiv)
+              avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
+
+            updateMobileUser(user.fullname);
+          } else {
+            document.getElementById("userFullName").textContent = "Visitante";
+            document.getElementById("userAvatar").textContent = "?";
+            updateMobileUser("Visitante");
+          }
+        } catch (error) {
+          console.error("Erro ao preencher perfil:", error);
+          updateMobileUser("Visitante");
+        }
+      }
+      preencherpaguser();
+
+      // ===== FUNÇÕES DO SCRAPER =====
       function enableButtons() {
         document
           .querySelectorAll(".search-section button")
           .forEach((button) => (button.disabled = false));
       }
 
-      const lojas = ["continente", "pingodoce", "auchan", "lidl"];
-      const search = document.getElementById("produto");
-
       function displayResults(loja, data) {
         const resultsDiv = document.getElementById("results");
         let html = `<div class="store-section" data-store="${loja}">
-                        <div class="store-header">
-                          <i class="fas fa-tag"></i> ${loja.toUpperCase()}
-                          <span class="store-count">${data.output && data.output.products ? data.output.products.length : 0} produtos</span>
-                        </div>`;
+          <div class="store-header">
+            <i class="fas fa-tag"></i> ${loja.toUpperCase()}
+            <span class="store-count">${data.output && data.output.products ? data.output.products.length : 0} produtos</span>
+          </div>`;
 
         if (
           data.output &&
@@ -2280,17 +2318,17 @@
           data.output.products.length > 0
         ) {
           html += `<div class="store-info"><i class="fas fa-clock"></i> Atualizado: ${new Date().toLocaleString("pt-PT")}</div>
-                              <div class="products-grid">`;
+            <div class="products-grid">`;
 
           data.output.products.forEach((product) => {
             html += `<div class="product-card" data-price="${parseFloat(product.price.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0}" data-name="${product.name}">
-                                    <img src="${product.image || "placeholder.jpg"}" alt="${product.name}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f2f5%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2212%22%3Eimagem%3C/text%3E%3C/svg%3E'">
-                                    <div class="product-info">
-                                        <div class="product-name">${product.name}</div>
-                                        <div class="product-price">${product.price}</div>
-                                        <a href="${product.urldoproduto}" target="_blank" class="product-link"><i class="fas fa-external-link-alt"></i> Ver Produto</a>
-                                    </div>
-                                </div>`;
+              <img src="${product.image || "placeholder.jpg"}" alt="${product.name}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f2f5%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2212%22%3Eimagem%3C/text%3E%3C/svg%3E'">
+              <div class="product-info">
+                <div class="product-name">${product.name}</div>
+                <div class="product-price">${product.price}</div>
+                <a href="${product.urldoproduto}" target="_blank" class="product-link"><i class="fas fa-external-link-alt"></i> Ver Produto</a>
+              </div>
+            </div>`;
           });
           html += `</div>`;
         } else {
@@ -2307,9 +2345,8 @@
         document.getElementById("results").innerHTML =
           '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
 
-        fetch(
-          `${urlapi}/papapi/run-scraper-` + LOJA + "?produto=" + search.value,
-        )
+        const search = document.getElementById("produto");
+        fetch(`${urlapi}/papapi/run-scraper-${LOJA}?produto=${search.value}`)
           .then((response) => response.json())
           .then((data) => {
             document.getElementById("results").innerHTML = "";
@@ -2333,6 +2370,7 @@
         document.getElementById("results").innerHTML =
           '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando todas as lojas...</div>';
 
+        const search = document.getElementById("produto");
         try {
           document.getElementById("results").innerHTML = "";
           for (const loja of lojas) {
@@ -2353,69 +2391,13 @@
         }
       }
 
-      function filtrarPorNome() {
-        const searchTerm = document
-          .getElementById("produto")
-          .value.toLowerCase()
-          .trim();
-        const storeSections = document.querySelectorAll(".store-section");
-
-        storeSections.forEach((section) => {
-          const productCards = section.querySelectorAll(".product-card");
-          let visibleCount = 0;
-
-          productCards.forEach((card) => {
-            const productName = (card.dataset.name || "").toLowerCase();
-            if (searchTerm === "" || productName.includes(searchTerm)) {
-              card.style.display = "";
-              visibleCount++;
-            } else {
-              card.style.display = "none";
-            }
-          });
-
-          const countSpan = section.querySelector(".store-count");
-          if (countSpan) {
-            const total = section.querySelectorAll(".product-card").length;
-            countSpan.textContent = `${visibleCount} de ${total} produtos`;
-          }
-
-          if (visibleCount === 0) {
-            section.style.display = "none";
-          } else {
-            section.style.display = "";
-          }
-        });
-
-        const visibleSections = document.querySelectorAll(
-          ".store-section:not([style*='display: none'])",
-        );
-        const existingMsg = document.querySelector(".no-results");
-        if (existingMsg) existingMsg.remove();
-
-        if (
-          visibleSections.length === 0 &&
-          document.querySelector(".store-section")
-        ) {
-          const resultsDiv = document.getElementById("results");
-          const noResultsMsg = document.createElement("div");
-          noResultsMsg.className = "no-results";
-          noResultsMsg.innerHTML = `
-                  <i class="fas fa-search"></i>
-                  Nenhum produto encontrado para "<strong>${searchTerm || "esta busca"}</strong>"
-                `;
-          resultsDiv.appendChild(noResultsMsg);
-        }
-      }
-
+      // ===== FILTROS =====
       async function apicarfiltro(filtro) {
         const filterButtons = document.querySelectorAll(".filter-chip");
         filterButtons.forEach((btn) => btn.classList.remove("active"));
 
         const activeButton = document.getElementById(`filter-${filtro}`);
-        if (activeButton) {
-          activeButton.classList.add("active");
-        }
+        if (activeButton) activeButton.classList.add("active");
 
         const resultsDiv = document.getElementById("results");
         const storeSections = resultsDiv.querySelectorAll(".store-section");
@@ -2441,50 +2423,42 @@
 
           switch (filtro) {
             case "menor-preco":
-              sortedProducts.sort((a, b) => {
-                const priceA = parseFloat(a.dataset.price || 0);
-                const priceB = parseFloat(b.dataset.price || 0);
-                return priceA - priceB;
-              });
+              sortedProducts.sort(
+                (a, b) =>
+                  parseFloat(a.dataset.price || 0) -
+                  parseFloat(b.dataset.price || 0),
+              );
               break;
             case "maior-preco":
-              sortedProducts.sort((a, b) => {
-                const priceA = parseFloat(a.dataset.price || 0);
-                const priceB = parseFloat(b.dataset.price || 0);
-                return priceB - priceA;
-              });
+              sortedProducts.sort(
+                (a, b) =>
+                  parseFloat(b.dataset.price || 0) -
+                  parseFloat(a.dataset.price || 0),
+              );
               break;
             case "az":
-              sortedProducts.sort((a, b) => {
-                const nameA = (a.dataset.name || "").toLowerCase();
-                const nameB = (b.dataset.name || "").toLowerCase();
-                return nameA.localeCompare(nameB);
-              });
+              sortedProducts.sort((a, b) =>
+                (a.dataset.name || "").localeCompare(b.dataset.name || ""),
+              );
               break;
             case "za":
-              sortedProducts.sort((a, b) => {
-                const nameA = (a.dataset.name || "").toLowerCase();
-                const nameB = (b.dataset.name || "").toLowerCase();
-                return nameB.localeCompare(nameA);
-              });
+              sortedProducts.sort((a, b) =>
+                (b.dataset.name || "").localeCompare(a.dataset.name || ""),
+              );
               break;
             case "todos":
               sortedProducts = [...filteredCards];
               break;
             default:
-              console.warn("Filtro desconhecido:", filtro);
               return;
           }
 
           allCards.forEach((card) => {
-            const isVisible = sortedProducts.includes(card);
-            card.style.display = isVisible ? "" : "none";
+            card.style.display = sortedProducts.includes(card) ? "" : "none";
           });
 
           if (filtro !== "todos") {
-            sortedProducts.forEach((card) => {
-              productsGrid.appendChild(card);
-            });
+            sortedProducts.forEach((card) => productsGrid.appendChild(card));
           }
 
           const countSpan = section.querySelector(".store-count");
@@ -2494,11 +2468,7 @@
             countSpan.textContent = `${visible} de ${total} produtos`;
           }
 
-          if (sortedProducts.length === 0) {
-            section.style.display = "none";
-          } else {
-            section.style.display = "";
-          }
+          section.style.display = sortedProducts.length === 0 ? "none" : "";
         });
 
         const visibleSections = document.querySelectorAll(
@@ -2515,43 +2485,36 @@
           const noResultsMsg = document.createElement("div");
           noResultsMsg.className = "no-results";
           noResultsMsg.innerHTML = `
-                <i class="fas fa-search"></i>
-                Nenhum produto encontrado para "<strong>${searchTerm || "esta busca"}</strong>"
-              `;
+            <i class="fas fa-search"></i>
+            Nenhum produto encontrado para "<strong>${searchTerm || "esta busca"}</strong>"
+          `;
           resultsDiv.appendChild(noResultsMsg);
         }
       }
 
       function limparFiltros() {
         const searchInput = document.getElementById("produto");
-        if (searchInput) {
-          searchInput.value = "";
-        }
+        if (searchInput) searchInput.value = "";
 
-        const filterButtons = document.querySelectorAll(".filter-chip");
-        filterButtons.forEach((btn) => btn.classList.remove("active"));
+        document
+          .querySelectorAll(".filter-chip")
+          .forEach((btn) => btn.classList.remove("active"));
         const todosBtn = document.getElementById("filter-todos");
         if (todosBtn) todosBtn.classList.add("active");
 
         document.querySelectorAll(".store-section").forEach((section) => {
           const cards = section.querySelectorAll(".product-card");
-          cards.forEach((card) => {
-            card.style.display = "";
-          });
+          cards.forEach((card) => (card.style.display = ""));
           const countSpan = section.querySelector(".store-count");
-          if (countSpan) {
-            countSpan.textContent = `${cards.length} produtos`;
-          }
+          if (countSpan) countSpan.textContent = `${cards.length} produtos`;
           section.style.display = "";
         });
 
-        const existingMsg = document.querySelector(".no-results");
-        if (existingMsg) existingMsg.remove();
-
-        const resultadosdiv = document.getElementById("results");
-        resultadosdiv.innerHTML = ``;
+        document.querySelector(".no-results")?.remove();
+        document.getElementById("results").innerHTML = "";
       }
 
+      // ===== EVENTOS DO INPUT =====
       document
         .getElementById("produto")
         .addEventListener("keypress", function (e) {
@@ -2563,86 +2526,10 @@
 
       document.getElementById("produto").addEventListener("input", function () {
         const activeFilter = document.querySelector(".filter-chip.active");
-        if (activeFilter) {
-          const filterId = activeFilter.id.replace("filter-", "");
-          apicarfiltro(filterId);
-        } else {
-          apicarfiltro("todos");
-        }
+        apicarfiltro(
+          activeFilter ? activeFilter.id.replace("filter-", "") : "todos",
+        );
       });
-
-      // ===== USER PROFILE =====
-      async function perfiluser() {
-        try {
-          const response = await fetch(`${urlapi}/papapi/perfil`, {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error("Erro:", error);
-          return {
-            success: false,
-            message: error.message,
-          };
-        }
-      }
-
-      async function preencherpaguser() {
-        try {
-          const data = await perfiluser();
-          console.log("📊 Dados do perfil:", data);
-
-          if (data && data.success) {
-            const user = data.user;
-
-            const nameElement = document.getElementById("userFullName");
-            if (nameElement) {
-              nameElement.textContent = user.fullname;
-            }
-
-            const avatarDiv = document.getElementById("userAvatar");
-            if (avatarDiv) {
-              avatarDiv.textContent = user.fullname.charAt(0).toUpperCase();
-            }
-
-            updateMobileUser(user.fullname);
-
-            console.log("Perfil carregado para:", user.fullname);
-          } else {
-            console.error(
-              "Falha ao obter perfil:",
-              data?.message || "Erro desconhecido",
-            );
-
-            const nameElement = document.getElementById("userFullName");
-            if (nameElement) {
-              nameElement.textContent = "Visitante";
-            }
-
-            const avatarDiv = document.getElementById("userAvatar");
-            if (avatarDiv) {
-              avatarDiv.textContent = "?";
-            }
-
-            updateMobileUser("Visitante");
-          }
-        } catch (error) {
-          console.error("Erro ao preencher perfil:", error);
-          updateMobileUser("Visitante");
-        }
-      }
-
-      preencherpaguser();
 
       // ===== HISTÓRICO =====
       async function pegarhistorico() {
@@ -2651,14 +2538,9 @@
             method: "POST",
             credentials: "include",
           });
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
           console.log("historico:", data);
-
           carregarHistorico(data);
           abrirHistorico();
         } catch (error) {
@@ -2673,7 +2555,6 @@
           .forEach((el) => {
             el.style.display = "none";
           });
-
         document.getElementById("historicoContainer").style.display = "block";
         document.getElementById("historicoContainer").style.animation =
           "fadeIn 0.3s ease";
@@ -2686,66 +2567,64 @@
           .forEach((el) => {
             el.style.display = "";
           });
+        // Se não houver resultados, mostra mensagem
+        const resultsDiv = document.getElementById("results");
+        if (resultsDiv.children.length === 0) {
+          resultsDiv.innerHTML =
+            '<div style="text-align:center;padding:2rem;color:#7b8aa3;"><i class="fas fa-search" style="font-size:2rem;display:block;margin-bottom:1rem;"></i>Faça uma pesquisa para ver os resultados</div>';
+        }
       }
 
       function carregarHistorico(data) {
         window.historicoData = data;
-
         const lista = document.getElementById("listaHistorico");
 
         if (!data || !data.success || !data.dados || data.dados.length === 0) {
           lista.innerHTML = `
-          <div class="historico-vazio">
-            <i class="fas fa-inbox"></i>
-            <p>Nenhuma pesquisa registrada</p>
-            <span>Suas pesquisas aparecerão aqui</span>
-          </div>
-        `;
+            <div class="historico-vazio">
+              <i class="fas fa-inbox"></i>
+              <p>Nenhuma pesquisa registrada</p>
+              <span>Suas pesquisas aparecerão aqui</span>
+            </div>
+          `;
           return;
         }
-        console.log("dados: " + data);
 
         let html = "";
-
         data.dados.forEach((item, index) => {
-          const loja = identificarLoja(item.search?.url || "");
-          const termo = item.search?.term || item.message || "Pesquisa";
-          const totalProdutos =
-            item.summary?.total_products ??
-            (Array.isArray(item.products) ? item.products.length : 0);
+          const loja = identificarLoja(item.search.url);
+          const termo = item.search.term;
+          const totalProdutos = item.summary.total_products;
           const dataHora = formatarData(item.timestamp);
-          const resultadoTexto = item.success
-            ? `${totalProdutos} produtos`
-            : item.message || "Sem resultados";
 
           html += `
-          <div class="historico-item" data-id="${index}" data-termo="${termo}" data-loja="${loja}" data-data="${item.timestamp}">
-            <div class="item-info">
-              <div class="item-icon" style="background: ${getCorLoja(loja)};">
-                <i class="fas fa-store"></i>
-              </div>
-              <div class="item-detalhes">
-                <div class="item-produto"><strong>${termo}</strong> · ${resultadoTexto}</div>
-                <div class="item-loja">
-                  <i class="fas fa-store"></i> ${loja || "Desconhecida"}
-                  <span style="margin: 0 0.3rem;">·</span>
-                  <i class="far fa-clock"></i> ${dataHora}
+            <div class="historico-item" data-id="${index}" data-termo="${termo}" data-loja="${loja}" data-data="${item.timestamp}">
+              <div class="item-info">
+                <div class="item-icon" style="background: ${getCorLoja(loja)};">
+                  <i class="fas fa-store"></i>
+                </div>
+                <div class="item-detalhes">
+                  <div class="item-produto"><strong>${termo}</strong> · ${totalProdutos} produtos</div>
+                  <div class="item-loja">
+                    <i class="fas fa-store"></i> ${loja}
+                    <span style="margin: 0 0.3rem;">·</span>
+                    <i class="far fa-clock"></i> ${dataHora}
+                  </div>
                 </div>
               </div>
+              <div class="item-acoes">
+                <button class="btn-item primary" onclick="repetirBusca('${termo}')">
+                  <i class="fas fa-redo"></i> Repetir
+                </button>
+                <button class="btn-item" onclick="verDetalhesHistorico(${index})">
+                  <i class="fas fa-eye"></i> Ver
+                </button>
+                <button class="btn-item danger" onclick="removerHistorico(${index})">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
             </div>
-            <div class="item-acoes">
-              <button class="btn-item primary" onclick="repetirBusca('${termo}')">
-                <i class="fas fa-redo"></i> Repetir
-              </button>
-              <button class="btn-item" onclick="verDetalhesHistorico(${index})">
-                <i class="fas fa-eye"></i> Ver
-              </button>
-              <button class="btn-item danger" onclick="removerHistorico(${index})">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          </div>
-        `;
+          `;
         });
 
         lista.innerHTML = html;
@@ -2782,7 +2661,6 @@
         if (diff < 48 * 60 * 60 * 1000) {
           return `Ontem ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
         }
-
         return date.toLocaleString("pt-PT", {
           day: "2-digit",
           month: "2-digit",
@@ -2804,25 +2682,16 @@
           return;
         }
 
-        const loja = identificarLoja(dados.search?.url || "");
-        const termo = dados.search?.term || dados.message || "Pesquisa";
+        const loja = identificarLoja(dados.search.url);
+        const termo = dados.search.term;
 
         let produtosHTML = "";
-        const produtos = Array.isArray(dados.products) ? dados.products : [];
-
-        if (produtos.length === 0) {
-          produtosHTML = `
-            <div style="padding: 1rem; color: #7b8aa3; text-align: center;">
-              ${dados.success === false ? dados.message || "Nenhum produto encontrado." : "Nenhum produto salvo neste registro."}
-            </div>
-          `;
-        } else {
-          produtos.forEach((produto, i) => {
-            produtosHTML += `
+        dados.products.forEach((produto, i) => {
+          produtosHTML += `
             <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
               <span style="font-weight: 600; color: #7b8aa3; min-width: 30px;">#${i + 1}</span>
               <img src="${produto.image || "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22%3E%3Crect fill=%22%23f0f2f5%22 width=%2250%22 height=%2250%22/%3E%3Ctext x=%2225%22 y=%2225%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2210%22%3Eimg%3C/text%3E%3C/svg%3E"}"
-                   style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #f8fafc; flex-shrink: 0;">
+                style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #f8fafc; flex-shrink: 0;">
               <div style="flex: 1; min-width: 0;">
                 <div style="font-weight: 500; font-size: 0.9rem; color: #0b1a30; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                   ${produto.name}
@@ -2836,23 +2705,21 @@
               </div>
             </div>
           `;
-          });
-        }
+        });
 
         const overlay = document.getElementById("popupOverlay");
         const title = document.getElementById("popupTitle");
         const content = document.getElementById("popupContent");
 
         title.textContent = `${termo} · ${loja}`;
-
         content.innerHTML = `
-        <div style="margin-bottom: -1rem;">
-          <div style="max-height: 305px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
-            ${produtosHTML}
+          <div style="margin-bottom: -1rem;">
+            <div style="max-height: 305px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
+              ${produtosHTML}
+            </div>
+            ${dados.products.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${dados.products.length} produtos</div>` : ""}
           </div>
-          ${dados.products.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${dados.products.length} produtos</div>` : ""}
-        </div>
-      `;
+        `;
 
         document.getElementById("confirmarPopupDIV").style.display = "none";
         document.getElementById("fecharPopupDIV").style.display = "inline-flex";
@@ -2863,14 +2730,13 @@
       }
 
       function mostrarErroHistorico() {
-        const lista = document.getElementById("listaHistorico");
-        lista.innerHTML = `
-        <div class="historico-vazio" style="color: #b13e3e;">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Erro ao carregar histórico</p>
-          <span>Tente novamente mais tarde</span>
-        </div>
-      `;
+        document.getElementById("listaHistorico").innerHTML = `
+          <div class="historico-vazio" style="color: #b13e3e;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Erro ao carregar histórico</p>
+            <span>Tente novamente mais tarde</span>
+          </div>
+        `;
       }
 
       function filtrarHistorico(periodo) {
@@ -2922,16 +2788,15 @@
           .getElementById("buscaHistorico")
           .value.toLowerCase()
           .trim();
-        const items = document.querySelectorAll(".historico-item");
-
-        items.forEach((item) => {
+        document.querySelectorAll(".historico-item").forEach((item) => {
           const termoItem = (item.dataset.termo || "").toLowerCase();
           const lojaItem = (item.dataset.loja || "").toLowerCase();
-          const match =
+          item.style.display =
             termo === "" ||
             termoItem.includes(termo) ||
-            lojaItem.includes(termo);
-          item.style.display = match ? "" : "none";
+            lojaItem.includes(termo)
+              ? ""
+              : "none";
         });
       }
 
@@ -2966,56 +2831,35 @@
             credentials: "include",
           });
 
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
-          console.log("Logout:", data);
 
           if (data.success) {
-            if (CONFIG.ambiente === "dev") {
-              console.log(
-                "Logout bem-sucedido. Redirecionando para /login.html",
-              );
-              window.location.href = "/public/login.html";
-            } else {
-              console.log("Logout bem-sucedido. Redirecionando para /");
-              window.location.href = "/";
-            }
-          } else {
-            console.error("Falha ao fazer logout:", data.message);
+            window.location.href =
+              CONFIG.ambiente === "dev" ? "/public/login.html" : "/";
           }
         } catch (error) {
           console.error("Erro ao fazer logout:", error);
         }
       }
 
-      // Fechar popup com ESC
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape") {
-          const overlay = document.getElementById("popupOverlay");
-          if (overlay.style.display === "flex") {
-            fecharpopup();
-          }
-          const menu = document.getElementById("mobileMenu");
-          if (menu.classList.contains("open")) {
-            toggleMobileMenu();
-          }
-        }
-      });
-
-      // Fechar popup clicando fora
+      // ===== EVENTOS GLOBAIS =====
       document.addEventListener("DOMContentLoaded", function () {
         const overlay = document.getElementById("popupOverlay");
         overlay.addEventListener("click", function (e) {
-          if (e.target === overlay) {
-            fecharpopup();
+          if (e.target === overlay) fecharpopup();
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            const overlayActive = document.getElementById("popupOverlay");
+            if (overlayActive.style.display === "flex") fecharpopup();
+
+            const menu = document.getElementById("mobileMenu");
+            if (menu.classList.contains("open")) toggleMobileMenu();
           }
         });
       });
     </script>
-    <script src="assets/js/loading.js"></script>
-    <script src="assets/js/toast.js"></script>
   </body>
 </html>
