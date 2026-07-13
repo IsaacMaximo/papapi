@@ -2789,10 +2789,6 @@
 
         const resultsDiv = document.getElementById("results");
         const storeSections = resultsDiv.querySelectorAll(".store-section");
-        const searchTerm = document
-          .getElementById("produto")
-          .value.toLowerCase()
-          .trim();
 
         storeSections.forEach((section) => {
           const productsGrid = section.querySelector(".products-grid");
@@ -2802,12 +2798,7 @@
             productsGrid.querySelectorAll(".product-card"),
           );
 
-          let filteredCards = allCards.filter((card) => {
-            const productName = (card.dataset.name || "").toLowerCase();
-            return searchTerm === "" || productName.includes(searchTerm);
-          });
-
-          let sortedProducts = [...filteredCards];
+          let sortedProducts = [...allCards];
 
           switch (filtro) {
             case "menor-preco":
@@ -2842,21 +2833,46 @@
           }
 
           allCards.forEach((card) => {
-            card.style.display = sortedProducts.includes(card) ? "" : "none";
+            card.style.display = "";
           });
 
           if (filtro !== "todos") {
+            switch (filtro) {
+              case "menor-preco":
+                sortedProducts.sort(
+                  (a, b) =>
+                    parseFloat(a.dataset.price || 0) -
+                    parseFloat(b.dataset.price || 0),
+                );
+                break;
+              case "maior-preco":
+                sortedProducts.sort(
+                  (a, b) =>
+                    parseFloat(b.dataset.price || 0) -
+                    parseFloat(a.dataset.price || 0),
+                );
+                break;
+              case "az":
+                sortedProducts.sort((a, b) =>
+                  (a.dataset.name || "").localeCompare(b.dataset.name || ""),
+                );
+                break;
+              case "za":
+                sortedProducts.sort((a, b) =>
+                  (b.dataset.name || "").localeCompare(a.dataset.name || ""),
+                );
+                break;
+            }
             sortedProducts.forEach((card) => productsGrid.appendChild(card));
           }
 
           const countSpan = section.querySelector(".store-count");
           if (countSpan) {
             const total = allCards.length;
-            const visible = sortedProducts.length;
-            countSpan.textContent = `${visible} de ${total} produtos`;
+            countSpan.textContent = `${total} produtos`;
           }
 
-          section.style.display = sortedProducts.length === 0 ? "none" : "";
+          section.style.display = "";
         });
 
         const visibleSections = document.querySelectorAll(
