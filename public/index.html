@@ -2594,7 +2594,9 @@
         data.dados.forEach((item, index) => {
           const loja = identificarLoja(item.search?.url || "");
           const termo = item.search?.term || item.message || "Pesquisa";
-          const totalProdutos = item.summary?.total_products ?? (Array.isArray(item.products) ? item.products.length : 0);
+          const totalProdutos =
+            item.summary?.total_products ??
+            (Array.isArray(item.products) ? item.products.length : 0);
           const dataHora = formatarData(item.timestamp);
           const resultadoTexto = item.success
             ? `${totalProdutos} produtos`
@@ -2729,7 +2731,10 @@
             <div style="max-height: 305px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
               ${produtosHTML}
             </div>
-              ${produtos.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${produtos.length} produtos</div>` : ""}
+            ${produtos.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${produtos.length} produtos</div>` : ""}
+          </div>
+        `;
+        document.getElementById("confirmarPopupDIV").style.display = "none";
         document.getElementById("fecharPopupDIV").style.display = "inline-flex";
 
         overlay.style.display = "flex";
