@@ -101,13 +101,6 @@ app.use(
 app.use(express.json());
 app.set("trust proxy", 1);
 
-const fs = require('fs');
-
-// Lê e exibe o conteúdo do .env
-const envContent = fs.readFileSync('.env', 'utf8');
-console.log('Conteúdo do .env:');
-console.log(envContent);
-
 
 const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -370,6 +363,14 @@ app.get(
 );
 
 app.get("/papapi/", (req, res) => {
+  
+const fs = require('fs');
+
+// Lê e exibe o conteúdo do .env
+const envContent = fs.readFileSync('.env', 'utf8');
+console.log('Conteúdo do .env:');
+console.log(envContent);
+
   res.send("Servidor Node.js funcionando!");
 });
 
