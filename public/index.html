@@ -2600,6 +2600,7 @@
 
       // ===== AUTENTICAÇÃO =====
       function verificarToken() {
+        
         fetch(`${urlapi}/papapi/verificar-token`, {
           method: "GET",
           credentials: "include",
@@ -2613,11 +2614,18 @@
                 );
               } else {
                 console.log("Token inválido. Redirecionando para / (prod)");
+                ToastNotification.info(
+                "Login invalido, redirecionando para tela de login..."
+              );
+
                 window.location.href = "/";
               }
             }
             if (data.success) {
               console.log("Token válido. Acesso permitido.");
+              ToastNotification.success(
+                "Login bem sucedido",
+              );
             }
           })
           .catch((error) => {
@@ -2629,6 +2637,9 @@
             } else {
               console.log(
                 "Erro ao verificar token. Redirecionando para / (prod)",
+              );
+              ToastNotification.error(
+                "erro interno",
               );
               window.location.href = "/";
             }
@@ -2648,6 +2659,9 @@
           return await response.json();
         } catch (error) {
           console.error("Erro:", error);
+                        ToastNotification.error(
+                "erro interno",
+              );
           return { success: false, message: error.message };
         }
       }
@@ -2666,6 +2680,9 @@
 
             updateMobileUser(user.fullname);
           } else {
+                          ToastNotification.error(
+                "erro ao buscar informacoes do usuario",
+              );
             document.getElementById("userFullName").textContent = "Visitante";
             document.getElementById("userAvatar").textContent = "?";
             updateMobileUser("Visitante");
@@ -2685,6 +2702,9 @@
       }
 
       function displayResults(loja, data) {
+                      ToastNotification.success(
+                `resultados carregados de ${loja}`,
+              );
         const resultsDiv = document.getElementById("results");
         let html = `<div class="store-section" data-store="${loja}">
           <div class="store-header">
@@ -2894,6 +2914,9 @@
           `;
           resultsDiv.appendChild(noResultsMsg);
         }
+                      ToastNotification.success(
+                "filtro aplicado com sucesso",
+              );
       }
 
       function limparFiltros() {
@@ -2916,6 +2939,8 @@
 
         document.querySelector(".no-results")?.remove();
         document.getElementById("results").innerHTML = "";
+        ToastNotification.success(
+                "filtros removidos com sucesso",)
       }
 
       // ===== EVENTOS DO INPUT =====
@@ -2938,6 +2963,7 @@
       // ===== HISTÓRICO =====
       async function pegarhistorico() {
         try {
+          LoadingOverlay.show("Retornando historico de produtos...");
           const response = await fetch(`${urlapi}/papapi/pegarhistorico`, {
             method: "POST",
             credentials: "include",
@@ -2947,6 +2973,7 @@
           console.log("historico:", data);
           carregarHistorico(data);
           abrirHistorico();
+          LoadingOverlay.hide()
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           mostrarErroHistorico();

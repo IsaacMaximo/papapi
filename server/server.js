@@ -363,14 +363,6 @@ app.get(
 );
 
 app.get("/papapi/", (req, res) => {
-  
-const fs = require('fs');
-
-// Lê e exibe o conteúdo do .env
-const envContent = fs.readFileSync('.env', 'utf8');
-console.log('Conteúdo do .env:');
-console.log(envContent);
-
   res.send("Servidor Node.js funcionando!");
 });
 
