@@ -2701,12 +2701,21 @@
             <div class="products-grid">`;
 
           data.output.products.forEach((product) => {
-            html += `<div class="product-card" data-price="${parseFloat(product.price.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0}" data-name="${product.name}">
-              <img src="${product.image || "placeholder.jpg"}" alt="${product.name}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f2f5%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2212%22%3Eimagem%3C/text%3E%3C/svg%3E'">
+            const productName = String(product.name || "Produto");
+            const productPriceText = String(product.price || "");
+            const productPriceValue =
+              parseFloat(
+                productPriceText.replace(/[^0-9.,]/g, "").replace(",", "."),
+              ) || 0;
+            const productImage = product.image || "placeholder.jpg";
+            const productUrl = product.urldoproduto || "#";
+
+            html += `<div class="product-card" data-price="${productPriceValue}" data-name="${productName}">
+              <img src="${productImage}" alt="${productName}" class="product-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f2f5%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2212%22%3Eimagem%3C/text%3E%3C/svg%3E'">
               <div class="product-info">
-                <div class="product-name">${product.name}</div>
-                <div class="product-price">${product.price}</div>
-                <a href="${product.urldoproduto}" target="_blank" class="product-link"><i class="fas fa-external-link-alt"></i> Ver Produto</a>
+                <div class="product-name">${productName}</div>
+                <div class="product-price">${productPriceText}</div>
+                <a href="${productUrl}" target="_blank" class="product-link"><i class="fas fa-external-link-alt"></i> Ver Produto</a>
               </div>
             </div>`;
           });
@@ -2767,7 +2776,6 @@
         } finally {
           buttons.forEach((btn) => (btn.disabled = false));
           document.body.style.cursor = "default";
-          limparFiltros();
         }
       }
 
