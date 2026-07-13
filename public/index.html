@@ -1047,6 +1047,7 @@
         margin-bottom: 2rem;
         padding-bottom: 1rem;
         border-bottom: 2px solid rgba(43, 58, 103, 0.1);
+        margin-top: 2rem;
       }
 
       .historico-titulo {
@@ -1195,6 +1196,26 @@
         display: flex;
         flex-direction: column;
         gap: 0.8rem;
+        max-height: 70vh;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .historico-lista::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .historico-lista::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .historico-lista::-webkit-scrollbar-thumb {
+        background: rgba(43, 58, 103, 0.3);
+        border-radius: 10px;
+      }
+
+      .historico-lista::-webkit-scrollbar-thumb:hover {
+        background: rgba(43, 58, 103, 0.5);
       }
 
       .historico-item {
@@ -1332,6 +1353,8 @@
       }
 
       /* ===== RESPONSIVE ===== */
+
+      /* Tablet e dispositivos médios */
       @media (max-width: 1024px) {
         .hamburger-btn {
           display: inline-flex;
@@ -1352,6 +1375,68 @@
 
         .navbar {
           padding: 1.2rem 1.8rem;
+        }
+
+        .historico-header {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 1rem;
+        }
+
+        .historico-header-actions {
+          justify-content: stretch;
+          flex-wrap: wrap;
+        }
+
+        .historico-header-actions button {
+          flex: 1;
+          min-width: 140px;
+          justify-content: center;
+        }
+
+        .historico-filtros {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 1rem;
+          padding: 1rem;
+          border-radius: 28px;
+        }
+
+        .filtro-periodo {
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .historico-busca {
+          min-width: unset;
+          width: 100%;
+        }
+
+        .historico-item {
+          padding: 1rem;
+          gap: 0.8rem;
+        }
+
+        .item-info {
+          min-width: unset;
+          flex: 1 1 100%;
+        }
+
+        .item-acoes {
+          justify-content: flex-end;
+          width: 100%;
+          border-top: 1px solid rgba(0, 0, 0, 0.06);
+          padding-top: 0.8rem;
+          flex-wrap: wrap;
+        }
+
+        .btn-item {
+          padding: 0.4rem 0.7rem;
+          font-size: 0.75rem;
+        }
+
+        .historico-titulo h2 {
+          font-size: 1.4rem;
         }
       }
 
@@ -1461,40 +1546,160 @@
         }
 
         .historico-header {
-          flex-direction: column;
-          align-items: stretch;
-          gap: 0.8rem;
+          margin-top: 1rem;
+          margin-bottom: 1.2rem;
+          padding-bottom: 0.8rem;
+        }
+
+        .historico-titulo {
+          gap: 0.5rem;
+        }
+
+        .historico-titulo i {
+          font-size: 1.5rem;
+        }
+
+        .historico-titulo h2 {
+          font-size: 1.2rem;
         }
 
         .historico-header-actions {
-          justify-content: stretch;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .historico-header-actions button {
+          width: 100%;
+          justify-content: center;
+          padding: 0.6rem 1rem;
+          font-size: 0.8rem;
         }
 
         .historico-filtros {
-          flex-direction: column;
-          align-items: stretch;
-          border-radius: 28px;
-          padding: 1rem;
+          padding: 0.8rem;
+          border-radius: 20px;
           gap: 0.8rem;
         }
 
         .filtro-periodo {
-          justify-content: center;
+          gap: 0.3rem;
+        }
+
+        .filtro-btn {
+          font-size: 0.7rem;
+          padding: 0.35rem 0.8rem;
+        }
+
+        .historico-busca {
+          padding: 0.2rem 0.8rem;
+        }
+
+        .historico-busca input {
+          font-size: 0.8rem;
+          padding: 0.4rem 0;
         }
 
         .historico-item {
-          flex-direction: column;
-          align-items: stretch;
+          padding: 0.8rem 1rem;
+          border-radius: 12px;
         }
 
         .item-info {
-          min-width: unset;
+          gap: 0.8rem;
+        }
+
+        .item-icon {
+          width: 38px;
+          height: 38px;
+          font-size: 1rem;
+        }
+
+        .item-produto {
+          font-size: 0.9rem;
+        }
+
+        .item-loja {
+          font-size: 0.7rem;
         }
 
         .item-acoes {
-          justify-content: flex-end;
-          border-top: 1px solid rgba(0, 0, 0, 0.05);
-          padding-top: 0.8rem;
+          justify-content: center;
+          gap: 0.4rem;
+        }
+
+        .btn-item {
+          font-size: 0.7rem;
+          padding: 0.3rem 0.6rem;
+        }
+
+        .btn-item.primary {
+          font-size: 0.7rem;
+          padding: 0.3rem 0.8rem;
+        }
+
+        .historico-vazio {
+          padding: 2.5rem 1rem;
+        }
+
+        .historico-vazio i {
+          font-size: 2.5rem;
+        }
+
+        .historico-vazio p {
+          font-size: 1rem;
+        }
+
+        .historico-vazio span {
+          font-size: 0.8rem;
+        }
+
+        .popup-body {
+          padding: 1.2rem;
+          max-height: 300px;
+        }
+
+        .popup-content {
+          font-size: 0.9rem;
+        }
+
+        .popup-content h3 {
+          font-size: 1rem;
+        }
+
+        .popup-content p {
+          font-size: 0.85rem;
+        }
+
+        .popup-content ul li {
+          font-size: 0.85rem;
+        }
+
+        .popup-footer {
+          flex-direction: column;
+          padding: 1rem 1.2rem 1.5rem;
+        }
+
+        .popup-btn {
+          justify-content: center;
+          width: 100%;
+          padding: 0.6rem 1rem;
+          font-size: 0.85rem;
+        }
+
+        .popup-header h2 {
+          font-size: 1.2rem;
+        }
+
+        .popup-icon {
+          width: 50px;
+          height: 50px;
+          font-size: 1.4rem;
+        }
+
+        .popup-close {
+          width: 34px;
+          height: 34px;
+          font-size: 0.9rem;
         }
       }
 
@@ -1611,17 +1816,115 @@
           font-size: 1rem;
         }
 
+        .historico-header {
+          margin-top: 0.5rem;
+          margin-bottom: 1rem;
+          gap: 0.6rem;
+        }
+
         .historico-titulo h2 {
-          font-size: 1.4rem;
+          font-size: 1rem;
+        }
+
+        .historico-titulo i {
+          font-size: 1.2rem;
+        }
+
+        .historico-header-actions button {
+          font-size: 0.7rem;
+          padding: 0.5rem 0.8rem;
+        }
+
+        .historico-filtros {
+          padding: 0.6rem;
+          border-radius: 16px;
+          gap: 0.6rem;
+        }
+
+        .filtro-periodo {
+          gap: 0.2rem;
         }
 
         .filtro-btn {
-          font-size: 0.7rem;
-          padding: 0.3rem 0.7rem;
+          font-size: 0.6rem;
+          padding: 0.25rem 0.6rem;
         }
 
         .historico-busca {
-          min-width: unset;
+          padding: 0.15rem 0.6rem;
+        }
+
+        .historico-busca i {
+          font-size: 0.7rem;
+        }
+
+        .historico-busca input {
+          font-size: 0.7rem;
+          padding: 0.3rem 0;
+        }
+
+        .historico-item {
+          padding: 0.6rem 0.8rem;
+          border-radius: 10px;
+          gap: 0.5rem;
+        }
+
+        .item-info {
+          gap: 0.6rem;
+        }
+
+        .item-icon {
+          width: 32px;
+          height: 32px;
+          font-size: 0.8rem;
+          border-radius: 8px;
+        }
+
+        .item-produto {
+          font-size: 0.8rem;
+        }
+
+        .item-loja {
+          font-size: 0.6rem;
+          flex-wrap: wrap;
+          gap: 0.2rem;
+        }
+
+        .item-acoes {
+          justify-content: center;
+          gap: 0.3rem;
+          padding-top: 0.5rem;
+        }
+
+        .btn-item {
+          font-size: 0.6rem;
+          padding: 0.25rem 0.5rem;
+          border-radius: 20px;
+        }
+
+        .btn-item.primary {
+          font-size: 0.6rem;
+          padding: 0.25rem 0.6rem;
+        }
+
+        .btn-item i {
+          font-size: 0.6rem;
+        }
+
+        .historico-vazio {
+          padding: 2rem 0.8rem;
+        }
+
+        .historico-vazio i {
+          font-size: 2rem;
+        }
+
+        .historico-vazio p {
+          font-size: 0.9rem;
+        }
+
+        .historico-vazio span {
+          font-size: 0.7rem;
         }
 
         .popup-header {
@@ -1656,6 +1959,83 @@
         }
       }
 
+      /* Telas muito pequenas (320px) */
+      @media (max-width: 380px) {
+        .historico-item {
+          padding: 0.5rem 0.6rem;
+        }
+
+        .item-info {
+          flex-wrap: wrap;
+          justify-content: center;
+          text-align: center;
+          gap: 0.4rem;
+        }
+
+        .item-icon {
+          width: 28px;
+          height: 28px;
+          font-size: 0.7rem;
+        }
+
+        .item-produto {
+          font-size: 0.75rem;
+        }
+
+        .item-loja {
+          font-size: 0.55rem;
+        }
+
+        .item-acoes {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.3rem;
+        }
+
+        .btn-item {
+          justify-content: center;
+          font-size: 0.6rem;
+          padding: 0.25rem 0.4rem;
+          width: 100%;
+        }
+
+        .btn-item.primary {
+          width: 100%;
+        }
+
+        .filtro-periodo {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .filtro-btn {
+          font-size: 0.55rem;
+          padding: 0.2rem 0.5rem;
+        }
+      }
+
+      /* Desativar hover em dispositivos touch */
+      @media (hover: none) {
+        .historico-item:hover {
+          transform: none;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .btn-item:hover {
+          background: transparent;
+          transform: none;
+        }
+
+        .btn-item.primary:hover {
+          transform: none;
+        }
+
+        .btn-limpar-historico:hover,
+        .btn-voltar-home:hover {
+          transform: none;
+        }
+      }
+
       img {
         max-width: 100%;
         height: auto;
@@ -1665,7 +2045,7 @@
   <body>
     <!-- ===== NAVBAR ===== -->
     <nav class="navbar">
-      <a href="#" class="navbar-brand">
+      <a href="#" class="navbar-brand" onclick="fecharHistorico()">
         <i class="fas fa-handshake"></i> PoupIn
       </a>
 
