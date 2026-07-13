@@ -1346,7 +1346,7 @@
         .navbar-user {
           display: none !important;
         }
-        .footer-links{
+        .footer-links {
           display: none !important;
         }
 
@@ -2592,10 +2592,13 @@
 
         let html = "";
         data.dados.forEach((item, index) => {
-          const loja = identificarLoja(item.search.url);
-          const termo = item.search.term;
-          const totalProdutos = item.summary.total_products;
+          const loja = identificarLoja(item.search?.url || "");
+          const termo = item.search?.term || item.message || "Pesquisa";
+          const totalProdutos = item.summary?.total_products ?? (Array.isArray(item.products) ? item.products.length : 0);
           const dataHora = formatarData(item.timestamp);
+          const resultadoTexto = item.success
+            ? `${totalProdutos} produtos`
+            : item.message || "Sem resultados";
 
           html += `
             <div class="historico-item" data-id="${index}" data-termo="${termo}" data-loja="${loja}" data-data="${item.timestamp}">
@@ -2604,9 +2607,9 @@
                   <i class="fas fa-store"></i>
                 </div>
                 <div class="item-detalhes">
-                  <div class="item-produto"><strong>${termo}</strong> · ${totalProdutos} produtos</div>
+                  <div class="item-produto"><strong>${termo}</strong> · ${resultadoTexto}</div>
                   <div class="item-loja">
-                    <i class="fas fa-store"></i> ${loja}
+                    <i class="fas fa-store"></i> ${loja || "Desconhecida"}
                     <span style="margin: 0 0.3rem;">·</span>
                     <i class="far fa-clock"></i> ${dataHora}
                   </div>
@@ -2682,30 +2685,39 @@
           return;
         }
 
-        const loja = identificarLoja(dados.search.url);
-        const termo = dados.search.term;
+        const loja = identificarLoja(dados.search?.url || "");
+        const termo = dados.search?.term || dados.message || "Pesquisa";
+        const produtos = Array.isArray(dados.products) ? dados.products : [];
 
         let produtosHTML = "";
-        dados.products.forEach((produto, i) => {
-          produtosHTML += `
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
-              <span style="font-weight: 600; color: #7b8aa3; min-width: 30px;">#${i + 1}</span>
-              <img src="${produto.image || "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22%3E%3Crect fill=%22%23f0f2f5%22 width=%2250%22 height=%2250%22/%3E%3Ctext x=%2225%22 y=%2225%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2210%22%3Eimg%3C/text%3E%3C/svg%3E"}"
-                style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #f8fafc; flex-shrink: 0;">
-              <div style="flex: 1; min-width: 0;">
-                <div style="font-weight: 500; font-size: 0.9rem; color: #0b1a30; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                  ${produto.name}
-                </div>
-                <a href="${produto.urldoproduto}" target="_blank" style="font-size: 0.75rem; color: #2b3a67; text-decoration: none; border-bottom: 1px dotted rgba(43,58,103,0.3);">
-                  <i class="fas fa-external-link-alt"></i> Ver na loja
-                </a>
-              </div>
-              <div style="font-weight: 700; color: #1d2b4a; font-size: 1rem; white-space: nowrap;">
-                ${produto.price}
-              </div>
+        if (produtos.length === 0) {
+          produtosHTML = `
+            <div style="padding: 1rem; color: #7b8aa3; text-align: center;">
+              ${dados.success === false ? dados.message || "Nenhum produto encontrado." : "Nenhum produto salvo neste registro."}
             </div>
           `;
-        });
+        } else {
+          produtos.forEach((produto, i) => {
+            produtosHTML += `
+              <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <span style="font-weight: 600; color: #7b8aa3; min-width: 30px;">#${i + 1}</span>
+                <img src="${produto.image || "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22%3E%3Crect fill=%22%23f0f2f5%22 width=%2250%22 height=%2250%22/%3E%3Ctext x=%2225%22 y=%2225%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2399a9be%22 font-family=%22Inter%22 font-size=%2210%22%3Eimg%3C/text%3E%3C/svg%3E"}"
+                  style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #f8fafc; flex-shrink: 0;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-weight: 500; font-size: 0.9rem; color: #0b1a30; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    ${produto.name}
+                  </div>
+                  <a href="${produto.urldoproduto}" target="_blank" style="font-size: 0.75rem; color: #2b3a67; text-decoration: none; border-bottom: 1px dotted rgba(43,58,103,0.3);">
+                    <i class="fas fa-external-link-alt"></i> Ver na loja
+                  </a>
+                </div>
+                <div style="font-weight: 700; color: #1d2b4a; font-size: 1rem; white-space: nowrap;">
+                  ${produto.price}
+                </div>
+              </div>
+            `;
+          });
+        }
 
         const overlay = document.getElementById("popupOverlay");
         const title = document.getElementById("popupTitle");
@@ -2717,11 +2729,7 @@
             <div style="max-height: 305px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px;">
               ${produtosHTML}
             </div>
-            ${dados.products.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${dados.products.length} produtos</div>` : ""}
-          </div>
-        `;
-
-        document.getElementById("confirmarPopupDIV").style.display = "none";
+              ${produtos.length > 10 ? `<div style="text-align: center; padding: 0.5rem; color: #7b8aa3; font-size: 0.8rem;">Mostrando todos os ${produtos.length} produtos</div>` : ""}
         document.getElementById("fecharPopupDIV").style.display = "inline-flex";
 
         overlay.style.display = "flex";
