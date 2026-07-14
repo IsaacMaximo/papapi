@@ -2597,47 +2597,96 @@
           .catch(() => alert("Erro ao enviar feedback. Tente novamente."));
       }
 
-      function verificarToken() {
-        fetch(`${urlapi}/papapi/verificar-token`, {
-          method: "GET",
-          credentials: "include",
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (!data.success) {
-              if (CONFIG.ambiente === "dev") {
-                console.log(
-                  "Token inválido. Redirecionando para /login.html (dev)",
-                );
-              } else {
-                console.log("Token inválido. Redirecionando para / (prod)");
-                ToastNotification.info(
-                  "Login invalido, redirecionando para tela de login...",
-                );
-
-                window.location.href = "/";
-              }
-            }
-            if (data.success) {
-              console.log("Token válido. Acesso permitido.");
-              ToastNotification.success("Login bem sucedido");
-            }
-          })
-          .catch((error) => {
-            console.error("Erro ao verificar token:", error);
-            if (CONFIG.ambiente === "dev") {
-              console.log(
-                "Erro ao verificar token. Redirecionando para /login.html (dev)",
-              );
-            } else {
-              console.log(
-                "Erro ao verificar token. Redirecionando para / (prod)",
-              );
-              ToastNotification.error("erro interno");
-              window.location.href = "/";
-            }
-          });
+      function redirecionarParaLogin() {
+        if (CONFIG.ambiente === "dev") {
+          console.log("Token inválido. Redirecionando para /login.html (dev)");
+        } else {
+          console.log("Token inválido. Redirecionando para / (prod)");
+          ToastNotification.info(
+            "Login inválido, redirecionando para tela de login...",
+          );
+          window.location.href = "/";
+        }
       }
+
+      async function verificarToken(refreshAttempted = false) {
+        try {
+          const response = await fetch(`${urlapi}/papapi/verificar-token`, {
+            method: "GET",
+            credentials: "include",
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            console.log("Token válido. Acesso permitido.");
+            ToastNotification.success("Login bem sucedido");
+            return true;
+          }
+
+          console.warn("Token inválido no verify-token:", data);
+
+          if (refreshAttempted) {
+            redirecionarParaLogin();
+            return false;
+          }
+
+          const refreshResponse = await fetch(
+            `${urlapi}/papapi/refresh-token`,
+            {
+              method: "POST",
+              credentials: "include",
+            },
+          );
+
+          const refreshData = await refreshResponse.json();
+
+          if (refreshResponse.ok && refreshData.success) {
+            console.log("Refresh token válido. Token renovado com sucesso.");
+            ToastNotification.success("Sessão renovada com sucesso");
+            return verificarToken(true);
+          }
+
+          console.warn("Refresh token falhou:", refreshData);
+          redirecionarParaLogin();
+          return false;
+        } catch (error) {
+          console.error("Erro ao verificar token:", error);
+
+          if (refreshAttempted) {
+            redirecionarParaLogin();
+            return false;
+          }
+
+          try {
+            const refreshResponse = await fetch(
+              `${urlapi}/papapi/refresh-token`,
+              {
+                method: "POST",
+                credentials: "include",
+              },
+            );
+            const refreshData = await refreshResponse.json();
+
+            if (refreshResponse.ok && refreshData.success) {
+              console.log("Refresh token válido. Token renovado com sucesso.");
+              ToastNotification.success("Sessão renovada com sucesso");
+              return verificarToken(true);
+            }
+
+            console.warn(
+              "Refresh token falhou após erro de verificação:",
+              refreshData,
+            );
+          } catch (refreshError) {
+            console.error("Erro ao tentar renovar token:", refreshError);
+          }
+
+          redirecionarParaLogin();
+          return false;
+        }
+      }
+
       verificarToken();
 
       // ===== PERFIL DO USUÁRIO =====
@@ -2842,7 +2891,6 @@
             default:
               ToastNotification.success("filtro aplicado com sucesso");
               return;
-            
           }
 
           allCards.forEach((card) => {
@@ -2907,7 +2955,6 @@
           `;
           resultsDiv.appendChild(noResultsMsg);
         }
-        
       }
 
       function limparFiltros() {
