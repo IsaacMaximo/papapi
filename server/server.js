@@ -101,7 +101,6 @@ app.use(
 app.use(express.json());
 app.set("trust proxy", 1);
 
-
 const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -149,11 +148,18 @@ const {
   perfilUsuario,
   enviarFeedback,
   pegarhistorico,
+  removerItemHistorico,
 } = require("./server-modules/perfil.js");
 
 app.post("/papapi/perfil", rateLimiter, autenticar, perfilUsuario);
 app.post("/papapi/enviarfeedback", rateLimiter, autenticar, enviarFeedback);
 app.post("/papapi/pegarhistorico", rateLimiter, autenticar, pegarhistorico);
+app.delete(
+  "/papapi/removeritemhistorico",
+  rateLimiter,
+  autenticar,
+  removerItemHistorico,
+);
 
 app.get("/papapi/getambiente", (req, res) => {
   res.json({

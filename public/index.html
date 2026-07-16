@@ -3278,10 +3278,39 @@
         });
       }
 
-      function removerHistorico(id) {
-        if (confirm("Remover este item do histórico?")) {
-          console.log("Remover histórico ID:", id);
-          pegarhistorico();
+      async function removerHistorico(indice) {
+        if (!confirm("Remover este item do histórico?")) {
+          return;
+        }
+
+        try {
+          LoadingOverlay.show("Removendo item do histórico...");
+
+          const response = await fetch(
+            `${urlapi}/papapi/removeritemhistorico/${indice}`,
+            {
+              method: "DELETE",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            },
+          );
+
+          const data = await response.json();
+
+          if (data.success) {
+            ToastNotification.success("Item removido com sucesso!");
+            // Recarrega o histórico
+            await pegarhistorico();
+          } else {
+            ToastNotification.error(data.message || "Erro ao remover item");
+          }
+        } catch (error) {
+          console.error("Erro ao remover histórico:", error);
+          ToastNotification.error("Erro ao remover item do histórico");
+        } finally {
+          LoadingOverlay.hide();
         }
       }
 

@@ -166,9 +166,77 @@ async function pegarhistorico(req, res) {
     });
   }
 }
+// server-modules/perfil.js
+
+async function removerItemHistorico(req, res) {
+  try {
+    const userId = req.user.userId;
+    const { indice } = req.params; // ou req.body
+
+    if (indice === undefined || indice === null) {
+      return res.status(400).json({
+        success: false,
+        message: "Índice do item é obrigatório"
+      });
+    }
+
+    const indiceNum = parseInt(indice);
+    if (isNaN(indiceNum) || indiceNum < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Índice deve ser um número positivo"
+      });
+    }
+
+    const db = client.db("PoupIn");
+    const historicocollection = db.collection("users_historico");
+
+    // Busca o documento atual
+    const historico = await historicocollection.findOne({ userId: userId });
+    if (!historico || !historico.dados || historico.dados.length <= indiceNum) {
+      return res.status(404).json({
+        success: false,
+        message: `Índice ${indiceNum} não encontrado no histórico`
+      });
+    }
+
+    // Remove o item do array pelo índice
+    const dadosAtualizados = [...historico.dados];
+    dadosAtualizados.splice(indiceNum, 1);
+
+    // Atualiza o documento com o novo array
+    const result = await historicocollection.updateOne(
+      { userId: userId },
+      { $set: { dados: dadosAtualizados } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao remover item do histórico"
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: `Item no índice ${indiceNum} removido com sucesso`,
+      dados: dadosAtualizados
+    });
+
+  } catch (error) {
+    console.error("❌ Erro ao remover item do histórico:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro interno ao remover item do histórico",
+      error: error.message
+    });
+  }
+}
+
 
 module.exports = {
   perfilUsuario,
   enviarFeedback,
   pegarhistorico,
+  removerItemHistorico,
 };
