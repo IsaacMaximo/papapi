@@ -3022,8 +3022,8 @@
         const toolbar = document.getElementById("resultsToolbar");
         if (toolbar) toolbar.style.display = "flex";
 
-        let html = `<div class="store-section collapsed" data-store="${loja}">
-          <div class="store-header" role="button" tabindex="0" aria-expanded="false">
+        let html = `<div class="store-section" data-store="${loja}">
+          <div class="store-header" role="button" tabindex="0" aria-expanded="true">
             <span class="store-summary">
               <i class="fas fa-store"></i>
               <span class="store-name">${loja.toUpperCase()}</span>
