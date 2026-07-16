@@ -2968,9 +2968,18 @@
       }
 
       function redirecionarParaLogin() {
-        console.log(`🔀 Redirecionando para login...`);
-        //window.location.href =
-        //  CONFIG.ambiente === "dev" ? "/public/login.html" : "/";
+        console.log(`Redirecionando para login...`);
+        ToastNotification.warning(
+          "Sessão expirada. Redirecionando em 10 segundos...",
+        );
+
+        setTimeout(() => {
+          if (CONFIG.ambiente === "dev") {
+            window.location.href = "/public/login.html";
+          } else {
+            window.location.href = "/";
+          }
+        }, 10000);
       }
 
       verificarToken();
