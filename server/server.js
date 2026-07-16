@@ -149,6 +149,7 @@ const {
   enviarFeedback,
   pegarhistorico,
   removerItemHistorico,
+  limparHistorico,
 } = require("./server-modules/perfil.js");
 
 app.post("/papapi/perfil", rateLimiter, autenticar, perfilUsuario);
