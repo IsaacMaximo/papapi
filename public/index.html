@@ -2950,7 +2950,7 @@
 
           if (refreshAttempted) {
             console.log(`🚫 Refresh já tentado. Redirecionando...`);
-            redirecionarParaLogin();
+            console.log("redirecionarParaLogin();")
             return false;
           }
 
@@ -2981,13 +2981,13 @@
           }
 
           console.warn(`❌ Refresh falhou: ${refreshData.message || "Erro"}`);
-          redirecionarParaLogin();
+          console.log("redirecionarParaLogin();")
           return false;
         } catch (error) {
           console.error(`❌ Erro: ${error.message}`);
 
           if (refreshAttempted) {
-            redirecionarParaLogin();
+            console.log("redirecionarParaLogin();")
             return false;
           }
 
@@ -3023,15 +3023,9 @@
             console.error(`❌ Erro no refresh: ${refreshError.message}`);
           }
 
-          redirecionarParaLogin();
+          console.log("redirecionarParaLogin();")
           return false;
         }
-      }
-
-      function redirecionarParaLogin() {
-        console.log(`🔀 Redirecionando para login...`);
-        window.location.href =
-          CONFIG.ambiente === "dev" ? "/public/login.html" : "/";
       }
 
       verificarToken();
