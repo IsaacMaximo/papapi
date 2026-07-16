@@ -674,6 +674,9 @@
                 .querySelector("form");
               verifyForm.dataset.email = email.trim();
               verifyForm.dataset.rememberMe = String(rememberMe);
+              if (data.refreshToken) {
+                localStorage.setItem("refreshToken", data.refreshToken);
+              }
               switchTab("verifyCode");
               document.getElementById("verificationCode").value = "";
 

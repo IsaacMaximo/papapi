@@ -2835,7 +2835,6 @@
 
           if (data.success) {
             console.log("Token válido. Acesso permitido.");
-            ToastNotification.success("Login bem sucedido");
             return true;
           }
 
@@ -2846,17 +2845,25 @@
             return false;
           }
 
+          const storedRefreshToken = localStorage.getItem("refreshToken");
           const refreshResponse = await fetch(
             `${urlapi}/papapi/refresh-token`,
             {
               method: "POST",
               credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: storedRefreshToken
+                ? JSON.stringify({ refreshToken: storedRefreshToken })
+                : undefined,
             },
           );
 
           const refreshData = await refreshResponse.json();
 
           if (refreshResponse.ok && refreshData.success) {
+            if (refreshData.refreshToken) {
+              localStorage.setItem("refreshToken", refreshData.refreshToken);
+            }
             console.log("Refresh token válido. Token renovado com sucesso.");
             ToastNotification.success("Sessão renovada com sucesso");
             return verificarToken(true);
@@ -2874,16 +2881,24 @@
           }
 
           try {
+            const storedRefreshToken = localStorage.getItem("refreshToken");
             const refreshResponse = await fetch(
               `${urlapi}/papapi/refresh-token`,
               {
                 method: "POST",
                 credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: storedRefreshToken
+                  ? JSON.stringify({ refreshToken: storedRefreshToken })
+                  : undefined,
               },
             );
             const refreshData = await refreshResponse.json();
 
             if (refreshResponse.ok && refreshData.success) {
+              if (refreshData.refreshToken) {
+                localStorage.setItem("refreshToken", refreshData.refreshToken);
+              }
               console.log("Refresh token válido. Token renovado com sucesso.");
               ToastNotification.success("Sessão renovada com sucesso");
               return verificarToken(true);
@@ -2956,7 +2971,7 @@
         if (!section) return;
         const isCollapsed = section.classList.contains("collapsed");
         const shouldCollapse =
-          forceExpand === null ? isCollapsed : !forceExpand;
+          forceExpand === null ? !isCollapsed : !forceExpand;
         section.classList.toggle("collapsed", shouldCollapse);
 
         const header = section.querySelector(".store-header");

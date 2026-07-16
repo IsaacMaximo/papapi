@@ -402,48 +402,44 @@ async function recebercodeLogin(req, res) {
     res.cookie("token", accessToken, cookieOptions);
 
     const rememberMe = req.body.rememberMe || false;
+    const payloadRefresh = {
+      userId: usuario._id,
+      email: usuario.email,
+      version:
+        typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0,
+    };
+    const refreshToken = jwt.sign(payloadRefresh, JWT_REFRESH_SECRET, {
+      expiresIn: JWT_REFRESH_EXPIRES_IN,
+    });
+
+    const refreshOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+    };
+
+    if (isProduction) {
+      refreshOptions.domain = ".vercel.app";
+    }
+
+    res.cookie("refreshToken", refreshToken, refreshOptions);
+
+    await collection.updateOne(
+      { _id: usuario._id },
+      {
+        $set: {
+          refreshToken: refreshToken,
+        },
+      },
+    );
 
     if (rememberMe) {
       console.log(`✅ Usuário optou por "Lembrar de mim": ${email}`);
-      const payloadRefresh = {
-        userId: usuario._id,
-        email: usuario.email,
-        version:
-          typeof usuario.tokenVersion === "number" ? usuario.tokenVersion : 0,
-      };
-      const refreshToken = jwt.sign(payloadRefresh, JWT_REFRESH_SECRET, {
-        expiresIn: JWT_REFRESH_EXPIRES_IN,
-      });
-
-      const refreshOptions = {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        path: "/",
-      };
-
-      if (isProduction) {
-        refreshOptions.domain = ".vercel.app";
-      }
-
-      res.cookie("refreshToken", refreshToken, refreshOptions);
-
-      await collection.updateOne(
-        { _id: usuario._id },
-        {
-          $set: {
-            refreshToken: refreshToken,
-          },
-        },
-      );
     } else {
-      console.log(`Usuário NÃO optou por "Lembrar de mim": ${email}`);
-      await collection.updateOne(
-        { _id: usuario._id },
-        {
-          $unset: { refreshToken: "" },
-        },
+      console.log(
+        `ℹ️ Refresh token persistido na sessão do navegador: ${email}`,
       );
     }
 
@@ -456,6 +452,7 @@ async function recebercodeLogin(req, res) {
         email: usuario.email,
         createdAt: usuario.createdAt,
       },
+      refreshToken: refreshToken,
       expiresIn: 15 * 60,
     });
   } catch (error) {
@@ -506,7 +503,7 @@ async function logoutUser(req, res) {
 
     res.clearCookie("refreshToken", {
       ...clearOptions,
-      path: "/api/refresh",
+      path: "/",
     });
 
     console.log("✅ Cookies limpos com sucesso");
@@ -527,9 +524,13 @@ async function logoutUser(req, res) {
 
 async function refreshToken(req, res) {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshTokenValue =
+      req.cookies?.refreshToken ||
+      req.body?.refreshToken ||
+      req.headers["x-refresh-token"] ||
+      req.query?.refreshToken;
 
-    if (!refreshToken) {
+    if (!refreshTokenValue) {
       return res.status(401).json({
         success: false,
         message: "Refresh token não encontrado",
@@ -538,7 +539,7 @@ async function refreshToken(req, res) {
 
     let decoded;
     try {
-      decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+      decoded = jwt.verify(refreshTokenValue, JWT_REFRESH_SECRET);
     } catch (error) {
       if (error.name === "TokenExpiredError") {
         return res.status(401).json({
@@ -557,7 +558,7 @@ async function refreshToken(req, res) {
     const collection = db.collection("users");
     const usuario = await collection.findOne({
       _id: normalizeUserId(decoded.userId),
-      refreshToken: refreshToken,
+      refreshToken: refreshTokenValue,
     });
 
     if (!usuario) {
@@ -596,7 +597,8 @@ async function refreshToken(req, res) {
     return res.json({
       success: true,
       message: "Token renovado com sucesso",
-      token: newAccessToken, // 🔥 Retorna o token também
+      token: newAccessToken,
+      refreshToken: refreshTokenValue,
       expiresIn: 15 * 60,
     });
   } catch (error) {
