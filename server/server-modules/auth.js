@@ -30,12 +30,10 @@ function normalizeUserId(userId) {
 
   return userId;
 }
+
 function normalizeEmail(email) {
   if (!email) return email;
-
-  let normalized = email.trim().toLowerCase();
-
-  return normalized;
+  return email.trim().toLowerCase();
 }
 
 // ========== FUNÇÕES DE HASH ==========
@@ -71,19 +69,34 @@ async function verificarPassword(senha, hashArmazenado) {
   }
 }
 
-// ========== MIDDLEWARE DE AUTENTICAÇÃO MELHORADO ==========
+// ========== CONFIGURAÇÃO DE COOKIES ==========
+const getCookieOptions = (maxAge) => ({
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  maxAge: maxAge,
+  path: "/",
+});
+
+const getClearOptions = () => ({
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  path: "/",
+});
+
+// ========== MIDDLEWARE DE AUTENTICAÇÃO ==========
 const autenticar = async (req, res, next) => {
   try {
-    // 🔥 TENTA PEGAR O TOKEN DE VÁRIAS FORMAS
     let token = null;
 
-    // 1. Do cookie (navegador)
+    // 1. Do cookie
     if (req.cookies && req.cookies.token) {
       token = req.cookies.token;
       console.log("🍪 Token obtido do cookie");
     }
 
-    // 2. Do header Authorization (Yaak/Postman/API)
+    // 2. Do header Authorization
     if (!token) {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -92,14 +105,14 @@ const autenticar = async (req, res, next) => {
       }
     }
 
-    // 3. Do body (fallback para testes)
+    // 3. Do body
     if (!token && req.body && req.body.token) {
       token = req.body.token;
       console.log("📦 Token obtido do body");
     }
 
     if (!token) {
-      console.log("❌ Token não encontrado em nenhum lugar");
+      console.log("❌ Token não encontrado");
       return res.status(401).json({
         success: false,
         message: "Acesso negado. Faça login primeiro.",
@@ -121,7 +134,7 @@ const autenticar = async (req, res, next) => {
       const usuario = await collection.findOne({ _id: userIdNormalizado });
 
       if (!usuario) {
-        console.log("❌ Usuário não encontrado para o token");
+        console.log("❌ Usuário não encontrado");
         return res.status(401).json({
           success: false,
           message: "Sessão inválida. Faça login novamente.",
@@ -202,7 +215,6 @@ async function cadastrarUser(req, res) {
     console.log(`📝 Cadastro recebido: ${fullname} - ${email}`);
 
     const hashedPassword = await hashPassword(password);
-    console.log(`🔒 Senha hasheada: ${hashedPassword}`);
 
     const userData = {
       fullname: fullname,
@@ -250,7 +262,7 @@ async function cadastrarUser(req, res) {
 
 async function loginUser(req, res) {
   try {
-    let { email, password, rememberMe } = req.body;
+    let { email, password } = req.body;
     email = normalizeEmail(email);
 
     if (!email || !password) {
@@ -348,29 +360,29 @@ async function loginUser(req, res) {
 }
 
 async function recebercodeLogin(req, res) {
-  let { email, code } = req.body;
-  email = normalizeEmail(email);
-
-  const db = client.db("PoupIn");
-  const collection = db.collection("users");
-
-  console.log("email do user: " + email);
-  console.log("code enviado pelo user: " + code);
-
-  const usuario = await collection.findOne({
-    email: email,
-    LoginCode: code,
-    LoginCodeExpires: { $gt: new Date() },
-  });
-
-  if (!usuario) {
-    return res.status(400).json({
-      success: false,
-      message: "Código inválido ou expirado",
-    });
-  }
-
   try {
+    let { email, code } = req.body;
+    email = normalizeEmail(email);
+
+    const db = client.db("PoupIn");
+    const collection = db.collection("users");
+
+    console.log("📧 Email: " + email);
+    console.log("🔑 Code: " + code);
+
+    const usuario = await collection.findOne({
+      email: email,
+      LoginCode: code,
+      LoginCodeExpires: { $gt: new Date() },
+    });
+
+    if (!usuario) {
+      return res.status(400).json({
+        success: false,
+        message: "Código inválido ou expirado",
+      });
+    }
+
     await collection.updateOne(
       { _id: usuario._id },
       {
@@ -391,17 +403,11 @@ async function recebercodeLogin(req, res) {
       expiresIn: JWT_EXPIRES_IN,
     });
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      maxAge: 15 * 60 * 1000,
-      path: "/",
-    };
-
+    // Token cookie
+    const cookieOptions = getCookieOptions(15 * 60 * 1000);
     res.cookie("token", accessToken, cookieOptions);
 
-    const rememberMe = req.body.rememberMe || false;
+    // Refresh token
     const payloadRefresh = {
       userId: usuario._id,
       email: usuario.email,
@@ -412,18 +418,7 @@ async function recebercodeLogin(req, res) {
       expiresIn: JWT_REFRESH_EXPIRES_IN,
     });
 
-    const refreshOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: "/",
-    };
-
-    if (isProduction) {
-      refreshOptions.domain = ".vercel.app";
-    }
-
+    const refreshOptions = getCookieOptions(7 * 24 * 60 * 60 * 1000);
     res.cookie("refreshToken", refreshToken, refreshOptions);
 
     await collection.updateOne(
@@ -435,13 +430,10 @@ async function recebercodeLogin(req, res) {
       },
     );
 
-    if (rememberMe) {
-      console.log(`✅ Usuário optou por "Lembrar de mim": ${email}`);
-    } else {
-      console.log(
-        `ℹ️ Refresh token persistido na sessão do navegador: ${email}`,
-      );
-    }
+    console.log(`✅ Login realizado: ${email}`);
+    console.log(
+      `🍪 Cookies configurados: secure=${isProduction}, sameSite=${isProduction ? "none" : "lax"}`,
+    );
 
     return res.json({
       success: true,
@@ -488,23 +480,9 @@ async function logoutUser(req, res) {
       }
     }
 
-    const clearOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      path: "/",
-    };
-
-    if (isProduction) {
-      clearOptions.domain = ".vercel.app";
-    }
-
+    const clearOptions = getClearOptions();
     res.clearCookie("token", clearOptions);
-
-    res.clearCookie("refreshToken", {
-      ...clearOptions,
-      path: "/",
-    });
+    res.clearCookie("refreshToken", clearOptions);
 
     console.log("✅ Cookies limpos com sucesso");
 
@@ -524,22 +502,37 @@ async function logoutUser(req, res) {
 
 async function refreshToken(req, res) {
   try {
+    console.log("🔄 [REFRESH] Iniciando...");
+    console.log("🍪 Cookies:", req.cookies);
+    console.log("📦 Body:", req.body);
+
     const refreshTokenValue =
       req.cookies?.refreshToken ||
       req.body?.refreshToken ||
       req.headers["x-refresh-token"] ||
       req.query?.refreshToken;
 
+    console.log(
+      "🔑 Refresh token:",
+      refreshTokenValue ? "✅ Encontrado" : "❌ Não encontrado",
+    );
+
     if (!refreshTokenValue) {
       return res.status(401).json({
         success: false,
         message: "Refresh token não encontrado",
+        debug: {
+          hasCookie: !!req.cookies?.refreshToken,
+          hasBody: !!req.body?.refreshToken,
+          cookieKeys: req.cookies ? Object.keys(req.cookies) : [],
+        },
       });
     }
 
     let decoded;
     try {
       decoded = jwt.verify(refreshTokenValue, JWT_REFRESH_SECRET);
+      console.log(`✅ Refresh válido para: ${decoded.email}`);
     } catch (error) {
       if (error.name === "TokenExpiredError") {
         return res.status(401).json({
@@ -580,19 +573,10 @@ async function refreshToken(req, res) {
       expiresIn: JWT_EXPIRES_IN,
     });
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      maxAge: 15 * 60 * 1000,
-      path: "/",
-    };
-
-    if (isProduction) {
-      cookieOptions.domain = ".vercel.app";
-    }
-
+    const cookieOptions = getCookieOptions(15 * 60 * 1000);
     res.cookie("token", newAccessToken, cookieOptions);
+
+    console.log(`✅ Novo token gerado para: ${usuario.email}`);
 
     return res.json({
       success: true,
@@ -612,153 +596,182 @@ async function refreshToken(req, res) {
 }
 
 async function recuperarsenha(req, res) {
-  let { email } = req.body;
-  email = normalizeEmail(email);
+  try {
+    let { email } = req.body;
+    email = normalizeEmail(email);
 
-  const db = client.db("PoupIn");
-  const collection = db.collection("users");
+    const db = client.db("PoupIn");
+    const collection = db.collection("users");
 
-  const existingUser = await collection.findOne({ email: email });
-  if (!existingUser) {
-    return res.status(409).json({
-      success: false,
-      message: "Usuário não encontrado",
-    });
-  } //adicionar verificacao de caps ou sla P =! p
+    const existingUser = await collection.findOne({ email: email });
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuário não encontrado",
+      });
+    }
 
-  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 600000);
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 600000);
 
-  await collection.updateOne(
-    { email: email },
-    {
-      $set: {
-        resetCode: resetCode,
-        resetCodeExpires: expiresAt,
+    await collection.updateOne(
+      { email: email },
+      {
+        $set: {
+          resetCode: resetCode,
+          resetCodeExpires: expiresAt,
+        },
       },
-    },
-  );
-  var paraquem = email;
-  var subject_msg = "Codigo de verificação Email";
-  var texto_msg = `Codigo de verificação: ${resetCode}     Esse codigo é vaido por: ${expiresAt}`;
-  var html_msg = `
-  <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;background:#fff;padding:40px;border-radius:20px;border:1px solid #e9edf4;">
-      <h1 style="font-size:28px;color:#1a2634;text-align:center;">
-          Poup<span style="color:#3b82f6;">In</span>
-      </h1>
-      <h2 style="font-size:22px;color:#0f172a;text-align:center;">Recuperação de Senha</h2>
-      <p style="color:#475569;text-align:center;font-size:15px;">Use o código abaixo para redefinir sua senha:</p>
-      <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:16px;padding:28px;text-align:center;margin:20px 0;">
-          <div style="font-size:42px;font-weight:700;letter-spacing:10px;color:#0f172a;font-family:'Courier New',monospace;background:#fff;padding:12px 20px;border-radius:12px;display:inline-block;">
-              ${resetCode}
-          </div>
-          <p style="color:#64748b;margin-top:16px;font-size:13px;">
-              ⏱️ Válido por 10 minutos<br>
-              <span style="font-size:12px;color:#94a3b8;">Expira em: ${expiresAt.toLocaleString("pt-pt")}</span>
-          </p>
-      </div>
-      <p style="text-align:center;color:#94a3b8;font-size:13px;">Se você não solicitou, ignore este email.</p>
-      <hr style="border:none;border-top:1px solid #e9edf4;margin:20px 0;">
-      <p style="text-align:center;color:#cbd5e1;font-size:12px;">© 2026 PoupIn</p>
-  </div>
-  `;
+    );
 
-  var conteudodamensgem = {
-    subject: subject_msg,
-    text: texto_msg,
-    html: html_msg,
-  };
+    var paraquem = email;
+    var subject_msg = "Código de verificação - Recuperação de Senha";
+    var html_msg = `
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;background:#fff;padding:40px;border-radius:20px;border:1px solid #e9edf4;">
+        <h1 style="font-size:28px;color:#1a2634;text-align:center;">
+            Poup<span style="color:#3b82f6;">In</span>
+        </h1>
+        <h2 style="font-size:22px;color:#0f172a;text-align:center;">Recuperação de Senha</h2>
+        <p style="color:#475569;text-align:center;font-size:15px;">Use o código abaixo para redefinir sua senha:</p>
+        <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:16px;padding:28px;text-align:center;margin:20px 0;">
+            <div style="font-size:42px;font-weight:700;letter-spacing:10px;color:#0f172a;font-family:'Courier New',monospace;background:#fff;padding:12px 20px;border-radius:12px;display:inline-block;">
+                ${resetCode}
+            </div>
+            <p style="color:#64748b;margin-top:16px;font-size:13px;">
+                ⏱️ Válido por 10 minutos<br>
+                <span style="font-size:12px;color:#94a3b8;">Expira em: ${expiresAt.toLocaleString("pt-pt")}</span>
+            </p>
+        </div>
+        <p style="text-align:center;color:#94a3b8;font-size:13px;">Se você não solicitou, ignore este email.</p>
+        <hr style="border:none;border-top:1px solid #e9edf4;margin:20px 0;">
+        <p style="text-align:center;color:#cbd5e1;font-size:12px;">© 2026 PoupIn</p>
+    </div>
+    `;
 
-  await enviaremail(paraquem, conteudodamensgem);
+    var conteudodamensgem = {
+      subject: subject_msg,
+      text: `Código de verificação: ${resetCode}`,
+      html: html_msg,
+    };
 
-  console.log(`Código de recuperação para ${email}: ${resetCode}`);
+    await enviaremail(paraquem, conteudodamensgem);
 
-  res.json({
-    success: true,
-    message: "Código enviado com sucesso!",
-  });
+    console.log(`📧 Código de recuperação enviado para ${email}: ${resetCode}`);
+
+    res.json({
+      success: true,
+      message: "Código enviado com sucesso!",
+    });
+  } catch (error) {
+    console.error("❌ Erro ao enviar código:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao enviar código",
+      error: error.message,
+    });
+  }
 }
 
 async function verificarCodigo(req, res) {
-  let { email, code } = req.body;
-  email = normalizeEmail(email);
+  try {
+    let { email, code } = req.body;
+    email = normalizeEmail(email);
 
-  const db = client.db("PoupIn");
-  const collection = db.collection("users");
+    const db = client.db("PoupIn");
+    const collection = db.collection("users");
 
-  const user = await collection.findOne({
-    email: email,
-    resetCode: code,
-    resetCodeExpires: { $gt: new Date() },
-  });
+    const user = await collection.findOne({
+      email: email,
+      resetCode: code,
+      resetCodeExpires: { $gt: new Date() },
+    });
 
-  if (!user) {
-    return res.status(400).json({
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Código inválido ou expirado",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Código verificado com sucesso",
+    });
+  } catch (error) {
+    console.error("❌ Erro ao verificar código:", error);
+    return res.status(500).json({
       success: false,
-      message: "Código inválido ou expirado",
+      message: "Erro ao verificar código",
+      error: error.message,
     });
   }
-
-  res.json({
-    success: true,
-    message: "Código verificado com sucesso",
-  });
 }
 
 async function redefinirSenhaComCodigo(req, res) {
-  let { email, code, newPassword } = req.body;
-  email = normalizeEmail(email);
+  try {
+    let { email, code, newPassword } = req.body;
+    email = normalizeEmail(email);
 
-  if (!email || !code || !newPassword) {
-    return res.status(400).json({
-      success: false,
-      message: "Email, código e nova senha são obrigatórios",
+    if (!email || !code || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Email, código e nova senha são obrigatórios",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "A senha deve ter pelo menos 6 caracteres",
+      });
+    }
+
+    const db = client.db("PoupIn");
+    const collection = db.collection("users");
+
+    const user = await collection.findOne({
+      email: email,
+      resetCode: code,
+      resetCodeExpires: { $gt: new Date() },
     });
-  }
 
-  if (newPassword.length < 6) {
-    return res.status(400).json({
-      success: false,
-      message: "A senha deve ter pelo menos 6 caracteres",
-    });
-  }
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Código inválido ou expirado",
+      });
+    }
 
-  const db = client.db("PoupIn");
-  const collection = db.collection("users");
+    const hashedPassword = await hashPassword(newPassword);
 
-  const user = await collection.findOne({
-    email: email,
-    resetCode: code,
-    resetCodeExpires: { $gt: new Date() },
-  });
-
-  if (!user) {
-    return res.status(400).json({
-      success: false,
-      message: "Código inválido ou expirado",
-    });
-  }
-
-  const hashedPassword = await hashPassword(newPassword);
-
-  await collection.updateOne(
-    { _id: user._id },
-    {
-      $set: {
-        password: hashedPassword,
-        updatedAt: new Date(),
+    await collection.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          password: hashedPassword,
+          updatedAt: new Date(),
+        },
+        $unset: {
+          resetCode: "",
+          resetCodeExpires: "",
+        },
       },
-      $unset: {
-        resetCode: "",
-        resetCodeExpires: "",
-      },
-    },
-  );
+    );
 
-  res.json({
-    success: true,
-    message: "Senha redefinida com sucesso!",
-  });
+    console.log(`✅ Senha redefinida para: ${email}`);
+
+    res.json({
+      success: true,
+      message: "Senha redefinida com sucesso!",
+    });
+  } catch (error) {
+    console.error("❌ Erro ao redefinir senha:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao redefinir senha",
+      error: error.message,
+    });
+  }
 }
 
 module.exports = {
