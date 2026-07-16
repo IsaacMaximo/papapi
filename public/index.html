@@ -3301,7 +3301,7 @@
 
           if (data.success) {
             ToastNotification.success("Item removido com sucesso!");
-            // Recarrega o histórico
+
             await pegarhistorico();
           } else {
             ToastNotification.error(data.message || "Erro ao remover item");

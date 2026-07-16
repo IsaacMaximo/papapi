@@ -171,7 +171,7 @@ async function pegarhistorico(req, res) {
 async function removerItemHistorico(req, res) {
   try {
     const userId = req.user.userId;
-    const { indice } = req.params; // ou req.body
+    const { indice } = req.body;
 
     if (indice === undefined || indice === null) {
       return res.status(400).json({
