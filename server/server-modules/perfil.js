@@ -233,10 +233,43 @@ async function removerItemHistorico(req, res) {
   }
 }
 
+async function limparHistorico(req, res) {
+  try {
+    const userId = req.user.userId;
+
+    const db = client.db("PoupIn");
+    const historicocollection = db.collection("users_historico");
+
+    const result = await historicocollection.deleteOne({ userId: userId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Histórico não encontrado"
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Histórico deletado com sucesso"
+    });
+
+  } catch (error) {
+    console.error(" Erro ao deletar histórico:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro interno ao deletar histórico",
+      error: error.message
+    });
+  }
+}
+
+
 
 module.exports = {
   perfilUsuario,
   enviarFeedback,
   pegarhistorico,
   removerItemHistorico,
+  limparHistorico,
 };

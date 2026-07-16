@@ -160,6 +160,7 @@ app.delete(
   autenticar,
   removerItemHistorico,
 );
+app.delete("/papapi/limparHistorico", rateLimiter, autenticar, limparHistorico);
 
 app.get("/papapi/getambiente", (req, res) => {
   res.json({

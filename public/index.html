@@ -3314,10 +3314,43 @@
         }
       }
 
-      function limparHistorico() {
-        if (confirm("Tem certeza que deseja limpar todo o histórico?")) {
-          console.log("Limpar todo histórico");
-          pegarhistorico();
+      async function limparHistorico() {
+        if (
+          !confirm(
+            "Tem certeza que deseja limpar TODO o histórico?\n\nEsta ação não pode ser desfeita!",
+          )
+        ) {
+          return;
+        }
+        try {
+          LoadingOverlay.show("Limpando histórico...");
+
+          const response = await fetch(`${urlapi}/papapi/limparhistorico`, {
+            method: "DELETE", // ou "POST" dependendo da rota
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Resposta não é JSON");
+          }
+
+          const data = await response.json();
+
+          if (data.success) {
+            ToastNotification.success("Histórico limpo com sucesso!");
+            await pegarhistorico();
+          } else {
+            ToastNotification.error(data.message || "Erro ao limpar histórico");
+          }
+        } catch (error) {
+          console.error("Erro ao limpar histórico:", error);
+          ToastNotification.error("Erro ao limpar histórico");
+        } finally {
+          LoadingOverlay.hide();
         }
       }
 
