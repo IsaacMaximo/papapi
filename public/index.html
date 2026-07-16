@@ -2913,119 +2913,64 @@
           })
           .catch(() => alert("Erro ao enviar feedback. Tente novamente."));
       }
-
-      function redirecionarParaLogin() {
-        if (CONFIG.ambiente === "dev") {
-          console.log("Token inválido. Redirecionando para /login.html (dev)");
-        } else {
-          console.log("Token inválido. Redirecionando para / (prod)");
-          ToastNotification.info(
-            "Login inválido, redirecionando para tela de login...",
-          );
-          window.location.href = "/";
-        }
-      }
-
       async function verificarToken(refreshAttempted = false) {
         console.log(`🔐 Verificando token...`);
 
         try {
           const response = await fetch(`${urlapi}/papapi/verificar-token`, {
             method: "GET",
-            credentials: "include",
+            credentials: "include", // Isso envia os cookies automaticamente
           });
 
           const data = await response.json();
 
           if (data.success) {
-            console.log(
-              `✅ Token válido. Usuário: ${data.user?.email || "OK"}`,
-            );
+            console.log(`✅ Token válido.`);
             return true;
           }
 
-          console.warn(
-            `❌ Token inválido: ${data.message || "Não autenticado"}`,
-          );
+          console.warn(`❌ Token inválido: ${data.message}`);
 
           if (refreshAttempted) {
             console.log(`🚫 Refresh já tentado. Redirecionando...`);
-            console.log("redirecionarParaLogin();")
+            redirecionarParaLogin();
             return false;
           }
 
           console.log(`🔄 Tentando renovar token...`);
 
-          const storedRefreshToken = localStorage.getItem("refreshToken");
+          // O refresh token está no cookie, o backend vai pegar de lá
           const refreshResponse = await fetch(
             `${urlapi}/papapi/refresh-token`,
             {
               method: "POST",
-              credentials: "include",
+              credentials: "include", // Importante: envia os cookies
               headers: { "Content-Type": "application/json" },
-              body: storedRefreshToken
-                ? JSON.stringify({ refreshToken: storedRefreshToken })
-                : undefined,
             },
           );
 
           const refreshData = await refreshResponse.json();
 
           if (refreshResponse.ok && refreshData.success) {
-            if (refreshData.refreshToken) {
-              localStorage.setItem("refreshToken", refreshData.refreshToken);
-            }
             console.log(`✅ Token renovado com sucesso!`);
             ToastNotification.success("Sessão renovada com sucesso");
             return verificarToken(true);
           }
 
-          console.warn(`❌ Refresh falhou: ${refreshData.message || "Erro"}`);
-          console.log("redirecionarParaLogin();")
+          console.warn(`❌ Refresh falhou: ${refreshData.message}`);
+          redirecionarParaLogin();
           return false;
         } catch (error) {
           console.error(`❌ Erro: ${error.message}`);
-
-          if (refreshAttempted) {
-            console.log("redirecionarParaLogin();")
-            return false;
-          }
-
-          try {
-            console.log(`🔄 Tentando refresh após erro...`);
-
-            const storedRefreshToken = localStorage.getItem("refreshToken");
-            const refreshResponse = await fetch(
-              `${urlapi}/papapi/refresh-token`,
-              {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: storedRefreshToken
-                  ? JSON.stringify({ refreshToken: storedRefreshToken })
-                  : undefined,
-              },
-            );
-
-            const refreshData = await refreshResponse.json();
-
-            if (refreshResponse.ok && refreshData.success) {
-              if (refreshData.refreshToken) {
-                localStorage.setItem("refreshToken", refreshData.refreshToken);
-              }
-              console.log(`✅ Token renovado com sucesso!`);
-              ToastNotification.success("Sessão renovada com sucesso");
-              return verificarToken(true);
-            }
-
-            console.warn(`❌ Refresh falhou: ${refreshData.message || "Erro"}`);
-          } catch (refreshError) {
-            console.error(`❌ Erro no refresh: ${refreshError.message}`);
-          }
-
-          console.log("redirecionarParaLogin();")
+          redirecionarParaLogin();
           return false;
         }
+      }
+
+      function redirecionarParaLogin() {
+        console.log(`🔀 Redirecionando para login...`);
+        //window.location.href =
+        //  CONFIG.ambiente === "dev" ? "/public/login.html" : "/";
       }
 
       verificarToken();
