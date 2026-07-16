@@ -487,95 +487,171 @@
         box-shadow: 0 8px 20px rgba(27, 75, 60, 0.3);
       }
 
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       #results {
         display: flex;
         flex-direction: column;
-        gap: 2rem;
+        gap: 1rem;
       }
 
       .store-section {
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.78);
         backdrop-filter: blur(2px);
         -webkit-backdrop-filter: blur(2px);
-        border-radius: 28px;
-        padding: 1.5rem 1.5rem 1.8rem;
+        border-radius: 22px;
+        padding: 1rem 1rem 1.1rem;
         border: 1px solid rgba(255, 255, 255, 0.7);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-        transition: transform 0.2s;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+        animation: fadeInUp 0.3s ease both;
+        max-width: 900px;
+        margin: 0 auto;
       }
 
       .store-section:hover {
         transform: translateY(-2px);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+      }
+
+      .store-section.collapsed {
+        padding: 0.8rem 0.95rem;
+      }
+
+      .store-section.collapsed .store-info,
+      .store-section.collapsed .products-grid {
+        display: none;
+      }
+
+      .store-section.collapsed .store-header {
+        border-bottom: 0;
+        padding-bottom: 0;
+        margin-bottom: 0;
       }
 
       .store-header {
         font-weight: 600;
-        font-size: 1.4rem;
+        font-size: 1.05rem;
         color: #0b1a30;
         letter-spacing: -0.01em;
-        border-bottom: 2px solid rgba(43, 58, 103, 0.12);
+        border-bottom: 1px solid rgba(43, 58, 103, 0.12);
         padding-bottom: 0.6rem;
-        margin-bottom: 1rem;
+        margin-bottom: 0.7rem;
         display: flex;
         align-items: center;
         gap: 0.6rem;
+        cursor: pointer;
+        user-select: none;
+        transition:
+          background-color 0.2s ease,
+          border-radius 0.2s ease;
+      }
+
+      .store-header:hover {
+        background: rgba(43, 58, 103, 0.04);
+        border-radius: 10px;
       }
 
       .store-header i {
         color: #2b3a67;
-        font-size: 1.2rem;
+        font-size: 1rem;
+      }
+
+      .store-summary {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        min-width: 0;
+        flex: 1;
+      }
+
+      .store-name {
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
       }
 
       .store-count {
-        font-size: 0.9rem;
+        font-size: 0.82rem;
         font-weight: 500;
         color: #4a5a72;
         margin-left: auto;
+        white-space: nowrap;
+      }
+
+      .store-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(43, 58, 103, 0.08);
+        color: #2b3a67;
+        flex-shrink: 0;
+        margin-left: 0.3rem;
+        transition: transform 0.2s ease;
+      }
+
+      .store-section:not(.collapsed) .store-toggle {
+        transform: rotate(180deg);
       }
 
       .store-info {
-        font-size: 0.9rem;
+        font-size: 0.82rem;
         color: #4a5a72;
-        margin-bottom: 1rem;
+        margin-bottom: 0.7rem;
         font-weight: 450;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.45rem;
       }
 
       .products-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1.2rem;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
       }
 
       .product-card {
         background: white;
-        border-radius: 20px;
-        padding: 1rem 0.8rem 0.9rem;
+        border-radius: 16px;
+        padding: 0.7rem 0.6rem 0.8rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
         border: 1px solid rgba(221, 227, 237, 0.5);
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
+        min-height: 190px;
+        animation: fadeInUp 0.25s ease both;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
       }
 
       .product-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
       }
 
       .product-image {
         width: 100%;
-        max-height: 140px;
+        max-height: 100px;
         object-fit: contain;
-        border-radius: 12px;
+        border-radius: 10px;
         background: #f8fafc;
-        margin-bottom: 0.6rem;
+        margin-bottom: 0.5rem;
         padding: 0.2rem;
       }
 
@@ -585,28 +661,30 @@
 
       .product-name {
         font-weight: 500;
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         color: #0f1e34;
         margin-bottom: 0.2rem;
-        line-height: 1.3;
+        line-height: 1.25;
         display: -webkit-box;
+        line-clamp: 2;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        min-height: 2.4em;
       }
 
       .product-price {
         font-weight: 700;
         color: #1d2b4a;
-        font-size: 1.05rem;
-        margin: 0.3rem 0 0.5rem;
+        font-size: 0.92rem;
+        margin: 0.25rem 0 0.4rem;
       }
 
       .product-link {
         display: inline-flex;
         align-items: center;
         gap: 0.3rem;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 500;
         color: #2b3a67;
         text-decoration: none;
@@ -1440,6 +1518,46 @@
       }
 
       @media (max-width: 768px) {
+        .main-content {
+          padding: 0.8rem 0.7rem 1.2rem;
+        }
+
+        .page-header {
+          margin-bottom: 0.8rem;
+        }
+
+        .search-section {
+          position: sticky;
+          top: 0.5rem;
+          z-index: 20;
+          border-radius: 22px;
+          padding: 0.8rem;
+          flex-direction: column;
+          align-items: stretch;
+          box-shadow: 0 10px 28px rgba(27, 45, 75, 0.12);
+        }
+
+        .search-section .btn-group {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.4rem;
+        }
+
+        .search-section button {
+          width: 100%;
+          font-size: 0.75rem;
+          padding: 0.5rem 0.7rem;
+          border-radius: 999px;
+        }
+
+        .search-filtrar {
+          padding: 0.6rem 0.8rem;
+          border-radius: 16px;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.6rem;
+        }
+
         .navbar {
           padding: 0.6rem 1rem;
           flex-direction: row;
@@ -1703,6 +1821,39 @@
       }
 
       @media (max-width: 480px) {
+        .search-section {
+          top: 0.35rem;
+          padding: 0.7rem;
+        }
+
+        .search-section .btn-group {
+          grid-template-columns: 1fr;
+        }
+
+        .products-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 0.55rem;
+        }
+
+        .product-card {
+          min-height: 170px;
+          padding: 0.6rem 0.45rem 0.7rem;
+        }
+
+        .product-name {
+          font-size: 0.72rem;
+          min-height: 2.2em;
+        }
+
+        .store-header {
+          font-size: 0.95rem;
+        }
+
+        .store-toggle {
+          width: 24px;
+          height: 24px;
+        }
+
         .hamburger-btn {
           padding: 0.2rem 0.3rem;
         }
@@ -2737,13 +2888,44 @@
           .forEach((button) => (button.disabled = false));
       }
 
+      function toggleStoreSection(section) {
+        if (!section) return;
+        const isCollapsed = section.classList.contains("collapsed");
+        section.classList.toggle("collapsed", !isCollapsed);
+        const toggleIcon = section.querySelector(".store-toggle i");
+        if (toggleIcon) {
+          toggleIcon.classList.toggle("fa-chevron-down", !isCollapsed);
+          toggleIcon.classList.toggle("fa-chevron-up", isCollapsed);
+        }
+      }
+
+      function bindStoreSectionEvents(resultsDiv) {
+        resultsDiv.querySelectorAll(".store-section").forEach((section) => {
+          const header = section.querySelector(".store-header");
+          if (!header || header.dataset.bound === "true") return;
+
+          header.dataset.bound = "true";
+          header.addEventListener("click", () => toggleStoreSection(section));
+          header.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              toggleStoreSection(section);
+            }
+          });
+        });
+      }
+
       function displayResults(loja, data) {
         ToastNotification.success(`resultados carregados de ${loja}`);
         const resultsDiv = document.getElementById("results");
-        let html = `<div class="store-section" data-store="${loja}">
-          <div class="store-header">
-            <i class="fas fa-tag"></i> ${loja.toUpperCase()}
+        let html = `<div class="store-section collapsed" data-store="${loja}">
+          <div class="store-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="store-summary">
+              <i class="fas fa-store"></i>
+              <span class="store-name">${loja.toUpperCase()}</span>
+            </span>
             <span class="store-count">${data.output && data.output.products ? data.output.products.length : 0} produtos</span>
+            <span class="store-toggle"><i class="fas fa-chevron-down"></i></span>
           </div>`;
 
         if (
@@ -2779,6 +2961,7 @@
         }
         html += `</div>`;
         resultsDiv.innerHTML += html;
+        bindStoreSectionEvents(resultsDiv);
       }
 
       function runScraper(LOJA) {

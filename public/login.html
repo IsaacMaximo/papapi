@@ -669,9 +669,11 @@
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
-              document
+              const verifyForm = document
                 .getElementById("tab-verify-code")
-                .querySelector("form").dataset.email = email.trim();
+                .querySelector("form");
+              verifyForm.dataset.email = email.trim();
+              verifyForm.dataset.rememberMe = String(rememberMe);
               switchTab("verifyCode");
               document.getElementById("verificationCode").value = "";
 
@@ -694,6 +696,7 @@
       function verificarCodigoAcesso() {
         const form = document.querySelector("#tab-verify-code form");
         const email = form.dataset.email;
+        const rememberMe = form.dataset.rememberMe === "true";
         const code = document.getElementById("verificationCode").value;
 
         if (!code || code.length !== 6) {
@@ -717,6 +720,7 @@
           body: JSON.stringify({
             email: email,
             code: code,
+            rememberMe: rememberMe,
           }),
         })
           .then((response) => response.json())
