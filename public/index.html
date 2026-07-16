@@ -520,6 +520,19 @@
         }
       }
 
+      @keyframes storeSectionOpen {
+        from {
+          opacity: 0;
+          transform: translateY(10px) scale(0.985);
+          filter: blur(2px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+      }
+
       button,
       a,
       input,
@@ -592,21 +605,20 @@
         border: 1px solid rgba(255, 255, 255, 0.7);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
         transition:
-          transform 0.2s ease,
-          box-shadow 0.2s ease;
-        animation: fadeInUp 0.3s ease both;
+          transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+          box-shadow 0.24s ease,
+          padding 0.24s ease,
+          opacity 0.24s ease;
+        animation: storeSectionOpen 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         width: 100%;
         max-width: 1100px;
         margin: 0 auto;
+        overflow: hidden;
       }
 
       .store-section:hover {
         transform: translateY(-2px);
         box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
-      }
-
-      .store-section.collapsed {
-        padding: 0.8rem 0.95rem;
       }
 
       .store-section.collapsed .store-info,
@@ -635,7 +647,12 @@
         user-select: none;
         transition:
           background-color 0.2s ease,
-          border-radius 0.2s ease;
+          border-radius 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .store-header:active {
+        transform: scale(0.99);
       }
 
       .store-header:hover {
@@ -2997,7 +3014,7 @@
             console.error("Erro ao tentar renovar token:", refreshError);
           }
 
-          redirecionarParaLogin();
+          console.log("redirecionarParaLogin();")
           return false;
         }
       }
@@ -3765,6 +3782,7 @@
           const data = await response.json();
 
           if (data.success) {
+            localStorage.removeItem("refreshToken");
             window.location.href =
               CONFIG.ambiente === "dev" ? "/public/login.html" : "/";
           }

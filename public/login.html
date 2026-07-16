@@ -229,8 +229,8 @@
       body {
         font-family: "Inter", Arial, sans-serif;
         background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
-        width: 100vw;
-        height: 100vh;
+        width: 100dvw;
+        height: 100dvh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -730,6 +730,15 @@
           .then((data) => {
             console.log("Resposta da verificação:", data);
             if (data.success) {
+              if (data.refreshToken) {
+                localStorage.setItem("refreshToken", data.refreshToken);
+                console.log("Refresh token persistido no navegador.");
+              } else {
+                console.warn(
+                  "Nenhum refresh token recebido na resposta de verificação.",
+                );
+              }
+
               const redirectPath =
                 CONFIG.ambiente === "prod" ? "/app/" : "/public/index.html";
               window.location.href = redirectPath;
