@@ -3282,18 +3282,18 @@
         if (!confirm("Remover este item do histórico?")) {
           return;
         }
-
         try {
           LoadingOverlay.show("Removendo item do histórico...");
 
           const response = await fetch(
-            `${urlapi}/papapi/removeritemhistorico/${indice}`,
+            `${urlapi}/papapi/removeritemhistorico`,
             {
               method: "DELETE",
               credentials: "include",
               headers: {
                 "Content-Type": "application/json",
               },
+              body: JSON.stringify({ indice }),
             },
           );
 
