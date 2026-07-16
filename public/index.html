@@ -502,6 +502,33 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        align-items: stretch;
+      }
+
+      .results-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.7rem;
+      }
+
+      .results-toolbar button {
+        border: 0;
+        background: rgba(43, 58, 103, 0.08);
+        color: #1d2b4a;
+        border-radius: 999px;
+        padding: 0.45rem 0.9rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .results-toolbar button:hover {
+        background: rgba(43, 58, 103, 0.15);
+        transform: translateY(-1px);
       }
 
       .store-section {
@@ -516,7 +543,8 @@
           transform 0.2s ease,
           box-shadow 0.2s ease;
         animation: fadeInUp 0.3s ease both;
-        max-width: 900px;
+        width: 100%;
+        max-width: 1100px;
         margin: 0 auto;
       }
 
@@ -621,6 +649,34 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 0.75rem;
+      }
+
+      @media (min-width: 1024px) {
+        .store-section {
+          padding: 1.2rem 1.3rem 1.3rem;
+        }
+
+        .products-grid {
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 1rem;
+        }
+
+        .product-card {
+          min-height: 230px;
+          padding: 0.85rem 0.8rem 0.95rem;
+        }
+
+        .product-image {
+          max-height: 132px;
+        }
+
+        .product-name {
+          font-size: 0.9rem;
+        }
+
+        .product-price {
+          font-size: 1rem;
+        }
       }
 
       .product-card {
@@ -2498,6 +2554,14 @@
         </div>
       </div>
 
+      <div class="results-toolbar" id="resultsToolbar" style="display: none">
+        <button onclick="expandAllStoreSections()" type="button">
+          <i class="fas fa-expand-alt"></i> Expandir tudo
+        </button>
+        <button onclick="collapseAllStoreSections()" type="button">
+          <i class="fas fa-compress-alt"></i> Recolher tudo
+        </button>
+      </div>
       <div id="results"></div>
     </div>
 
@@ -2888,36 +2952,65 @@
           .forEach((button) => (button.disabled = false));
       }
 
-      function toggleStoreSection(section) {
+      function toggleStoreSection(section, forceExpand = null) {
         if (!section) return;
         const isCollapsed = section.classList.contains("collapsed");
-        section.classList.toggle("collapsed", !isCollapsed);
+        const shouldCollapse =
+          forceExpand === null ? isCollapsed : !forceExpand;
+        section.classList.toggle("collapsed", shouldCollapse);
+
+        const header = section.querySelector(".store-header");
+        if (header) {
+          header.setAttribute("aria-expanded", String(!shouldCollapse));
+        }
+
         const toggleIcon = section.querySelector(".store-toggle i");
         if (toggleIcon) {
-          toggleIcon.classList.toggle("fa-chevron-down", !isCollapsed);
-          toggleIcon.classList.toggle("fa-chevron-up", isCollapsed);
+          toggleIcon.classList.toggle("fa-chevron-down", shouldCollapse);
+          toggleIcon.classList.toggle("fa-chevron-up", !shouldCollapse);
         }
       }
 
-      function bindStoreSectionEvents(resultsDiv) {
-        resultsDiv.querySelectorAll(".store-section").forEach((section) => {
-          const header = section.querySelector(".store-header");
-          if (!header || header.dataset.bound === "true") return;
+      function expandAllStoreSections() {
+        document.querySelectorAll(".store-section").forEach((section) => {
+          toggleStoreSection(section, true);
+        });
+      }
 
-          header.dataset.bound = "true";
-          header.addEventListener("click", () => toggleStoreSection(section));
-          header.addEventListener("keydown", (event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              toggleStoreSection(section);
-            }
-          });
+      function collapseAllStoreSections() {
+        document.querySelectorAll(".store-section").forEach((section) => {
+          toggleStoreSection(section, false);
+        });
+      }
+
+      function bindStoreSectionEvents(resultsDiv) {
+        if (resultsDiv.dataset.eventsBound === "true") return;
+        resultsDiv.dataset.eventsBound = "true";
+
+        resultsDiv.addEventListener("click", (event) => {
+          const header = event.target.closest(".store-header");
+          if (!header) return;
+          const section = header.closest(".store-section");
+          if (section) toggleStoreSection(section);
+        });
+
+        resultsDiv.addEventListener("keydown", (event) => {
+          const header = event.target.closest(".store-header");
+          if (!header) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            const section = header.closest(".store-section");
+            if (section) toggleStoreSection(section);
+          }
         });
       }
 
       function displayResults(loja, data) {
         ToastNotification.success(`resultados carregados de ${loja}`);
         const resultsDiv = document.getElementById("results");
+        const toolbar = document.getElementById("resultsToolbar");
+        if (toolbar) toolbar.style.display = "flex";
+
         let html = `<div class="store-section collapsed" data-store="${loja}">
           <div class="store-header" role="button" tabindex="0" aria-expanded="false">
             <span class="store-summary">
