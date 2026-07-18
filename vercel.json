@@ -35,6 +35,10 @@
       "dest": "public/login.html"
     },
     {
+      "src": "/favicon.ico",
+      "dest": "public/visual/favicon.ico"
+    },
+    {
       "src": "/(.*)",
       "dest": "public/$1"
     }
