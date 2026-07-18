@@ -2885,19 +2885,20 @@
 
       function confirmarPopup() {
         if (ratingValue === 0) {
-          alert("Por favor, selecione uma avaliação com estrelas!");
+          ToastNotification.warning(
+            "Por favor, selecione uma avaliação com estrelas!",
+          );
           return;
         }
 
         const comentario = document.querySelector("textarea");
         if (!ratingValue) {
-          alert("A avaliação não pode ser vazia");
+          ToastNotification.warning("A avaliação não pode ser vazia");
           return;
         }
 
-        fetch(`${urlapi}/papapi/enviarfeedback`, {
+        fetchWithAuth(`${urlapi}/papapi/enviarfeedback`, {
           method: "POST",
-          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             comentarioRAW: comentario ? comentario.value : "",
@@ -2907,19 +2908,27 @@
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
-              alert("Obrigado pelo feedback!");
+              ToastNotification.success("Obrigado pelo feedback!");
               fecharpopup();
+            } else {
+              ToastNotification.error(
+                data.message || "Erro ao enviar feedback",
+              );
             }
           })
-          .catch(() => alert("Erro ao enviar feedback. Tente novamente."));
+          .catch(() =>
+            ToastNotification.error(
+              "Erro ao enviar feedback. Tente novamente.",
+            ),
+          );
       }
-      async function verificarToken(refreshAttempted = false) {
+      async function verificarToken() {
         console.log(`🔐 Verificando token...`);
 
         try {
           const response = await fetch(`${urlapi}/papapi/verificar-token`, {
             method: "GET",
-            credentials: "include", // Isso envia os cookies automaticamente
+            credentials: "include",
           });
 
           const data = await response.json();
@@ -2931,40 +2940,112 @@
 
           console.warn(`❌ Token inválido: ${data.message}`);
 
-          if (refreshAttempted) {
-            console.log(`🚫 Refresh já tentado. Redirecionando...`);
-            redirecionarParaLogin();
-            return false;
-          }
-
-          console.log(`🔄 Tentando renovar token...`);
-
-          // O refresh token está no cookie, o backend vai pegar de lá
-          const refreshResponse = await fetch(
-            `${urlapi}/papapi/refresh-token`,
-            {
-              method: "POST",
-              credentials: "include", // Importante: envia os cookies
-              headers: { "Content-Type": "application/json" },
-            },
-          );
-
-          const refreshData = await refreshResponse.json();
-
-          if (refreshResponse.ok && refreshData.success) {
-            console.log(`✅ Token renovado com sucesso!`);
-            ToastNotification.success("Sessão renovada com sucesso");
-            return verificarToken(true);
-          }
-
-          console.warn(`❌ Refresh falhou: ${refreshData.message}`);
-          redirecionarParaLogin();
-          return false;
+          const renewed = await tryRefreshToken();
+          return renewed;
         } catch (error) {
-          console.error(`❌ Erro: ${error.message}`);
-          redirecionarParaLogin();
+          console.error(`❌ Erro ao verificar token: ${error.message}`);
           return false;
         }
+      }
+
+      async function fetchWithAuth(url, options = {}) {
+        const maxRetries = 2;
+        let attempt = 0;
+
+        while (attempt < maxRetries) {
+          try {
+            const response = await fetch(url, {
+              ...options,
+              credentials: "include",
+              headers: {
+                ...options.headers,
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (response.status === 401 || response.status === 403) {
+              console.warn(
+                `🔑 Token expirado na requisição (${attempt + 1}/${maxRetries})`,
+              );
+
+              if (attempt >= maxRetries - 1) {
+                throw new Error("Token expirado e não foi possível renovar");
+              }
+
+              const renewed = await tryRefreshToken();
+              if (renewed) {
+                attempt++;
+                continue;
+              } else {
+                throw new Error("Falha ao renovar token");
+              }
+            }
+
+            return response;
+          } catch (error) {
+            if (attempt >= maxRetries - 1) {
+              throw error;
+            }
+            attempt++;
+            console.warn(
+              `⚠️ Erro na requisição, tentando novamente (${attempt + 1}/${maxRetries}):`,
+              error.message,
+            );
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+        }
+
+        throw new Error("Máximo de tentativas excedido");
+      }
+
+      let isRefreshing = false;
+      let refreshPromise = null;
+
+      async function tryRefreshToken() {
+        if (isRefreshing) {
+          return refreshPromise;
+        }
+
+        isRefreshing = true;
+        refreshPromise = new Promise(async (resolve) => {
+          try {
+            console.log("🔄 Tentando renovar token...");
+            ToastNotification.info("Renovando sessão...");
+
+            const response = await fetch(`${urlapi}/papapi/refresh-token`, {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+              console.log("✅ Token renovado com sucesso!");
+              ToastNotification.success("Sessão renovada com sucesso");
+              await preencherpaguser();
+              resolve(true);
+            } else {
+              console.warn("❌ Falha ao renovar token:", data.message);
+              ToastNotification.warning(
+                "Sessão expirada. Faça login novamente.",
+              );
+              setTimeout(() => {
+                redirecionarParaLogin();
+              }, 3000);
+              resolve(false);
+            }
+          } catch (error) {
+            console.error("❌ Erro ao renovar token:", error);
+            ToastNotification.error("Erro ao renovar sessão");
+            resolve(false);
+          } finally {
+            isRefreshing = false;
+            refreshPromise = null;
+          }
+        });
+
+        return refreshPromise;
       }
 
       function redirecionarParaLogin() {
@@ -2986,16 +3067,14 @@
 
       async function perfiluser() {
         try {
-          const response = await fetch(`${urlapi}/papapi/perfil`, {
+          const response = await fetchWithAuth(`${urlapi}/papapi/perfil`, {
             method: "GET",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
           });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           return await response.json();
         } catch (error) {
-          console.error("Erro:", error);
-          ToastNotification.error("erro interno");
+          console.error("Erro ao buscar perfil:", error);
+          ToastNotification.error("Erro ao carregar perfil");
           return { success: false, message: error.message };
         }
       }
@@ -3145,7 +3224,9 @@
           '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
 
         const search = document.getElementById("produto");
-        fetch(`${urlapi}/papapi/run-scraper-${LOJA}?produto=${search.value}`)
+        fetchWithAuth(
+          `${urlapi}/papapi/run-scraper-${LOJA}?produto=${search.value}`,
+        )
           .then((response) => response.json())
           .then((data) => {
             document.getElementById("results").innerHTML = "";
@@ -3173,7 +3254,7 @@
         try {
           document.getElementById("results").innerHTML = "";
           for (const loja of lojas) {
-            const response = await fetch(
+            const response = await fetchWithAuth(
               `${urlapi}/papapi/run-scraper-${loja}?produto=${search.value}`,
             );
             const data = await response.json();
@@ -3189,7 +3270,6 @@
         }
       }
 
-      // ===== FILTROS =====
       async function apicarfiltro(filtro) {
         const filterButtons = document.querySelectorAll(".filter-chip");
         filterButtons.forEach((btn) => btn.classList.remove("active"));
@@ -3351,14 +3431,15 @@
         );
       });
 
-      // ===== HISTÓRICO =====
       async function pegarhistorico() {
         try {
           LoadingOverlay.show("Retornando historico de produtos...");
-          const response = await fetch(`${urlapi}/papapi/pegarhistorico`, {
-            method: "POST",
-            credentials: "include",
-          });
+          const response = await fetchWithAuth(
+            `${urlapi}/papapi/pegarhistorico`,
+            {
+              method: "POST",
+            },
+          );
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
           console.log("historico:", data);
@@ -3368,6 +3449,7 @@
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           mostrarErroHistorico();
+          LoadingOverlay.hide();
         }
       }
 
@@ -3656,14 +3738,10 @@
         try {
           LoadingOverlay.show("Removendo item do histórico...");
 
-          const response = await fetch(
+          const response = await fetchWithAuth(
             `${urlapi}/papapi/removeritemhistorico`,
             {
               method: "DELETE",
-              credentials: "include",
-              headers: {
-                "Content-Type": "application/json",
-              },
               body: JSON.stringify({ indice }),
             },
           );
@@ -3672,7 +3750,6 @@
 
           if (data.success) {
             ToastNotification.success("Item removido com sucesso!");
-
             await pegarhistorico();
           } else {
             ToastNotification.error(data.message || "Erro ao remover item");
@@ -3684,7 +3761,6 @@
           LoadingOverlay.hide();
         }
       }
-
       async function limparHistorico() {
         if (
           !confirm(
@@ -3696,13 +3772,12 @@
         try {
           LoadingOverlay.show("Limpando histórico...");
 
-          const response = await fetch(`${urlapi}/papapi/limparhistorico`, {
-            method: "DELETE", // ou "POST" dependendo da rota
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
+          const response = await fetchWithAuth(
+            `${urlapi}/papapi/limparhistorico`,
+            {
+              method: "DELETE",
             },
-          });
+          );
 
           const contentType = response.headers.get("content-type");
           if (!contentType || !contentType.includes("application/json")) {
