@@ -7,7 +7,7 @@ const { client } = require("./conndb.js");
 const saltRounds = 12;
 const hashSecret = process.env.HASH_SECRET;
 const jwtSecret = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = "5m";
+const JWT_EXPIRES_IN = "15m";
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_REFRESH_EXPIRES_IN = "7d";
 
